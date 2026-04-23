@@ -1,0 +1,20 @@
+---
+title: "Subscribe"
+date: "2009-05-10T09:50:26"
+original_url: "http://www.alexonlinux.com/subscribe"
+categories: []
+tags: []
+---
+
+# Subscribe
+
+You can receive periodic updates via one of the following subscription channels.
+
+[Subscribe via RSS](http://feeds2.feedburner.com/AlexOnLinux)(to receive periodic updates with your favorite RSS reader)
+
+or
+
+[Subscribe via mailing list](http://feedburner.google.com/fb/a/mailverify?uri=AlexOnLinux&loc=en_US)(to receive periodic updates right into your mailbox)*
+Your email address will remain private and you can always unsubscribe.*
+
+##### **

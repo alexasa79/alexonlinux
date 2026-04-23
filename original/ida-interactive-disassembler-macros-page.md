@@ -1,0 +1,196 @@
+---
+title: "IDA – Interactive Disassembler Macros Page"
+type: "post"
+created_at: "2008-08-21T13:40:59"
+original_url: "http://www.alexonlinux.com/ida-interactive-disassembler-macros-page"
+categories: ["Resources"]
+tags: ["coff", "disassembler", "ida", "macro", "script"]
+---
+
+This page presents IDA macros I’ve written.
+
+[Introduction to the series](#introduction_to_the_series)
+[Introduction to the article](#introduction_to_the_article)
+[Way of working with Bazaar](#way_of_working_with_bazaar)
+[Demo setup description](#demo_setup_description)
+[Directory and user configuration](#directory_and_user_configuration)
+[The basics](#the_basics)
+[Creating a project](#creating_a_project)
+[Checking-out the project](#checking-out_the_project)
+[Adding files to the project](#adding_files_to_the_project)
+[Committing files](#committing_files)
+[Few words about revision numbers in Bazaar](#few_words_about_revision_numbers_in_bazaar)
+[Local commits or offline commits](#local_commits_or_offline_commits)
+[Committing local commits to remote branch](#committing_local_commits_to_remote_branch)
+[Multi-user environment](#multi-user_environment)
+[Making modifications to files and viewing differences](#making_modifications_to_files_and_viewing_differences)
+[Committing non-up-to-date file](#committing_non-up-to-date_file)
+[Merging with the latest version of the file](#merging_with_the_latest_version_of_the_file)
+[Introduction](#introduction)
+[What reference counting needed for?](#what_reference_counting_needed_for?)
+[This is how we will use atomic variables to count references to objects](#this_is_how_we_will_use_atomic_variables_to_count_references_to_objects)
+[The naive approach](#the_naive_approach)
+[The RCU approach](#the_rcu_approach)
+[Where atomic variables coming from?](#where_atomic_variables_coming_from?)
+[Conclusion](#conclusion)
+[Introduction](#introduction)
+[What do we do with command line options](#what_do_we_do_with_command_line_options)
+**[optparsebasics](#optparse_basics)
+[Adding options](#adding_options)
+[Specifying help string for an option](#specifying_help_string_for_an_option)
+**[Tellingoptparseto parse arguments](#telling_optparse_to_parse_arguments)
+[Putting it together](#putting_it_together)
+**[optparsecookbook](#optparse_cookbook)
+[Support for a standalone command line options](#support_for_a_standalone_command_line_options)
+[Support for mandatory (required) options.](#support_for_mandatory_(required)_options.)
+[Support for options with one or more arguments](#support_for_options_with_one_or_more_arguments)
+[Option destination types](#option_destination_types)
+[Dependencies between options](#dependencies_between_options)
+[Help screen customizations](#help_screen_customizations)
+[Grouping options](#grouping_options)
+[Changing programs usage string](#changing_programs_usage_string)
+[Telling option’s default value](#telling_option’s_default_value)
+[Better argument description](#better_argument_description)
+[Adding program description](#adding_program_description)
+[Adding epilog](#adding_epilog)
+[Program version string](#program_version_string)
+[Conclusion](#conclusion)
+[Introduction](#introduction)
+[What are signals?](#what_are_signals?)
+[Signal as interrupt](#signal_as_interrupt)
+[Signal masks](#signal_masks)
+[What signals are good for](#what_signals_are_good_for)
+[Signals that report exceptions](#signals_that_report_exceptions)
+[Other uses of signals](#other_uses_of_signals)
+[Types of signals](#types_of_signals)
+[Handling exception signals](#handling_exception_signals)
+[SIGKILL and SIGSTOP](#sigkill_and_sigstop)
+[SIGKILL](#sigkill)
+[SIGSTOP](#sigstop)
+[Registering signal handler](#registering_signal_handler)
+**[signal()](#signal())
+[Ignoring signals and restoring original signal handler function](#ignoring_signals_and_restoring_original_signal_handler_function)
+**[sigaction()](#sigaction())
+**[sigaction()in action](#sigaction()_in_action)
+[Conclusion](#conclusion)
+[Quick links](#quick_links)
+[Introduction](#introduction)
+[Creating the backup](#creating_the_backup)
+[What to backup](#what_to_backup)
+[Figuring out device file](#figuring_out_device_file)
+[Preparations](#preparations)
+[Actual backup](#actual_backup)
+[Restoring from backup](#restoring_from_backup)
+[Preparations](#preparations)
+[Restoring](#restoring)
+[Restoring entire hard disk](#restoring_entire_hard_disk)
+[Restoring single partition](#restoring_single_partition)
+[Introduction](#introduction)
+**[Howscpworks](#how_scp_works)
+**[You can run commands on a remote computer usingssh](#you_can_run_commands_on_a_remote_computer_using_ssh)
+**[Back toscp](#back_to_scp)
+[Creating our own SSH based application](#creating_our_own_ssh_based_application)
+[The idea](#the_idea)
+[The code](#the_code)
+[Discussion](#discussion)
+[Demonstration](#demonstration)
+[Conclusion](#conclusion)
+[Introduction](#introduction)
+[Part 1. Basics](#part_1._basics)
+[Intro](#intro)
+[Connecting to remote host – simple case](#connecting_to_remote_host_–_simple_case)
+[RSA/DSA host fingerprint](#rsa/dsa_host_fingerprint)
+[What happens when host fingerprint changes](#what_happens_when_host_fingerprint_changes)
+[How to handle expected host fingerprint change](#how_to_handle_expected_host_fingerprint_change)
+[Executing command on a remote computer](#executing_command_on_a_remote_computer)
+[Securely copying files to and from a remote computer](#securely_copying_files_to_and_from_a_remote_computer)
+[Copying multiple files](#copying_multiple_files)
+[Part 2. Encryption](#part_2._encryption)
+[Login without entering password?](#login_without_entering_password?)
+[How modern cryptography works](#how_modern_cryptography_works)
+[What are keys](#what_are_keys)
+[Public/private key](#public/private_key)
+[How actual encryption works](#how_actual_encryption_works)
+[SSH identities](#ssh_identities)
+[How to generate identity files](#how_to_generate_identity_files)
+[How to install identity file](#how_to_install_identity_file)
+[Installing identity files manually](#installing_identity_files_manually)
+[Part 3. Advanced SSH](#part_3._advanced_ssh)
+[X forwarding](#x_forwarding)
+[Introduction](#introduction)
+[Remote X Windows server configuration](#remote_x_windows_server_configuration)
+[How SSH fixes the situation](#how_ssh_fixes_the_situation)
+[What if -Y doesn’t work](#what_if_-y_doesn’t_work)
+[Configuration](#configuration)
+[Allowing login as root](#allowing_login_as_root)
+[X forwarding](#x_forwarding)
+[Other options](#other_options)
+[Conclusion](#conclusion)
+[Introduction](#introduction)
+[How atomic variables work](#how_atomic_variables_work)
+[Atomic variables size limitations](#atomic_variables_size_limitations)
+[Use cases](#use_cases)
+[The real thing…](#the_real_thing…)
+[Time to see some action](#time_to_see_some_action)
+[Precautions](#precautions)
+[Conslusion](#conslusion)
+[Introduction](#introduction)
+[Encapsulation](#encapsulation)
+[How methods work](#how_methods_work)
+[How overloading works](#how_overloading_works)
+[How mangling solves the problem](#how_mangling_solves_the_problem)
+[Structure and size of the object](#structure_and_size_of_the_object)
+[How inheritance and polymorphism work](#how_inheritance_and_polymorphism_work)
+[How basic polymorphism works](#how_basic_polymorphism_works)
+[How multiple inheritance works](#how_multiple_inheritance_works)
+[Difference between different casting types](#difference_between_different_casting_types)
+[Polymorphism and multiple inheritance](#polymorphism_and_multiple_inheritance)
+[What if we try something even more complicated](#what_if_we_try_something_even_more_complicated)
+[Few words about C++ constructors](#few_words_about_c++_constructors)
+[Conclusion](#conclusion)
+[Introduction](#introduction)
+[What 64-bit support mean?](#what_64-bit_support_mean?)
+[What the difference between the 32-bit and 64-bit anyway?](#what_the_difference_between_the_32-bit_and_64-bit_anyway?)
+[General purpose registers](#general_purpose_registers)
+[What additional registers good for?](#what_additional_registers_good_for?)
+[So how good 64-bit really is?](#so_how_good_64-bit_really_is?)
+[What about OS and software?](#what_about_os_and_software?)
+[Does that mean that paying extra money for 64-bit Windows XP/Vista worth it?](#does_that_mean_that_paying_extra_money_for_64-bit_windows_xp/vista_worth_it?)
+[How about Linux?](#how_about_linux?)
+[Load PE/COFF symbols](#load_pe/coff_symbols)
+[Introduction](#introduction)
+[Download](#download)
+[Installation and use](#installation_and_use)
+[Same script but in a standalone version](#same_script_but_in_a_standalone_version)
+
+# Load PE/COFF symbols [BACK TO TOC](#table_of_contents)
+
+## Introduction [BACK TO TOC](#table_of_contents)
+
+It appears that when IDA parses symbols of Windows applications compiled with gcc (cygwin), it does not load symbol names properly. I.e. instead of real function names, you see things like*sub_401064*.
+
+The problem is that*gcc*uses stores symbol information in slightly different manner, which IDA does not understand. The macro below fixes this.
+
+## Download [BACK TO TOC](#table_of_contents)
+
+Grab it [here](http://www.alexonlinux.com/wp-content/uploads/2008/08/userload.idc).
+
+## Installation and use [BACK TO TOC](#table_of_contents)
+
+To install it, do the following:
+
+1. Close all instances of IDA.
+2. Put it in idc directory, in IDA’s installation directory.
+3. Start IDA
+
+After installing the script, the script will automatically process every binary file you open and fix the symbols if it sees*gcc*‘s symbol table format.
+
+You can see it works if you see following line in the log window.
+
+```text
+-------- PE/COFF Symbol Name Parser ------------------
+```
+
+## Same script but in a standalone version [BACK TO TOC](#table_of_contents)
+
+This is a standalone version of the same script. Grab it [here](http://www.alexonlinux.com/wp-content/uploads/2008/08/load_pe_syms.idc). To run it, save it somewhere on your computer and run it via File->IDC File menu.
