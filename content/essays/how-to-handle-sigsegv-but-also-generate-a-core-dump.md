@@ -6,13 +6,20 @@ categories: ["Blog", "Howto", "Short articles"]
 tags: []
 ---
 
-Recently I ran into this problem. How do you capture SIGSEGV with a signal handler and still generate a core file?
+Recently I ran into this problem. How do you capture SIGSEGV with a signal
+handler and still generate a core file?
 
-The problem is that once you have your own signal handler for SIGSEGV, Linux will not call default signal handler which generates the core file. So, once you got SIGSEGV, consider all that useful information about about origin of the exception, lost.
+The problem is that once you have your own signal handler for SIGSEGV, Linux
+will not call default signal handler which generates the core file. So, once you
+got SIGSEGV, consider all that useful information about about origin of the
+exception, lost.
 
 Luckily, there’s a solution. Here’s what I did.
 
-You start with registering a signal handler. Once you get the signal, inside of the signal handler, set signal handler for the signal to SIG_DFL. Then send yourself same signal, using*kill()*system call. Here’s a short code snippet that demonstrates this little trick in action.
+You start with registering a signal handler. Once you get the signal, inside of
+the signal handler, set signal handler for the signal to SIG_DFL. Then send
+yourself same signal, using*kill()*system call. Here’s a short code snippet that
+demonstrates this little trick in action.
 
 ```text
 #include <stdio.h>
@@ -58,7 +65,9 @@ int main()
 }
 ```
 
-Note that this code doesn’t actually cause a segmentation fault. To simulate segmentation fault, I did*kill -11 <pid>*from the command line. This is what happened.
+Note that this code doesn’t actually cause a segmentation fault. To simulate
+segmentation fault, I did*kill -11 <pid>*from the command line. This is what
+happened.
 
 ```text
 $ ls
@@ -82,4 +91,5 @@ a.out*  core  sigs.c
 
 Obviously, without lines 9 and 10 in the code, there would not be core file.
 
-By the way, you can use this technique to handle any core generating exception – SIGILL, SIGFPE, etc.
+By the way, you can use this technique to handle any core generating exception –
+SIGILL, SIGFPE, etc.
