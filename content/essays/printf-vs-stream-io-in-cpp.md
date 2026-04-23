@@ -11,25 +11,27 @@ language. At Dell I still work on mostly low level stuff, but this time it is
 user-mode, so I am not tied up to C anymore. We’re writing in C++ and I am
 learning C++. One of the less appealing things for me in C++ was streaming
 support and the way its input/output implemented. In particular I got used to
-printf() functions family and leaving those in favor of streams and cout was
-tough. What really strikes me is the fact that no C++ book explains this stuff.
-All C++ books just tell you – so, my dear, this is how this stuff is done in
-C++. It took me some time to realize how C++ style input/output is much more
-convenient and powerful than printf() family of functions. Here’s why.
+`printf()` functions family and leaving those in favor of streams and `cout` was
+tough. What really strikes me is the fact that no C++ book explains this
+stuff. All C++ books just tell you – so, my dear, this is how this stuff is
+done in C++. It took me some time to realize how C++ style input/output is
+much more convenient and powerful than `printf()` family of functions. Here’s
+why.
 
 ### The C++ way
 
-So, In C++ you normally work with stream of some sort. Stream is an abstraction
-that may hide anything in the world. It can be string stream that writes things
-to string or debug output stream that sends debug printouts to some remote debug
-log server. Once you have a stream, you redefine `operator<<` for various
-classes to write into stream instead of doing bit-shift. For input streams you
+So, In C++ you normally work with stream of some sort. Stream is an
+abstraction that may hide anything in the world. It can be string stream that
+writes things to string or debug output stream that sends debug printouts to
+some remote debug log server. Once you have a stream, you redefine
+`operator<<` for various classes to write into stream instead of doing
+bit-shift. For input streams you
 define `operator>>` that reads data from string or from socket and initializes
 object of some class with values it read. All those `operator<<` and
 `operator>>` seem kind of weird. And in fact, this can be any of the operators.
 For some reason, standard library uses bit-shift operators and this turned into
-a standard. Boost, popular C++ extensions library uses `operator%` to implement
-similar functionality, although in slightly different way.
+a standard. Boost, popular C++ extensions library uses `operator%` to
+implement similar functionality, although in slightly different way.
 
 ### Convenience
 
@@ -40,31 +42,31 @@ really.
 
 ### It makes much more sense in object oriented language
 
-Since we’re talking object oriented here, C++ way to output stuff actually makes
-much more sense. The way object represented as a string is a property is the
-object itself.
+Since we’re talking object oriented here, C++ way to output stuff actually
+makes much more sense. The way object represented as a string is a property is
+the object itself.
 
 ### Performance
 
-Here is the interesting part. In printf(), the standard C library has to parse
-format string every time you print something. So, at runtime, every time you
-print something, standard C library parses your format string to figure out what
-and how many parameters you passed to printf(). This is important for high
-performance systems. Intensively printing, just anything, whether this is a
-debug log or part of some communication protocol rises CPU consumption of your
-program to the roof.
+Here is the interesting part. In `printf()`, the standard C library has to
+parse format string every time you print something. So, at runtime, every time
+you print something, standard C library parses your format string to figure
+out what and how many parameters you passed to `printf()`. This is important
+for high performance systems. Intensively printing, just anything, whether this
+is a debug log or part of some communication protocol rises CPU consumption of
+your program to the roof.
 
 > I worked for one company where they came up with a really neat trick to
 > overcome the problem of high CPU consumption. They had to implement debug
-> logging in C for their high performance product. So, instead of formatting the
-> string every time there is a printout, they saved format string and then every
-> printout they just saved the arguments in their binary form. To read the debug
-> log, they had to read format strings that were periodically saved in the debug
-> log file. Then they read binary arguments for the debug printout and finally
-> formatted the message. So instead of formatting the printouts at runtime, they
-> formatted the printouts when debug log is read.
+> logging in C for their high performance product. So, instead of formatting
+> the string every time there is a printout, they saved format string and then
+> every printout they just saved the arguments in their binary form. To read the
+> debug log, they had to read format strings that were periodically saved in the
+> debug log file. Then they read binary arguments for the debug printout and
+> finally formatted the message. So instead of formatting the printouts at
+> runtime, they formatted the printouts when debug log is read.
 
-Another problem occurs when you by mistake pass wrong data type to printf()
+Another problem occurs when you by mistake pass wrong data type to `printf()`
 function and compiler misses it. Another problem is when you pass a string that
 is not properly null terminated. Etc. Etc. C++ way solves all these problems.
 First, data type resolving happens during compilation. It is up to compiler to
