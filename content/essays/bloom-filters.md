@@ -4,6 +4,7 @@ date: "2013-09-04T05:08:24"
 original_url: "http://www.alexonlinux.com/bloom-filters"
 categories: ["Blog"]
 tags: []
+math: true
 ---
 
 Bloom filter is a data structure that contains set of elements. Unlike regular
@@ -65,21 +66,19 @@ come from.
 ## Controlling probabilities
 
 First of all, lets see what happens when you have large number of entries per
-bloom filter bucket. Lets say your bloom filter represents ![n]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-b170995d512c659d8668b4e42e1fef6b_l3-020f43ff1c.png" >}})
-entries in the large data structure. Lets also assume that bloom filter has
-![m]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-6b41df788161942c6f98604d37de8098_l3-638ba1c102.png" >}})
-bits.
+bloom filter bucket. Lets say your bloom filter represents $n$ entries in the
+large data structure. Lets also assume that bloom filter has $m$ bits.
 
 > There is an interesting problem in probability theory called birthdays
 > problem. The problem asks following question: how many people should work in
 > one company so that probability that two of them have birthday on the same day
 > is above 50%. Interestingly enough, the answer is approximately square root of
 > all possibilities. There are 365 options for birthdays, so the answer is 19.
-
+>
 > This problem often called paradox because the right answer is not intuitive.
 > One would expect the answer to be much bigger.
 
-Birthdays paradox applies here as well. It is enough to insert ![\sqrt{n}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-7195eb4914a5720a92f0a9174906eda8_l3-cb0fd28dc1.png" >}})
+Birthdays paradox applies here as well. It is enough to insert $\sqrt{n}$
 entries into bloom filter for probability of single bit representing two or more
 elements to be more than 50%. This is a serious problem when working with bloom
 filter.
@@ -92,10 +91,11 @@ filter where we get false positives. Lets see when we get false positive for
 element that is not in the filter.
 
 With just 1 element inside of 10 bit long bloom filter, probability of getting
-false positive result is ![\frac{1}{10}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-a9948ce98461082e7c8558675198f9ff_l3-cf2ea6b24f.png" >}}). This is so because we assume equal distribution of the hash function that
-convert element into right bit in the bloom filter. So, one element inside,
-means one bit is set and querying for different element can accidentally hit
-this bit with probability of ![\frac{1}{10}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-a9948ce98461082e7c8558675198f9ff_l3-cf2ea6b24f.png" >}}).
+false positive result is $\frac{1}{10}$. This is so because we assume equal
+distribution of the hash function that convert element into right bit in the
+bloom filter. So, one element inside, means one bit is set and querying for
+different element can accidentally hit this bit with probability of
+$\frac{1}{10}$.
 
 Now lets see how we make this probability smaller. Lets say that when inserting
 element into bloom filter, instead of setting one bit, we will set two bits. So
@@ -104,10 +104,10 @@ that for every entry, it will be two different bits. If we find that both bits
 set, we will conclude that element is in the filter.
 
 In this case, probability of false positive will be
-![\frac{2}{10}\cdot\frac{1}{9}=\frac{1}{45}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-cebf89c5fd5c12650a0877bd2535e19b_l3-b20cb2dcd2.png" >}}).
-This is because probability of hitting first set bit is ![\frac{2}{10}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-c446101d74be10d65ddf30b0208b7775_l3-cef46dc4f5.png" >}})
-and probability if hitting second set bit is ![\frac{1}{9}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-6cad8eec3d159e52efa483f5f56c5d60_l3-f0420627be.png" >}}).
-So, we clearly see that probability of hitting drops when we use several bits.
+$\frac{2}{10}\cdot\frac{1}{9}=\frac{1}{45}$. This is because probability of
+hitting first set bit is $\frac{2}{10}$ and probability if hitting second set
+bit is $\frac{1}{9}$. So, we clearly see that probability of hitting drops
+when we use several bits.
 
 ![Data structure vs bloom filter2]({{< relurl "assets/2013-09-04T050824 Bloom filters/Data-structure-vs-bloom-filter2-62dea9dd9c.png" >}})
 
@@ -119,20 +119,18 @@ decreases number of elements we can safely insert into bloom filter. Lets see
 how.
 
 With just one bit per element, probability of hitting false positive answer for
-querying is ![\frac{1}{10}=10\%]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-94fbb561290a6ea5606aea5c92036f53_l3-ae97e544b2.png" >}}).
+querying is $\frac{1}{10}=10\\%$.
 With two bits inside, probability of hitting false positive when querying for
-third element is ![\frac{2}{10}=\frac{1}{5}=20\%]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-b0540a34ecc02c0bf41b172c4ce16738_l3-e3e500673d.png" >}}).
-This is obviously lower than ![\frac{1}{10}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-a9948ce98461082e7c8558675198f9ff_l3-cf2ea6b24f.png" >}}).
+third element is $\frac{2}{10}=\frac{1}{5}=20\\%$.
+This is obviously lower than $\frac{1}{10}$.
 
 With two bits per element, probability of hitting false positive is
-![\frac{2}{10}\cdot\frac{1}{9}=\frac{1}{45}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-cebf89c5fd5c12650a0877bd2535e19b_l3-b20cb2dcd2.png" >}}).
-Adding second element and querying for third, makes probability of false
-positive
-![\frac{4}{10}\cdot\frac{3}{9}+\frac{3}{10}\cdot\frac{2}{9}+\frac{2}{10}\cdot\frac{1}{9}=\frac{2}{9}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-eb2497c12a6d84d290e6b0b787fc2b45_l3-ad619046a6.png" >}}).
+$\frac{2}{10}\cdot\frac{1}{9}=\frac{1}{45}$. Adding second element and
+querying for third, makes probability of false positive
+$\frac{4}{10}\cdot\frac{3}{9}+\frac{3}{10}\cdot\frac{2}{9}+\frac{2}{10}\cdot\frac{1}{9}=\frac{2}{9}$.
 So, its clear that probability of false positive when querying for third element
-decreased from ![\frac{1}{5}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-e174a73678f6bd6f70d7aaec8f911349_l3-cb6d8d3fd5.png" >}})
-to ![\frac{2}{9}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-bf1373135328a6c32cdb1a5958179f11_l3-efef9a5fc9.png" >}})
-simply because we’re using one more bit per element.
+decreased from $\frac{1}{5}$ to $\frac{2}{9}$ simply because we’re using
+one more bit per element.
 
 In fact, as we will see in later, bloom filter is a function of four parameters:
 overall number of bits in the bloom, number of bits per element, probability of
@@ -143,24 +141,26 @@ false positive and how many elements are in the bloom.
 Like I said, bloom filter is a function of four different variables. Lets name
 them:
 
-- ![m]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-6b41df788161942c6f98604d37de8098_l3-638ba1c102.png" >}})– number of bits in bloom filter
-- ![k]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-3422b6bb5c160593658b7c39425d9880_l3-fc647c8667.png" >}})– number of bits that will represent single entry
-- ![n]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-b170995d512c659d8668b4e42e1fef6b_l3-020f43ff1c.png" >}})– number of entries in the bloom filter when calculating probability of
+- $m$ – number of bits in bloom filter
+- $k$ – number of bits that will represent single entry
+- $n$ – number of entries in the bloom filter when calculating probability of
   false positive
-- ![p]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-3bf85f1087e9fbed3a319341134ac1a2_l3-2c303a382b.png" >}})– probability of false positive answer
+- $p$ – probability of false positive answer
 
 As we just saw, calculating probabilities for large bloom filter can be quiet
 complicated task. Luckily there are some approximations that can help us to get
 a clue of what’s going on.
 
 Normally, when calculating various properties of the bloom filter, we can start
-with making an assumption on maximum number of elements in the filter (![n]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-b170995d512c659d8668b4e42e1fef6b_l3-020f43ff1c.png" >}})). Also, you can decide what is the probability of false positive you can
-tolerate. With this in hand, lets see how we choose ![m]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-6b41df788161942c6f98604d37de8098_l3-638ba1c102.png" >}}).
-I’ll spare you the task of calculating probabilities and how they affect our
-![m]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-6b41df788161942c6f98604d37de8098_l3-638ba1c102.png" >}})
-and give you the final formula:
+with making an assumption on maximum number of elements in the filter $n$.
+Also, you can decide what is the probability of false positive you can tolerate.
+With this in hand, lets see how we choose $m$. I’ll spare you the task of
+calculating probabilities and how they affect our $m$ and give you the final
+formula:
 
-![m=-\frac{n\ln{p}}{\ln{2}^2}=n\cdot-\frac{\ln{p}}{\ln{2}^2}]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-96cfc0b06fa3e49f49df34e9f65b2ccf_l3-0d662a1448.png" >}})
+$$
+m=-\frac{n\ln{p}}{\ln{2}^2}=n\cdot-\frac{\ln{p}}{\ln{2}^2}
+$$
 
 Chart below shows number of bits in bloom filter per element as a function of
 probability of getting false positive.
@@ -174,12 +174,13 @@ and with probability of 5% you can settle with just 6 bits per element. And with
 Now lets see how many bits in the set will represent single entry in the filter.
 Here comes another useful approximation.
 
-![k=\frac{m}{n}\ln{2}=\frac{m}{n}\cdot0.693]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-7c5b2e1d28ae66773aa621d4be21b3a0_l3-8db637dfd3.png" >}})
+$$
+k=\frac{m}{n}\ln{2}=\frac{m}{n}\cdot0.693
+$$
 
-So, with ![\frac{m}{n}=10]({{< relurl "assets/2013-09-04T050824 Bloom filters/quicklatex.com-10f537e9f6c7144d5db3dc4849805609_l3-6dd1adc223.png" >}})
-you will set 7 bits per element in the bloom. This will give us 1% chance of
-false positive. From here, the math is fairly simple, so you can handle it
-yourself.
+So, with $\frac{m}{n}=10$ you will set 7 bits per element in the bloom. This
+will give us 1% chance of false positive. From here, the math is fairly simple,
+so you can handle it yourself.
 
 ## Deleting entries from bloom filter
 
