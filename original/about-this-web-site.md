@@ -1,0 +1,34 @@
+---
+title: "About this web-site"
+type: "post"
+created_at: "2008-02-19T19:04:14"
+original_url: "http://www.alexonlinux.com/about-this-web-site"
+categories: ["Other Stuff"]
+tags: ["about", "Blog", "editor", "gallery", "software", "system", "themes", "tinymce", "web-site", "wordpress"]
+---
+
+![Internet Explorer Shield](http://www.alexonlinux.com/wp-content/uploads/2008/01/stockxpertcom_id7862712_size1.thumbnail.jpg) I’ve been running this web-site for something like five years. Well… Not this one in particular, but many different sites with different domain names, different CMS systems, etc.
+
+I guess it started because I actually wanted to do web-designs. I started learning Photoshop back in 1997-1998, and by year 2002 became quiet proficient with it. As proficient as an amateur can be of course. Also, HTML is simple language and I used it to create simple web-pages for many years. Actually, there’s a page that I created back in 1997, still hosted somewhere on the internet. Imagine how amazed I was when I found it couple of years ago. By the year 2002 I, again, was proficient enough to do more complex web-sites. I learned PHP and JavaScript and knew how to do some nice things with these tools. Eventually, after using some free hosting solutions, I concluded that paid hosting is a must and purchased a hosting plan. Obviously I had to register a domain name. Back then it was asandler.org. Later, when I managed to come up with something that can be opened to public, I tried to register asandler.com. It appears that it is already taken by Adam Sandler. Anyway, now its just someone trying to sell something – I doubt it has anything to do with Adam anymore.
+
+As I mentioned, after a year or so I managed to come up with a design and content that can actually be shown to someone. Later, I concluded that the content is useless and threw it to garbage. Same happened to design and PHP/Javascript code backing it up.
+
+Later, I figured out that the true reason why I am doing this web-site is because I wanted to create a web-site. Note the difference between having a web-site and building one. Once I created a design and created PHP code to back it up, I became bored and threw everything away. It happened several times in a row. Once I even wrote a complete CMS system. One with built-in WYSIWYG editor (TinyMCE) and database driven file-system. I think I have this code somewhere on my hard-drive.
+
+Two years ago, after being asandler.org, asandler.net, obosnuy.org, obosnuy.com, etc, I registered alexandersandler.net. I registered it on dyndns. This allowed me to do some advanced configurations with the domain, including redirecting some sub-domains to my home computer and the primary domain to my web-site. Few month later I decided to stop playing around and to do a site that would stay. I went shopping for CMS system that could answer my demands. Back then, all I wanted is to manage few documents online, do a little theme and that is it. I was quiet terrified with number of features some CMS systems has. I really wanted something simple, that would just do those simple tasks I wanted it to do. Eventually, I found [Etomite](http://www.etomite.com/). Etomite is a simple CMS system, that allows you to write your own plug-ins, easily create themes and manage your content. Everything is online, using administrator panel.
+
+It appeared that doing themes for Etomite is very simple task. Basically, this is like having several PHP files included from one PHP file, to create a complete web-page. I.e. one PHP file contains only the header, second contains side-bar, etc. I created several themes, some were quiet nice. Also, I started working on some content, again. This is when I started the g15dods page. Eventually, after playing around with Etomite for about a year I started seeing its problems and disadvantages.
+
+In my opinion, one major problem with Etomite is that its community is very small. You can write plug-ins for it of course. And as with themes, writing plug-ins for it is a very easy. Yet from some reason when I started to look for something useful, I couldn’t find it. I was looking for gallery plug-in – I found whole bunch of them, but no one has touched them since 2005, meaning nobody maintained and fixed them. Also, I wanted Ajax gallery. There is none. Same with comments. I wanted to allow comments on my web-site, yet I couldn’t find working comments plug-in. When I asked about it on a forum it appeared that I actually needed a guest book plug-in, which with some effort could be turned into inconvenient comments plug-in. And forget about Ajax.
+
+So I went down to create another theme. And once few months after it was ready I decided it was time to move to some other CMS. This time I was looking for something mainstream. Something that would be easy to use, that would have lots of plug-ins and large community of people using it and enhancing it. Finally, after doing some research I ended up with two options – Drupal and WordPress.
+
+It really had to be blog. CMSes in their pure form no longer exist. Instead every CMS tries to be either portal or blog. I didn’t want to install portal software on my web-site so it really had to be a blog. Among many blogs, I picked two biggest.
+
+It took me 30 minutes to figure out that it can’t be Drupal. It was really simple to understand that Drupal is way too not intuitive for me. On the other hand, frankly my demands have changed too. I wanted something that works out of the box, preferably with tons of themes and plug-ins – as time passes I have less and less time to work on themes and plug-ins myself, hence the new demands. Drupal has tons of features, tons of themes and tons of plug-ins, yet it lacks simplicity. On the other hand, WordPress has them all.
+
+At the moment, my web-site is WordPress based. It didn’t take much time to get used to it and I found a way to make things work my way. At first I started working on a new theme, but over time I figured that I better use one of those ready themes, especially considering that there are so many of them – creating theme for WordPress is far from simple. Yet, since I am so impatient with getting things perfect I often change the theme. Of course since this is WordPress, I don’t really have to worry about the content – it’s there, no matter what theme I use.
+
+Few things were difficult with WordPress. For instance I wanted some more advanced features in the WYSIWYG editor that is built into WordPress. These features are available in plug-in that, on the other hand, breaks look and fill of the formatted text. Luckily, the plug-in allows you to use your own style for the edited text, so eventually I have it all the way I want it.
+
+I’ll continue adding new paragraphs to this article as this web-site evolves. In the meantime wish me good luck with WordPress and I hope this setup will last longer than it’s predecessors.

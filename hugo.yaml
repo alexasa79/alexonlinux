@@ -1,0 +1,41 @@
+baseURL: https://alexasa79.codeberg.page/alexonlinux.com/
+languageCode: en-us
+title: Alex on Linux
+theme: hugo-PaperMod
+relativeURLs: false
+canonifyURLs: false
+
+disableKinds:
+  - taxonomy
+  - term
+
+taxonomies: {}
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+
+permalinks:
+  essays: /essays/:slugorfilename/
+
+params:
+  ShowShareButtons: true
+  hideFooter: true
+  ShowReadingTime: true
+  ShowCodeCopyButtons: true
+  defaultTheme: auto
+  homeInfoParams:
+    Title: Alex on Linux
+    Content: Essays on Linux, systems programming, concurrency, debugging, and software architecture.
+
+menu:
+  main:
+    - identifier: home
+      name: Home
+      url: /
+      weight: 10
+    - identifier: essays
+      name: Essays
+      url: /essays/
+      weight: 20
