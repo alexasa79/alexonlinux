@@ -6,15 +6,26 @@ categories: ["Short articles"]
 tags: ["critical-section", "integer", "multi-threaded", "mutex", "semaphore", "spinlock", "synchronization", "threads"]
 ---
 
-Recently I ran into few pieces of code here and there that assumed that*int*is an atomic type. I.e. when you modify value of the variable from two or more different threads at the same time, all of the changes you’ve made to the value will remain intact.
+Recently I ran into few pieces of code here and there that assumed that*int*is
+an atomic type. I.e. when you modify value of the variable from two or more
+different threads at the same time, all of the changes you’ve made to the value
+will remain intact.
 
-But really, can you modify variables of basic types (integers, floats, etc), from two or more threads, at the same time, without screwing their value?
+But really, can you modify variables of basic types (integers, floats, etc),
+from two or more threads, at the same time, without screwing their value?
 
-Until now I’ve been very precautious with questions of this kind. I’ve spend enormous amount of time solving synchronization problems. So when I have a variable that being modified or accessed from two or more threads I always put some mutex or semaphore (spinlock in kernel) around it – no questions asked.
+Until now I’ve been very precautious with questions of this kind. I’ve spend
+enormous amount of time solving synchronization problems. So when I have a
+variable that being modified or accessed from two or more threads I always put
+some mutex or semaphore (spinlock in kernel) around it – no questions asked.
 
-Still, I decided to check things out, perhaps one more time. I wanted to see what happens with a variable if two or more threads modifying it. So, I’ve written a short program that demonstrates what happens when you do something like this.
+Still, I decided to check things out, perhaps one more time. I wanted to see
+what happens with a variable if two or more threads modifying it. So, I’ve
+written a short program that demonstrates what happens when you do something
+like this.
 
-Here’s the code. See my comments below to understand what it does and how it does it.
+Here’s the code. See my comments below to understand what it does and how it
+does it.
 
 ```text
 #include <stdio.h>
@@ -186,11 +197,17 @@ int main()
 }
 ```
 
-You can download the code and a Makefile [here](http://www.alexonlinux.com/wp-content/uploads/2008/10/atomics.tgz).
+You can download the code and a Makefile
+[here](http://www.alexonlinux.com/wp-content/uploads/2008/10/atomics.tgz).
 
-The setup is simple. Number of threads is as number of CPUs in your machine (this includes cores and even hyperthreaded semi-cores). Each thread affined to certain core with*sched_setaffinity()*. I.e. scheduler configured to run certain thread on certain core, to make sure that all cores access that variable. Each thread increases a global integer named*global_int*one million times.
+The setup is simple. Number of threads is as number of CPUs in your machine
+(this includes cores and even hyperthreaded semi-cores). Each thread affined to
+certain core with*sched_setaffinity()*. I.e. scheduler configured to run certain
+thread on certain core, to make sure that all cores access that variable. Each
+thread increases a global integer named*global_int*one million times.
 
-In the meantime, main thread waits for the worker threads to do their job. Once they’re done, it prints the value of*global_int*.
+In the meantime, main thread waits for the worker threads to do their job. Once
+they’re done, it prints the value of*global_int*.
 
 And the result is:
 
@@ -204,10 +221,18 @@ Expected value is: 4000000
 
 I guess numbers speak for themselves.
 
-In case you still have some doubts, consider this. When I compile the code with -O2 compiler option (enabling optimization), the value of the*global_int*is 4000000, as you may have expected. So, it is not really black and white. Also, things may be different on different computers.
+In case you still have some doubts, consider this. When I compile the code with
+-O2 compiler option (enabling optimization), the value of the*global_int*is
+4000000, as you may have expected. So, it is not really black and white. Also,
+things may be different on different computers.
 
-However, the bottom line is that you want to be on the safe side. This code is a little simple proof that in some cases, simultaneous access to certain basic variable can cause its value to become ambiguous. So, to be on the safe side, protect your shared variables, no matter if it is a complex data structure or simple integers.
+However, the bottom line is that you want to be on the safe side. This code is a
+little simple proof that in some cases, simultaneous access to certain basic
+variable can cause its value to become ambiguous. So, to be on the safe side,
+protect your shared variables, no matter if it is a complex data structure or
+simple integers.
 
-If you have further questions, comment here or send me an email to [alex@alexonlinux.com](mailto:alex@alexonlinux.com).
+If you have further questions, comment here or send me an email to
+[alex@alexonlinux.com](mailto:alex@alexonlinux.com).
 
 PS: I think this issue deserves full scale article. What do you think?

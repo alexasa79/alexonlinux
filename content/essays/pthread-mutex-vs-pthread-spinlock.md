@@ -6,18 +6,31 @@ categories: ["Programming Articles", "Short articles"]
 tags: ["CPU", "mutex", "pthread", "speed", "spinlock", "synchronization", "thread"]
 ---
 
-*Update 06/16/2009: On several occasions, commentators to this article pointed out that this essay is somewhat incomplete. Therefore, before I continue, I would like to make some things clear.*
+*Update 06/16/2009: On several occasions, commentators to this article pointed
+out that this essay is somewhat incomplete. Therefore, before I continue, I
+would like to make some things clear.*
 
-*Before considering the code below, please note that spinlocks are totally useless on uni-processor computers. This is due to a nature of spinlocks, which I will describe in future essays.*
+*Before considering the code below, please note that spinlocks are totally
+useless on uni-processor computers. This is due to a nature of spinlocks, which
+I will describe in future essays.*
 
-*Also, it is not the intent of this article to show that spinlocks better than mutexes in all circumstances. Spinlocks perform better than mutexes in this particular setup, on multi-processor computer. It does not mean that spinlocks are good for you. Apply your own judgment when considering using materials presented in this article for your needs.
-*
+*Also, it is not the intent of this article to show that spinlocks better than
+mutexes in all circumstances. Spinlocks perform better than mutexes in this
+particular setup, on multi-processor computer. It does not mean that spinlocks
+are good for you. Apply your own judgment when considering using materials
+presented in this article for your needs. *
 
-In this article I would like to demonstrate you how spinlocks are more efficient than mutexes. I’ll demonstrate a program that does the following.
+In this article I would like to demonstrate you how spinlocks are more efficient
+than mutexes. I’ll demonstrate a program that does the following.
 
-It builds a list of integers and then starts two threads, each removing entries from the list. Since both threads work with the same list at the same time, list has to be protected with synchronization mechanism of some kind.
+It builds a list of integers and then starts two threads, each removing entries
+from the list. Since both threads work with the same list at the same time, list
+has to be protected with synchronization mechanism of some kind.
 
-Depending on whether the program has been compiled with USE_SPINLOCK or not, it will use a spinlock or a mutex to protect the list. In any case, it will display number of seconds that has passed from the moment threads has been started, until they finish.
+Depending on whether the program has been compiled with USE_SPINLOCK or not, it
+will use a spinlock or a mutex to protect the list. In any case, it will display
+number of seconds that has passed from the moment threads has been started,
+until they finish.
 
 ```text
 #include <stdio.h>
@@ -231,13 +244,22 @@ int main()
 }
 ```
 
-Lets see how this little program works in greater detail.*main()*starts with initialization of a mutex or a spinlock, in lines 67-71. Next it initializes the list. Number of entries it will push into the list depends on LOOPS definition from line 10. Finally, in lines 77-81 it measures current time and spawns two threads. Then it waits for both threads to finish their job.
+Lets see how this little program works in greater detail.*main()*starts with
+initialization of a mutex or a spinlock, in lines 67-71. Next it initializes the
+list. Number of entries it will push into the list depends on LOOPS definition
+from line 10. Finally, in lines 77-81 it measures current time and spawns two
+threads. Then it waits for both threads to finish their job.
 
-The thread, between lines 24 and 56, runs in a loop and pops entries from the list. Once the list is empty, thread exits. Each iteration of the loop it locks the mutex/spinlock and then unlocks it (lines 32-36 and 51-55).
+The thread, between lines 24 and 56, runs in a loop and pops entries from the
+list. Once the list is empty, thread exits. Each iteration of the loop it locks
+the mutex/spinlock and then unlocks it (lines 32-36 and 51-55).
 
-Once both threads are over,*main()*will measure the time again and print difference between two measurements. This difference is how we measure effectiveness. The less time it took to run, the better.
+Once both threads are over,*main()*will measure the time again and print
+difference between two measurements. This difference is how we measure
+effectiveness. The less time it took to run, the better.
 
-Lets run the code and see how it performs, first with mutex and then with spinlock.
+Lets run the code and see how it performs, first with mutex and then with
+spinlock.
 
 ```text
 ~/lab/mutex-vs-spinlock --> g++ -Wall -pthread main.cc
@@ -263,6 +285,9 @@ Result - 2.587424
 ~/lab/mutex-vs-spinlock -->
 ```
 
-As we can see, the picture is clear. We can see that using spinlock, it took 2.5 seconds to complete the test. However when used mutex, it took almost 8 seconds to complete. This is 3 times more time.
+As we can see, the picture is clear. We can see that using spinlock, it took 2.5
+seconds to complete the test. However when used mutex, it took almost 8 seconds
+to complete. This is 3 times more time.
 
-This proves that the spinlock is more effective in term of CPU consumption and speed.
+This proves that the spinlock is more effective in term of CPU consumption and
+speed.
