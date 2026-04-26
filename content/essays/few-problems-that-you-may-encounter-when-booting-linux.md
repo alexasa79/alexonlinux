@@ -43,7 +43,7 @@ Other part of kernel resides in many smaller files under /lib/modules/ directory
 
 Under /lib/modules/ there is a directory per kernel installed on your system. Each sub-directory named as kernel version. I.e if you’re running kernel 2.6.21-8-default, you’ll find directory named 2.6.21-8-default in /lib/modules/.
 
-Every kernel directory under /lib/modules/ contains several files and directories. Few of them are important to remember. For instance,`build ` is a symbolic pointing for directory where the kernel has been built (usually somewhere in /usr/src although it can be anywhere).` kernel ` directory contains several sub-directories that contain actual modules (or directories that contain modules – anyway no module reside outside of` kernel `). Finally, it contains several files that start with` modules.*`These files used by different utilities such as ` modprobe`to locate right modules and resolve dependencies between them.
+Every kernel directory under /lib/modules/ contains several files and directories. Few of them are important to remember. For instance, `build` is a symbolic pointing for directory where the kernel has been built (usually somewhere in /usr/src although it can be anywhere). `kernel` directory contains several sub-directories that contain actual modules (or directories that contain modules – anyway no module reside outside of `kernel`). Finally, it contains several files that start with `modules.*`. These files used by different utilities such as `modprobe` to locate right modules and resolve dependencies between them.
 
 # Linux boot process explained
 
@@ -61,7 +61,7 @@ When you create one, you usually create it empty. However, ram-disks are not nec
 
 Initial ram-disk or shorter `initrd` is a file-system in a file. When system
 boots kernel loads it from hard drive into RAM. In case you want to know more
-about `initrd `, read my article about internal structure of ` initrd`. You can
+about `initrd`, read my article about internal structure of `initrd`. You can
 find it [here]({{< relref "essays/opening-and-modifying-the-initrd.md" >}}).
 
 ## Mounting root file-system
@@ -82,7 +82,7 @@ Finally, last thing that required for your system to boot are device files. Each
 
 A common problem occurs when you introduce a new SCSI disk into your system. Deciding how to present a new SCSI disk to your system is up to SCSI controller and the controller driver. You may find yourself in a situation when before the change in RAID configuration your root file-system was on /dev/sda, but after the change it is on /dev/sdb. This often occurs when you have RAID with sparse LUNs and you fill in the gaps between SCSI LUNs.
 
-Different distributions use different ways to create required device files. In some Linux distributions,`mkinitrd ` itself creates all needed device files. In others initrd carries` udev` daemon that creates needed files on the go.
+Different distributions use different ways to create required device files. In some Linux distributions, `mkinitrd` itself creates all needed device files. In others initrd carries `udev` daemon that creates needed files on the go.
 
 In any case, lack of appropriate device files can definitely be a good reason for the system to stop operating properly.
 
@@ -108,7 +108,7 @@ One of the things that may go wrong when booting your system is one of the servi
 
 ### Booting Linux with broken init scripts
 
-Luckily, there’s a simple way to boot the system even if you don’t have a rescue disk or don’t have an option to stop boot process at level 1, before most of the init scripts are executed (in RedHat Linux descendants you can press I to stop boot process on level 1). You can pass init=/bin/bash argument to the kernel, when booting the system. This will cause the system to execute /bin/bash instead of init. If you do that, instead of regular boot process you will find youself in a shell. In this environment you probably won’t have PATH variable set properly so don’t be surprised when it cannot find `vi`– help it by providing full path to the executable you would like to run. You can use this limited shell to fix whatever got wrong with scripts that being involved in the boot process.
+Luckily, there’s a simple way to boot the system even if you don’t have a rescue disk or don’t have an option to stop boot process at level 1, before most of the init scripts are executed (in RedHat Linux descendants you can press I to stop boot process on level 1). You can pass init=/bin/bash argument to the kernel, when booting the system. This will cause the system to execute /bin/bash instead of init. If you do that, instead of regular boot process you will find youself in a shell. In this environment you probably won’t have PATH variable set properly so don’t be surprised when it cannot find `vi` – help it by providing full path to the executable you would like to run. You can use this limited shell to fix whatever got wrong with scripts that being involved in the boot process.
 
 Passing arguments to kernel is easy. You can do this via GRUB boot menu. Usually you select configuration you would like to boot with from the list and then press ‘e’ key to edit it. Then you select line starting with kernel, press ‘e’ again to edit it and append init=/bin/bash to the end. Then you just press enter few times to boot the system.
 
