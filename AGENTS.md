@@ -9,3 +9,6 @@
 - Keep Markdown prose in essays wrapped to 80 characters where practical.
 - Do not reflow front matter, code fences, raw HTML blocks, Hugo shortcodes,
   images, or headings just to satisfy the line length rule.
+- In code examples, use 4 spaces for indentation and do not use tabs. Preserve
+  deeper indentation in 4-space increments. Keep intentional alignment only when
+  it improves readability.
