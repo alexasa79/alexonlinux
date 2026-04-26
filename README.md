@@ -12,8 +12,6 @@ newer.
 - `content/essays/`: curated published writing
 - `static/assets/`: local assets referenced by essays
 - `original/`: preserved archive of the broader recovered material
-- `data/uncurated-posts.txt`: original items not currently published in the
-  curated Hugo site
 
 To run locally:
 
