@@ -16,6 +16,7 @@
   {{- end }}
 </header>
 
+{{- if ne .Section "essays" }}
 {{- range .RegularPages.ByDate.Reverse }}
 <article class="post-entry">
   <header class="entry-header">
@@ -23,6 +24,7 @@
   </header>
   <a class="entry-link" aria-label="link to {{ .Title | plainify }}" href="{{ .RelPermalink }}"></a>
 </article>
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -72,33 +72,19 @@ By default APIC delivers ALL interrupts to core 0.This is the reason why
 
 ```text
          CPU0     CPU1     CPU2     CPU3
-
   0:   123357        0        0        0   IO-APIC-edge  timer
-
   8:        0        0        0        0   IO-APIC-edge  rtc
-
  11:        0        0        0        0  IO-APIC-level  acpi
-
 169:        0        0        0        0  IO-APIC-level  uhci_hcd:usb1
-
 177:        0        0        0        0  IO-APIC-level  qla2xxx
-
 185:        0        0        0        0  IO-APIC-level  qla2xxx
-
 193:    12252        0        0        0  IO-APIC-level  ioc0
-
 209:        0        0        0        0  IO-APIC-level  uhci_hcd:usb2
-
 217:      468        0        0        0  IO-APIC-level  eth0
-
 225:      285        0        0        0  IO-APIC-level  eth1
-
 NMI:      120       66       76       45
-
 LOC:   123239   123220   123187   123065
-
 ERR:        0
-
 MIS:        0
 ```
 
@@ -132,77 +118,41 @@ Let’s see an example…
 
 ```text
 #
-
 # cat /proc/interrupts
-
          CPU0     CPU1     CPU2     CPU3
-
   0: 19599546        0        0        0   IO-APIC-edge  timer
-
   8:        0        0        0        0   IO-APIC-edge  rtc
-
  11:        0        0        0        0  IO-APIC-level  acpi
-
 169:        0        0        0        0  IO-APIC-level  uhci_hcd:usb1
-
 177:        0        0        0        0  IO-APIC-level  qla2xxx
-
 185:        0        0        0        0  IO-APIC-level  qla2xxx
-
 193:    95337        0        0        0  IO-APIC-level  ioc0
-
 209:        0        0        0        0  IO-APIC-level  uhci_hcd:usb2
-
 217:   100778        0        0        0  IO-APIC-level  eth0
-
 225:    56651        0        0        0  IO-APIC-level  eth1
-
 NMI:      466      393      422      372
-
 LOC: 19600453 19600434 19600401 19600279
-
 ERR:        0
-
 MIS:        0
-
 #
-
 #
-
 # echo "2" > /proc/irq/217/smp_affinity
-
 # cat /proc/interrupts
-
          CPU0     CPU1     CPU2     CPU3
-
   0: 19606722        0        0        0   IO-APIC-edge  timer
-
   8:        0        0        0        0   IO-APIC-edge  rtc
-
  11:        0        0        0        0  IO-APIC-level  acpi
-
 169:        0        0        0        0  IO-APIC-level  uhci_hcd:usb1
-
 177:        0        0        0        0  IO-APIC-level  qla2xxx
-
 185:        0        0        0        0  IO-APIC-level  qla2xxx
-
 193:    95349        0        0        0  IO-APIC-level  ioc0
-
 209:        0        0        0        0  IO-APIC-level  uhci_hcd:usb2
-
 217:   101027       49        0        0  IO-APIC-level  eth0
-
 225:    56655        0        0        0  IO-APIC-level  eth1
-
 NMI:      466      393      422      372
-
 LOC: 19607629 19607610 19607577 19607455
-
 ERR:        0
-
 MIS:        0
-
 #
 ```
 
@@ -215,10 +165,10 @@ correspond to single CPU.
 
 How about writing “3” into the file. In theory, this should cause APIC to divert
 interrupts to CPU0 and CPU1. Unfortunately, things are a little more complicated
-here. It all depends on whether APIC works in*physical*“destination mode”
-and*low priority*“delivery mode”. If it is so, than you most likely would not be
+here. It all depends on whether APIC works in `physical` “destination mode”
+and `low priority` “delivery mode”. If it is so, than you most likely would not be
 seeing CPU0 handling all interrupts. This is because when kernel configures APIC
-to work in*physical/low priority*modes, it automatically tells APIC to load
+to work in `physical/low priority` modes, it automatically tells APIC to load
 balance interrupts between first eight cores.
 
 So if on your system CPU0 handles all interrupts by default, this probably means
@@ -239,33 +189,19 @@ like this, right from the start:
 
 ```text
 # cat /proc/interrupts
-
          CPU0     CPU1     CPU2     CPU3
-
   0:   728895   728796   728624   728895  IO-APIC-edge     timer
-
   8:        0        0        0        0  IO-APIC-edge     rtc
-
  11:        0        0        0        0  IO-APIC-fasteoi  acpi
-
  16:        0        0        0        0  IO-APIC-fasteoi  uhci_hcd:usb1
-
  19:        0        0        0        0  IO-APIC-fasteoi  uhci_hcd:usb2
-
  24:    14090    14090    14327    14056  IO-APIC-fasteoi  ioc0
-
  49:        7        9        7        8  IO-APIC-fasteoi  qla2xxx
-
  50:        8       12       11       10  IO-APIC-fasteoi  qla2xxx
-
  77:     2849     2759     2841     2827  IO-APIC-fasteoi  eth0
-
  78:    25072    25138    24996    24980  IO-APIC-fasteoi  eth1
-
 NMI:        0        0        0        0
-
 LOC:  2915270  2915256  2915228  2915092
-
 ERR:        0
 ```
 

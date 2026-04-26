@@ -6,33 +6,7 @@ categories: ["Howto", "Programming Articles"]
 tags: ["atomic", "C++", "CPU", "multithreaded", "mutex", "performance", "programming", "spinlock", "synchronization", "thread"]
 ---
 
-## Table of contents
-
-[Introduction to the series](#introduction_to_the_series) [Introduction to the
-article](#introduction_to_the_article) [Way of working with
-Bazaar](#way_of_working_with_bazaar) [Demo setup
-description](#demo_setup_description) [Directory and user
-configuration](#directory_and_user_configuration) [The basics](#the_basics)
-[Creating a project](#creating_a_project) [Checking-out the
-project](#checking-out_the_project) [Adding files to the
-project](#adding_files_to_the_project) [Committing files](#committing_files)
-[Few words about revision numbers in
-Bazaar](#few_words_about_revision_numbers_in_bazaar) [Local commits or offline
-commits](#local_commits_or_offline_commits) [Committing local commits to remote
-branch](#committing_local_commits_to_remote_branch) [Multi-user
-environment](#multi-user_environment) [Making modifications to files and viewing
-differences](#making_modifications_to_files_and_viewing_differences) [Committing
-non-up-to-date file](#committing_non-up-to-date_file) [Merging with the latest
-version of the file](#merging_with_the_latest_version_of_the_file)
-[Introduction](#introduction) [What reference counting needed
-for?](#what_reference_counting_needed_for?) [This is how we will use atomic
-variables to count references to
-objects](#this_is_how_we_will_use_atomic_variables_to_count_references_to_objects)
-[The naive approach](#the_naive_approach) [The RCU approach](#the_rcu_approach)
-[Where atomic variables coming from?](#where_atomic_variables_coming_from?)
-[Conclusion](#conclusion)
-
-## Introduction [BACK TO TOC](#table_of_contents)
+## Introduction
 
 Lets say we have a data structure that manages objects and we would like to
 manipulate the data structure and the objects from two or more threads. To
@@ -40,7 +14,7 @@ achieve maximum performance we have to distinguish between mechanism that we use
 to protect the data structure itself, and the mechanism that we use to protect
 actual objects.
 
-## What reference counting needed for?[BACK TO TOC](#table_of_contents)
+## What reference counting needed for?
 
 To explain why two mechanisms provide best performance and atomic variables aid
 us, consider following scenario.
@@ -87,11 +61,11 @@ asleep. Yet right after manipulator falls asleep, eraser will delete the object
 and its mutex, leaving manipulator sleeping on non-existing object. Ouch.
 
 There are couple of things that we can do actually. One of them is implementing
-reference counting on objects.[Yet we have to protect the reference counter
+reference counting on objects. [Yet we have to protect the reference counter
 itself]({{< relref "essays/do-you-need-a-mutex-to-protect-an-int.md" >}}).
 Luckily thanks to atomic variables we don’t need a mutex to protect the counter.
 
-## This is how we will use atomic variables to count references to objects [BACK TO TOC](#table_of_contents)
+## This is how we will use atomic variables to count references to objects
 
 First, we initialize our object’s reference counter to 1. When manipulator
 thread begins using it, it should increase the reference counter by one. When it
@@ -114,7 +88,7 @@ threads reference counter becomes zero. But, how?
 Answering this question can be quiet tricky. I usually consider one of two
 approaches. The naive or an approach I call the RCU approach.
 
-### The naive approach [BACK TO TOC](#table_of_contents)
+### The naive approach
 
 The naive approach goes like this. We create a list of objects that we want to
 delete. Every time our eraser thread wakes up, it runs through the list and
@@ -125,7 +99,7 @@ list of objects that we want to delete may grow and running through entire list
 can hog the CPU. Depending on how often we delete objects this can be good
 enough solution, but if its not, we have to consider RCU approach.
 
-### The RCU approach [BACK TO TOC](#table_of_contents)
+### The RCU approach
 
 RCU is another synchronization mechanism. Its being used primary in Linux
 kernel. You can read about it [here](http://lwn.net/Articles/305782/). I call
@@ -139,9 +113,9 @@ eraser thread should be able to delete it.
 
 Lets say that it takes manipulator thread to do its manipulations 1 minute at
 most. I am exaggerating on purpose here. When eraser thread tries to delete the
-object, all it has to do is to grab a mutex or a [spinlock](pthread-spinlocks)
-that protects the data structure that contains the objects and remove the object
-from the data structure.
+object, all it has to do is to grab a mutex or a [spinlock]({{< relref "essays/pthread-spinlocks.md" >}})
+that protects the data structure that contains the objects and remove the
+object from the data structure.
 
 Next it has to get current time and save it in the object. Object should have
 methods that allows it to remember its deletion time. Then eraser thread has to
@@ -179,7 +153,7 @@ use timestamps to build a sorted list of objects and check only few objects at
 the beginning of the list. Depending on the circumstances, this will save huge
 amount processing time.
 
-## Where atomic variables coming from?[BACK TO TOC](#table_of_contents)
+## Where atomic variables coming from?
 
 Starting version 4.1.2, gcc has built-in support for atomic variables. They work
 on majority of architectures, but before using them, please check if your
@@ -187,31 +161,21 @@ architecture supports them.
 
 There’s a set of functions that manipulate atomic variables.
 
-```text
+```c
 type __sync_fetch_and_add (type *ptr, type value);
-
 type __sync_fetch_and_sub (type *ptr, type value);
-
 type __sync_fetch_and_or (type *ptr, type value);
-
 type __sync_fetch_and_and (type *ptr, type value);
-
 type __sync_fetch_and_xor (type *ptr, type value);
-
 type __sync_fetch_and_nand (type *ptr, type value);
 ```
 
-```text
+```c
 type __sync_add_and_fetch (type *ptr, type value);
-
 type __sync_sub_and_fetch (type *ptr, type value);
-
 type __sync_or_and_fetch (type *ptr, type value);
-
 type __sync_and_and_fetch (type *ptr, type value);
-
 type __sync_xor_and_fetch (type *ptr, type value);
-
 type __sync_nand_and_fetch (type *ptr, type value);
 ```
 
@@ -219,7 +183,7 @@ There’s no need to include any header file to use these functions. If your
 architecture doesn’t support them, you will receive a linker error as if you
 were calling a non-existing function.
 
-Each one of these functions manipulates a variable of certain*type*.*type*can be
+Each one of these functions manipulates a variable of certain `type`. `type` can be
 either char, short, int, long, long long or their unsigned counterparts.
 
 It is a good idea to wrap these functions with something that hides
@@ -228,9 +192,10 @@ abstract data type.
 
 Finally, I have a nice example of how to use atomic variables in [multithreaded
 simple data type access and atomic
-variables](multithreaded-simple-data-type-access-and-atomic-variables) article.
+variables]({{< relref "essays/multithreaded-simple-data-type-access-and-atomic-variables.md" >}})
+article.
 
-## Conclusion [BACK TO TOC](#table_of_contents)
+## Conclusion
 
 I hope I’ve found this interesting. In case you have further questions, please
-send me emails to alex@alexonlinux.com
+send me emails to alexander.sandler@gmail.com

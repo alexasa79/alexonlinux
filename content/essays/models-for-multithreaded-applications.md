@@ -101,7 +101,7 @@ threads model, in this model tasks split into smaller jobs. However, instead of
 letting the operating system to schedule between job execution, this model
 implements a user-mode scheduler.
 
-The actual scheduling is made using setjmp() and longjmp() calls. One obvious
+The actual scheduling is made using `setjmp()` and `longjmp()` calls. One obvious
 constrain that this model presents is that if thread goes to sleep in operating
 system terms it will send entire system to sleep. As a result, the system should
 have very tight control over what threads does and in particular how it sleeps.
@@ -109,7 +109,7 @@ I.e. threads are not allowed to do regular I/O. Instead they should do I/O in a
 centralized way.
 
 For example, thread that wishes to read from a file-descriptor should register
-this file-descriptor with scheduler. Scheduler will select() or poll() on all
+this file-descriptor with scheduler. Scheduler will `select()` or `poll()` on all
 registered file-descriptors. Depending on what file-descriptor requires
 attention, scheduler will schedule thread that takes care of that
 file-descriptor.
