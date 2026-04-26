@@ -23,13 +23,9 @@ region.
 
 This is how you do it.
 
-```text
+```cpp
 char* s = new char[1024];
-
-
-
 SomeClass* p = new (s) SomeClass;
-
 ```
 
 First new operator just allocates 1024 bytes. This is good old allocation as we

@@ -39,7 +39,7 @@ technological innovation and cost of development that simply cannot coexist.
 
 Think about it. Technology behind virtualized CPU would have to split single
 stream of execution into several streams. But this is exactly what modern CPUs
-do already. Processor that utilizes*branch prediction*, try to predict most
+do already. Processor that utilizes branch prediction, try to predict most
 probable path of execution of a thread and execute several chunks of code
 simultaneously.
 

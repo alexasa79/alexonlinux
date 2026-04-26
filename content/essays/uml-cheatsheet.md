@@ -26,20 +26,20 @@ myself. I hope you will enjoy it as well.
 
 ![image]({{< relurl "assets/2011-09-19T184844 UML cheatsheet/child_inherits_from_parent-32e4b4e855.png" >}})
 
-So, this is how classes inherit one from another. Here*Child class*inherits
-from*Parent Class*.
+So, this is how classes inherit one from another. Here the Child class inherits
+from the Parent class.
 
 ## Use
 
 ![image]({{< relurl "assets/2011-09-19T184844 UML cheatsheet/user_uses_resource-f3d687d061.png" >}})
 
-This is how*User class*uses*Resource class*.
+This is how the User class uses the Resource class.
 
 ## Contains and manages
 
 ![image]({{< relurl "assets/2011-09-19T184844 UML cheatsheet/whole_part_managed-512a43292f.png" >}})
 
-Here,*Whole*class contains and manages*Part*class. This type of relation can be
+Here, the Whole class contains and manages the Part class. This type of relation can be
 extended to one of the following:
 
 - One to One
@@ -51,7 +51,7 @@ extended to one of the following:
 
 ![image]({{< relurl "assets/2011-09-19T184844 UML cheatsheet/whole_part_unmanaged-be04f39fff.png" >}})
 
-Here,*Whole*class references to*Part*class, but does not manage it. Again, can
+Here, the Whole class references to the Part class, but does not manage it. Again, can
 be extended with:
 
 - One to One

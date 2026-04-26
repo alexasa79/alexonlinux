@@ -6,126 +6,14 @@ categories: ["Programming Articles"]
 tags: ["C++", "call", "code", "CPU", "encapsulation", "functions", "identifier", "inheritance", "mangling", "memory", "method", "new", "OOD", "OOP", "polymorphism", "progming"]
 ---
 
-# Table of contents
-
-[Introduction to the series](#introduction_to_the_series) [Introduction to the
-article](#introduction_to_the_article) [Way of working with
-Bazaar](#way_of_working_with_bazaar) [Demo setup
-description](#demo_setup_description) [Directory and user
-configuration](#directory_and_user_configuration) [The basics](#the_basics)
-[Creating a project](#creating_a_project) [Checking-out the
-project](#checking-out_the_project) [Adding files to the
-project](#adding_files_to_the_project) [Committing files](#committing_files)
-[Few words about revision numbers in
-Bazaar](#few_words_about_revision_numbers_in_bazaar) [Local commits or offline
-commits](#local_commits_or_offline_commits) [Committing local commits to remote
-branch](#committing_local_commits_to_remote_branch) [Multi-user
-environment](#multi-user_environment) [Making modifications to files and viewing
-differences](#making_modifications_to_files_and_viewing_differences) [Committing
-non-up-to-date file](#committing_non-up-to-date_file) [Merging with the latest
-version of the file](#merging_with_the_latest_version_of_the_file)
-[Introduction](#introduction) [What reference counting needed
-for?](#what_reference_counting_needed_for?) [This is how we will use atomic
-variables to count references to
-objects](#this_is_how_we_will_use_atomic_variables_to_count_references_to_objects)
-[The naive approach](#the_naive_approach) [The RCU approach](#the_rcu_approach)
-[Where atomic variables coming from?](#where_atomic_variables_coming_from?)
-[Conclusion](#conclusion) [Introduction](#introduction) [What do we do with
-command line options](#what_do_we_do_with_command_line_options)
-**[optparsebasics](#optparse_basics) [Adding options](#adding_options)
-[Specifying help string for an option](#specifying_help_string_for_an_option)
-**[Tellingoptparseto parse arguments](#telling_optparse_to_parse_arguments)
-[Putting it together](#putting_it_together)
-**[optparsecookbook](#optparse_cookbook) [Support for a standalone command line
-options](#support_for_a_standalone_command_line_options) [Support for mandatory
-(required) options.](#support_for_mandatory_(required)_options.) [Support for
-options with one or more
-arguments](#support_for_options_with_one_or_more_arguments) [Option destination
-types](#option_destination_types) [Dependencies between
-options](#dependencies_between_options) [Help screen
-customizations](#help_screen_customizations) [Grouping
-options](#grouping_options) [Changing programs usage
-string](#changing_programs_usage_string) [Telling option’s default
-value](#telling_option’s_default_value) [Better argument
-description](#better_argument_description) [Adding program
-description](#adding_program_description) [Adding epilog](#adding_epilog)
-[Program version string](#program_version_string) [Conclusion](#conclusion)
-[Introduction](#introduction) [What are signals?](#what_are_signals?) [Signal as
-interrupt](#signal_as_interrupt) [Signal masks](#signal_masks) [What signals are
-good for](#what_signals_are_good_for) [Signals that report
-exceptions](#signals_that_report_exceptions) [Other uses of
-signals](#other_uses_of_signals) [Types of signals](#types_of_signals) [Handling
-exception signals](#handling_exception_signals) [SIGKILL and
-SIGSTOP](#sigkill_and_sigstop) [SIGKILL](#sigkill) [SIGSTOP](#sigstop)
-[Registering signal handler](#registering_signal_handler)
-**[signal()](#signal()) [Ignoring signals and restoring original signal handler
-function](#ignoring_signals_and_restoring_original_signal_handler_function)
-**[sigaction()](#sigaction()) **[sigaction()in action](#sigaction()_in_action)
-[Conclusion](#conclusion) [Quick links](#quick_links)
-[Introduction](#introduction) [Creating the backup](#creating_the_backup) [What
-to backup](#what_to_backup) [Figuring out device
-file](#figuring_out_device_file) [Preparations](#preparations) [Actual
-backup](#actual_backup) [Restoring from backup](#restoring_from_backup)
-[Preparations](#preparations) [Restoring](#restoring) [Restoring entire hard
-disk](#restoring_entire_hard_disk) [Restoring single
-partition](#restoring_single_partition) [Introduction](#introduction)
-**[Howscpworks](#how_scp_works) **[You can run commands on a remote computer
-usingssh](#you_can_run_commands_on_a_remote_computer_using_ssh) **[Back
-toscp](#back_to_scp) [Creating our own SSH based
-application](#creating_our_own_ssh_based_application) [The idea](#the_idea) [The
-code](#the_code) [Discussion](#discussion) [Demonstration](#demonstration)
-[Conclusion](#conclusion) [Introduction](#introduction) [Part 1.
-Basics](#part_1._basics) [Intro](#intro) [Connecting to remote host – simple
-case](#connecting_to_remote_host_–_simple_case) [RSA/DSA host
-fingerprint](#rsa/dsa_host_fingerprint) [What happens when host fingerprint
-changes](#what_happens_when_host_fingerprint_changes) [How to handle expected
-host fingerprint change](#how_to_handle_expected_host_fingerprint_change)
-[Executing command on a remote
-computer](#executing_command_on_a_remote_computer) [Securely copying files to
-and from a remote
-computer](#securely_copying_files_to_and_from_a_remote_computer) [Copying
-multiple files](#copying_multiple_files) [Part 2.
-Encryption](#part_2._encryption) [Login without entering
-password?](#login_without_entering_password?) [How modern cryptography
-works](#how_modern_cryptography_works) [What are keys](#what_are_keys)
-[Public/private key](#public/private_key) [How actual encryption
-works](#how_actual_encryption_works) [SSH identities](#ssh_identities) [How to
-generate identity files](#how_to_generate_identity_files) [How to install
-identity file](#how_to_install_identity_file) [Installing identity files
-manually](#installing_identity_files_manually) [Part 3. Advanced
-SSH](#part_3._advanced_ssh) [X forwarding](#x_forwarding)
-[Introduction](#introduction) [Remote X Windows server
-configuration](#remote_x_windows_server_configuration) [How SSH fixes the
-situation](#how_ssh_fixes_the_situation) [What if -Y doesn’t
-work](#what_if_-y_doesn’t_work) [Configuration](#configuration) [Allowing login
-as root](#allowing_login_as_root) [X forwarding](#x_forwarding) [Other
-options](#other_options) [Conclusion](#conclusion) [Introduction](#introduction)
-[How atomic variables work](#how_atomic_variables_work) [Atomic variables size
-limitations](#atomic_variables_size_limitations) [Use cases](#use_cases) [The
-real thing…](#the_real_thing…) [Time to see some
-action](#time_to_see_some_action) [Precautions](#precautions)
-[Conslusion](#conslusion) [Introduction](#introduction)
-[Encapsulation](#encapsulation) [How methods work](#how_methods_work) [How
-overloading works](#how_overloading_works) [How mangling solves the
-problem](#how_mangling_solves_the_problem) [Structure and size of the
-object](#structure_and_size_of_the_object) [How inheritance and polymorphism
-work](#how_inheritance_and_polymorphism_work) [How basic polymorphism
-works](#how_basic_polymorphism_works) [How multiple inheritance
-works](#how_multiple_inheritance_works) [Difference between different casting
-types](#difference_between_different_casting_types) [Polymorphism and multiple
-inheritance](#polymorphism_and_multiple_inheritance) [What if we try something
-even more complicated](#what_if_we_try_something_even_more_complicated) [Few
-words about C++ constructors](#few_words_about_c++_constructors)
-[Conclusion](#conclusion)
-
-# Introduction [BACK TO TOC](#table_of_contents)
+# Introduction
 
 Inheritance, encapsulation and polymorphism are undoubtedly the cornerstones of
 OOP/OOD in general and C++ in particular.
 
 When programming C, it is very easy to remember how things work. You know that
-when you add an*int*variable to a structure it mostly grows by four bytes. You
-know that*long*is either four or eight bytes long depending on the architecture
+when you add an `int` variable to a structure it mostly grows by four bytes. You
+know that `long` is either four or eight bytes long depending on the architecture
 you’re working with.
 
 Things are less obvious when moving to C++. OOP brings more abstractions to the
@@ -141,37 +29,37 @@ Things that I am going to show in this article may differ from compiler to
 compiler. I will talk mostly about g++ (version 4.2.3). Note however, that same
 ideas apply everywhere.
 
-# Encapsulation [BACK TO TOC](#table_of_contents)
+# Encapsulation
 
 As you know, encapsulation is a principle by which same entity, the object,
 encapsulates data and methods that manipulate the data. You may be surprised to
 find out that underneath, class methods are just plain functions.
 
-## How methods work [BACK TO TOC](#table_of_contents)
+## How methods work
 
 In C++ there’s one fundamental difference between plain functions and class
 methods. Class methods receive one additional argument and that is the pointer
 to the object whose data the method is expected to manipulate. I.e. first
-argument to a method is pointer to*this*.
+argument to a method is pointer to `this`.
 
 To speed things up, C++ developers used single CPU register (ECX/RCX on
-x86/x86_64) to pass pointer to*this*, instead of passing it via stack as if it
+x86/x86_64) to pass pointer to `this`, instead of passing it via stack as if it
 was a regular function argument (no longer true in x86_64).
 
 Otherwise, objects know nothing about methods that operate on them.
 
-## How overloading works [BACK TO TOC](#table_of_contents)
+## How overloading works
 
 Another thing that we have to take care of in C++ is how to distinguish
-between*some_function()*and*some_class::some_function()*. Or
-between*some_class::some_function( int )*and*some_class::some_function()*I.e.
+between `some_function()` and `some_class::some_function()`. Or
+between `some_class::some_function( int )` and `some_class::some_function()` I.e.
 what’s the difference between two methods with the same name that receive
 different number and type of arguments? What is the difference between method
 and function that has same name?
 
 Obviously, out of linker, compiler and preprocessor, linker is the one that
 should be aware of the above difference. This is because we may
-have*some_function()*in some distant object file. Linker is the component that
+have `some_function()` in some distant object file. Linker is the component that
 should find this distant function and interconnect the call to the function and
 the actual function. Linker uses function name as a unique identifier of the
 function.
@@ -184,71 +72,49 @@ method/function and makes sure that:
 2. Mangled method name includes number and type of arguments method receives.
 3. Mangled method name includes namespace it belongs to.
 
-With these three,*some_class::some_function()*and*some_function()*will have
+With these three, `some_class::some_function()` and `some_function()` will have
 totally different mangled name. See the following code sample.
 
-```text
+```cpp
 namespace some_namespace
-
 {
-
     class some_class
-
     {
-
     public:
-
         some_class() { }
-
         void some_method() { }
-
     };
-
 };
-
-
-
 class some_class
-
 {
-
 public:
-
     some_class() { }
-
     void some_method() { }
-
 };
-
-
-
 void some_method()
-
 {
-
     int a;
-
 }
 ```
 
-g++ will turn:
+`g++` will turn:
 
-- *void**some_class::some_method()*into*_ZN10some_class11some_methodEv*
-- *void
-  some_namespace::some_class::some_method()*into*_ZN14some_namespace10some_class11some_methodEv*
-- *void some_method()*into*_Z11some_methodv*
+- `void *some_class::some_method()` into `_ZN10some_class11some_methodEv`
+- `void some_namespace::some_class::some_method()` into
+  `_ZN14some_namespace10some_class11some_methodEv`
+- `void some_method()` into `_Z11some_methodv`
 
-Adding integer argument to*void some_method()*will turn it
-from*_Z11some_methodv*to*_Z11some_methodi*.
+Adding integer argument to `void some_method()` will turn it
+from `_Z11some_methodv` to `_Z11some_methodi`.
 
-### How mangling solves the problem [BACK TO TOC](#table_of_contents)
+### How mangling solves the problem
 
 So when you create two methods with same name, but with different arguments,
 compiler turns them into two functions with different names. Later, when linker
 links the code together it doesn’t know that these are two methods of the same
 class. From linkers standpoint, these are two different functions.
 
-## Structure and size of the object [BACK TO TOC](#table_of_contents)
+## Structure and size of the object
 
 You probably already know that C++ class and good old C structures are nearly
 the same thing. Perhaps the only difference is that all class members are
@@ -277,164 +143,86 @@ and most of the modern compilers do it this way.
 Adding virtual methods to the class will also increase amount of RAM your
 program consumes and its size on your hard drive.
 
-# How inheritance and polymorphism work [BACK TO TOC](#table_of_contents)
+# How inheritance and polymorphism work
 
 Lets say we have two classes. A and B. Class B inherits from class A.
 
-```text
+```cpp
 #include <iostream>
-
-
-
 using namespace std;
-
-
-
 class A
-
 {
-
 public:
-
     A() { a_member = 0; }
-
     int a_member;
-
 };
-
-
-
 class B : public A
-
 {
-
 public:
-
     B() : A() { b_member = 0; };
-
     int b_member;
-
 };
-
-
-
 int main()
-
 {
-
     A *a = new B;
-
     a->a_member = 10;
-
-
-
     return 0;
-
 }
 ```
 
-The interesting thing to notice here is that*a*actually points to instance of
-class B. When dereferencing*a_member*, we’re actually
-dereferencing*a_member*that defined in class A, but belongs to class B (via
+The interesting thing to notice here is that `a` actually points to instance of
+class B. When dereferencing `a_member`, we’re actually
+dereferencing `a_member` that defined in class A, but belongs to class B (via
 inheritance). To make this happen, compiler has to make sure that common part of
-both classes (*a_member*in our case) located at the same offset in the object.
+both classes (`a_member` in our case) located at the same offset in the object.
 
 ![image]({{< relurl "assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/a_b1-0534206b8c.png" >}})
 
 Now what if we have some virtual methods.
 
-## How basic polymorphism works [BACK TO TOC](#table_of_contents)
+## How basic polymorphism works
 
 Let’s change our example a bit and add some virtual methods.
 
-```text
+```cpp
 #include <iostream>
-
-
-
 using namespace std;
-
-
-
 class A
-
 {
-
 public:
-
     A() { a_member = 0; }
-
     virtual int reset() { a_member = 0; }
-
     void set_a_member( int a ) { a_member = a; }
-
     int get_a_member() { return a_member; }
-
 protected:
-
     int a_member;
-
 };
-
-
-
 class B : public A
-
 {
-
 public:
-
     B() : A() { b_member = 0; };
-
     virtual int reset() { a_member = b_member = 0; }
-
     virtual void some_virtual_method() { }
-
     void set_b_member(int b ) { b_member = b; }
-
     int get_b_member() { return b_member; }
-
 protected:
-
     int b_member;
-
 };
-
-
-
 int main()
-
 {
-
     B *b = new B;
-
     A *a = b;
-
-
-
     b->set_b_member( 20 );
-
     b->set_a_member( 10 );
-
-
-
     a->reset();
-
-
-
     cout << b->get_a_member() << " " << b->get_b_member() <<
-
         endl;
-
-
-
     return 0;
-
 }
 ```
 
 If you compile and run this program it will obviously print “0 0”. But how, you
-may ask. After all we did*a->reset()*. Without our understanding of polymorphism
+may ask. After all we did `a->reset()`. Without our understanding of polymorphism
 we could think that we’re calling method that belongs to class A.
 
 The reason it works is because when compiler sees code that dereferences pointer
@@ -452,101 +240,50 @@ of both classes.
 It is because of the virtual methods table structure compilers knows what
 virtual method to call. When it generates the code that dereferences pointer to
 A, it expects that first method in the virtual methods table of the object will
-be pointer to right*reset()*routine. It doesn’t really care if the pointer
+be pointer to right `reset()` routine. It doesn’t really care if the pointer
 actually points to B object. It will call first method of the virtual methods
 table anyway.
 
-## How multiple inheritance works [BACK TO TOC](#table_of_contents)
+## How multiple inheritance works
 
 Multiple inheritance makes things much more complicated. The problem is that
 when class C inherits from both A and B, we should have both members of class A
 and class B in the instance of class C.
 
-```text
+```cpp
 #include <iostream>
-
-
-
 using namespace std;
-
-
-
 class A
-
 {
-
 public:
-
     A() { a_member = 0; }
-
 protected:
-
     int a_member;
-
 };
-
-
-
 class B
-
 {
-
 public:
-
     B() { b_member = 0; }
-
 protected:
-
     int b_member;
-
 };
-
-
-
 class C : public A, public B
-
 {
-
 public:
-
     C() : A(), B() { c_member = 0; }
-
 protected:
-
     int c_member;
-
 };
-
-
-
 int main()
-
 {
-
     C c;
-
-
-
     A *a1 = &c;
-
     B *b1 = &c;
-
-
-
     A *a2 = reinterpret_cast<A *>( &c );
-
     B *b2 = reinterpret_cast<B *>( &c );
-
-
-
     printf( "%p %p %p\n", &c, a1, b1 );
-
     printf( "%p %p %p\n", &c, a2, b2 );
-
-
-
     return 0;
-
 }
 ```
 
@@ -554,7 +291,7 @@ int main()
 
 Once we cast pointer to class C into class B, we cannot keep the value of the
 pointer as is because first fields in the object occupied by fields defined in
-class A (*a_member*). Therefore, when we do casting we have to do a very special
+class A (`a_member`). Therefore, when we do casting we have to do a very special
 kind of casting – the one that changes the actual value of the pointer.
 
 If you compile and run above code snippet, you will see that all the values are
@@ -569,7 +306,7 @@ inherited from B, part of the object.
 In case you wonder what other types of casting will do, here is a short
 description.
 
-### Difference between different casting types [BACK TO TOC](#table_of_contents)
+### Difference between different casting types
 
 There are five types of casting in C++.
 
@@ -596,25 +333,25 @@ legal – it looks inside the object to see if it truly belongs to the type we�
 trying to cast from. static_cast<>() on the other hand, simply increments the
 value of the pointer.
 
-## Polymorphism and multiple inheritance [BACK TO TOC](#table_of_contents)
+## Polymorphism and multiple inheritance
 
 Things getting even more complicated when we have virtual methods in each one of
 the classes A, B and C that we already met. Let’s add following virtual methods
 to the classes.
 
-```text
+```cpp
 virtual void set_a( int new_a ) { a_member = new_a; }
 ```
 
 To class A.
 
-```text
+```cpp
 virtual void set_b( int new_b ) { b_member = new_b; }
 ```
 
 To class B and
 
-```text
+```cpp
 virtual void set_c( int new_c ) { c_member = new_c; }
 ```
 
@@ -661,7 +398,7 @@ If we project this rule onto our last example. A-C-F-X branch virtual methods
 table will include pointers to virtual methods from classes A, C, F and X. Same
 with other two branches.
 
-### What if we try something even more complicated [BACK TO TOC](#table_of_contents)
+### What if we try something even more complicated
 
 The thing is that you can’t. Lets say we try to create even more complicated
 hierarchy by changing class D from our previous example to inherit from class C.
@@ -679,19 +416,16 @@ of the same member/method and that it does not know which one of them to call.
 This what would be g++ output if you try to compile [this
 file](http://www.alexonlinux.com/wp-content/uploads/2008/09/main.cc).
 
-```text
+```cpp
 main.cc: In function 'int main()':
-
 main.cc:110: error: request for member 'set_a' is ambiguous
-
 main.cc:29: error: candidates are: virtual void A::set_a(int)
-
 main.cc:29: error:                 virtual void A::set_a(int)
 ```
 
-All this because I was trying to do*x.set_a( 20 );*in line 110.
+All this because I was trying to do `x.set_a( 20 );` in line 110.
 
-## Few words about C++ constructors [BACK TO TOC](#table_of_contents)
+## Few words about C++ constructors
 
 I guess you know what constructors are good for. In light of what we’ve seen,
 you may ask yourself, who is building all those virtual methods tables and who
@@ -702,9 +436,9 @@ one who fills in the right virtual methods table. And this is another reason why
 you cannot call constructor directly – you don’t want to mess up with virtual
 methods tables.
 
-# Conclusion [BACK TO TOC](#table_of_contents)
+# Conclusion
 
 For now, I think we had some very nice insight of what’s going on inside of the
 objects you create. Hope you find it useful. In case you have something to say,
 please leave comments here or send me emails to
-[alex@alexonlinux.com](mailto:alex@alexonlinux.com).
+[alexander.sandler@gmail.com](mailto:alexander.sandler@gmail.com).

@@ -45,7 +45,8 @@ with TCP connection object. Both of them will have to fetch its content into
 their cache. This will cause [cache
 coherency](http://en.wikipedia.org/wiki/Cache_coherence) problems (cache
 misses). And as you can learn from the [article I’ve written on misaligned
-memory accesses](aligned-vs-unaligned-memory-access), accessing memory that is
+memory accesses]({{< relref "essays/aligned-vs-unaligned-memory-access.md" >}}),
+accessing memory that is
 not in cache can take up to 30 times more time than accessing cached RAM.
 
 Moreover, assuming TCP connection object is properly protected using
@@ -56,8 +57,9 @@ My point is that round-robin style interrupt delivery can be quiet nasty on
 performance. It is much better to deliver interrupts from certain device to
 given core.
 
-Luckily,*smp_affinity*interface, that I mentioned in my [old
-article](smp-affinity-and-proper-interrupt-handling-in-linux), allows you to
+Luckily, `smp_affinity` interface, that I mentioned in my [old
+article]({{< relref "essays/smp-affinity-and-proper-interrupt-handling-in-linux.md" >}}),
+allows you to
 bind interrupts from certain device to certain (single) core.
 
 On some computers IO-APIC does not support logical delivery mode. This can be
