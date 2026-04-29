@@ -38,8 +38,8 @@ rsync -a --delete --exclude .git public/ "$PUBLISH_DIR/"
 git -C "$PUBLISH_DIR" add -A
 if git -C "$PUBLISH_DIR" diff --cached --quiet; then
     echo "No publish changes."
-    exit 0
+else
+    git -C "$PUBLISH_DIR" commit -m "publish"
 fi
 
-git -C "$PUBLISH_DIR" commit -m "publish"
 git -C "$PUBLISH_DIR" push "$REMOTE" "HEAD:$PUBLISH_BRANCH"
