@@ -17,7 +17,7 @@ if git ls-remote --exit-code --heads "$REMOTE" "$PUBLISH_BRANCH" >/dev/null 2>&1
     git fetch "$REMOTE" "$PUBLISH_BRANCH:refs/remotes/$REMOTE/$PUBLISH_BRANCH"
 fi
 
-if [[ ! -d "$PUBLISH_DIR/.git" ]]; then
+if [[ ! -e "$PUBLISH_DIR/.git" ]]; then
     if git show-ref --verify --quiet "refs/heads/$PUBLISH_BRANCH"; then
         git worktree add "$PUBLISH_DIR" "$PUBLISH_BRANCH"
     elif git show-ref --verify --quiet "refs/remotes/$REMOTE/$PUBLISH_BRANCH"; then
