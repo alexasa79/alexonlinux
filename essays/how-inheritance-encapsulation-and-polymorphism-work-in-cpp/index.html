@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>How inheritance, encapsulation and polymorphism work in C&#43;&#43; | Alex on Linux</title>
+<meta name="keywords" content="C&#43;&#43;, call, code, CPU, encapsulation, functions, identifier, inheritance, mangling, memory, method, new, OOD, OOP, polymorphism, progming">
+<meta name="description" content="Introduction Inheritance, encapsulation and polymorphism are undoubtedly the cornerstones of OOP/OOD in general and C&#43;&#43; in particular.
+When programming C, it is very easy to remember how things work. You know that when you add an int variable to a structure it mostly grows by four bytes. You know that long is either four or eight bytes long depending on the architecture you’re working with.
+Things are less obvious when moving to C&#43;&#43;.">
+<meta name="author" content="">
+<link rel="canonical" href="https://alexonlinux.com/essays/how-inheritance-encapsulation-and-polymorphism-work-in-cpp/">
+<link crossorigin="anonymous" href="../../assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://alexonlinux.com/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://alexonlinux.com/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://alexonlinux.com/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://alexonlinux.com/apple-touch-icon.png">
+<link rel="mask-icon" href="https://alexonlinux.com/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://alexonlinux.com/essays/how-inheritance-encapsulation-and-polymorphism-work-in-cpp/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<meta property="og:title" content="How inheritance, encapsulation and polymorphism work in C&#43;&#43;" />
+<meta property="og:description" content="Introduction Inheritance, encapsulation and polymorphism are undoubtedly the cornerstones of OOP/OOD in general and C&#43;&#43; in particular.
+When programming C, it is very easy to remember how things work. You know that when you add an int variable to a structure it mostly grows by four bytes. You know that long is either four or eight bytes long depending on the architecture you’re working with.
+Things are less obvious when moving to C&#43;&#43;." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://alexonlinux.com/essays/how-inheritance-encapsulation-and-polymorphism-work-in-cpp/" /><meta property="article:section" content="essays" />
+<meta property="article:published_time" content="2008-09-18T18:15:09+00:00" />
+<meta property="article:modified_time" content="2008-09-18T18:15:09+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="How inheritance, encapsulation and polymorphism work in C&#43;&#43;"/>
+<meta name="twitter:description" content="Introduction Inheritance, encapsulation and polymorphism are undoubtedly the cornerstones of OOP/OOD in general and C&#43;&#43; in particular.
+When programming C, it is very easy to remember how things work. You know that when you add an int variable to a structure it mostly grows by four bytes. You know that long is either four or eight bytes long depending on the architecture you’re working with.
+Things are less obvious when moving to C&#43;&#43;."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Essays",
+      "item": "https://alexonlinux.com/essays/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "How inheritance, encapsulation and polymorphism work in C++",
+      "item": "https://alexonlinux.com/essays/how-inheritance-encapsulation-and-polymorphism-work-in-cpp/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "How inheritance, encapsulation and polymorphism work in C++",
+  "name": "How inheritance, encapsulation and polymorphism work in C\u002b\u002b",
+  "description": "Introduction Inheritance, encapsulation and polymorphism are undoubtedly the cornerstones of OOP/OOD in general and C++ in particular.\nWhen programming C, it is very easy to remember how things work. You know that when you add an int variable to a structure it mostly grows by four bytes. You know that long is either four or eight bytes long depending on the architecture you’re working with.\nThings are less obvious when moving to C++.",
+  "keywords": [
+    "C++", "call", "code", "CPU", "encapsulation", "functions", "identifier", "inheritance", "mangling", "memory", "method", "new", "OOD", "OOP", "polymorphism", "progming"
+  ],
+  "articleBody": "Introduction Inheritance, encapsulation and polymorphism are undoubtedly the cornerstones of OOP/OOD in general and C++ in particular.\nWhen programming C, it is very easy to remember how things work. You know that when you add an int variable to a structure it mostly grows by four bytes. You know that long is either four or eight bytes long depending on the architecture you’re working with.\nThings are less obvious when moving to C++. OOP brings more abstractions to the program. As a result you are no longer sure if a+b sums two numbers or calls some overloaded operator method that concatenates contents of two files together.\nIn this article, I would like to give you a short insight into what’s going on behind the scenes. In particular we’ll see how the three whales of OOP work in C++.\nThings that I am going to show in this article may differ from compiler to compiler. I will talk mostly about g++ (version 4.2.3). Note however, that same ideas apply everywhere.\nEncapsulation As you know, encapsulation is a principle by which same entity, the object, encapsulates data and methods that manipulate the data. You may be surprised to find out that underneath, class methods are just plain functions.\nHow methods work In C++ there’s one fundamental difference between plain functions and class methods. Class methods receive one additional argument and that is the pointer to the object whose data the method is expected to manipulate. I.e. first argument to a method is pointer to this.\nTo speed things up, C++ developers used single CPU register (ECX/RCX on x86/x86_64) to pass pointer to this, instead of passing it via stack as if it was a regular function argument (no longer true in x86_64).\nOtherwise, objects know nothing about methods that operate on them.\nHow overloading works Another thing that we have to take care of in C++ is how to distinguish between some_function() and some_class::some_function(). Or between some_class::some_function( int ) and some_class::some_function() I.e. what’s the difference between two methods with the same name that receive different number and type of arguments? What is the difference between method and function that has same name?\nObviously, out of linker, compiler and preprocessor, linker is the one that should be aware of the above difference. This is because we may have some_function() in some distant object file. Linker is the component that should find this distant function and interconnect the call to the function and the actual function. Linker uses function name as a unique identifier of the function.\nTo make things work, g++ and any other modern compiler, mangles the name of the method/function and makes sure that:\nMangled method name includes name of the class it belongs to (if it belongs to any class). Mangled method name includes number and type of arguments method receives. Mangled method name includes namespace it belongs to. With these three, some_class::some_function() and some_function() will have totally different mangled name. See the following code sample.\nnamespace some_namespace { class some_class { public: some_class() { } void some_method() { } }; }; class some_class { public: some_class() { } void some_method() { } }; void some_method() { int a; } g++ will turn:\nvoid *some_class::some_method() into _ZN10some_class11some_methodEv void some_namespace::some_class::some_method() into _ZN14some_namespace10some_class11some_methodEv void some_method() into _Z11some_methodv Adding integer argument to void some_method() will turn it from _Z11some_methodv to _Z11some_methodi.\nHow mangling solves the problem So when you create two methods with same name, but with different arguments, compiler turns them into two functions with different names. Later, when linker links the code together it doesn’t know that these are two methods of the same class. From linkers standpoint, these are two different functions.\nStructure and size of the object You probably already know that C++ class and good old C structures are nearly the same thing. Perhaps the only difference is that all class members are private unless specified otherwise. On the contrary, all structure members are public.\nWhen looking at the memory layout of the object, it is very similar to C structure.\nDifferences begin when you add virtual methods. Once you add virtual methods to the class, compiler will create virtual methods table for the class. Then it will place pointer to the table in the beginning of each instance of this class.\nSo, bear in mind that once your class has virtual methods, each object of this class will be four or eight bytes (depends on whether you have 64-bit support or not) bigger.\nActually, pointer to the virtual methods table does not have to be at the beginning of the object. It is just handy to keep it at the beginning, so g++ and most of the modern compilers do it this way.\nAdding virtual methods to the class will also increase amount of RAM your program consumes and its size on your hard drive.\nHow inheritance and polymorphism work Lets say we have two classes. A and B. Class B inherits from class A.\n#include using namespace std; class A { public: A() { a_member = 0; } int a_member; }; class B : public A { public: B() : A() { b_member = 0; }; int b_member; }; int main() { A *a = new B; a-\u003ea_member = 10; return 0; } The interesting thing to notice here is that a actually points to instance of class B. When dereferencing a_member, we’re actually dereferencing a_member that defined in class A, but belongs to class B (via inheritance). To make this happen, compiler has to make sure that common part of both classes (a_member in our case) located at the same offset in the object.\nNow what if we have some virtual methods.\nHow basic polymorphism works Let’s change our example a bit and add some virtual methods.\n#include using namespace std; class A { public: A() { a_member = 0; } virtual int reset() { a_member = 0; } void set_a_member( int a ) { a_member = a; } int get_a_member() { return a_member; } protected: int a_member; }; class B : public A { public: B() : A() { b_member = 0; }; virtual int reset() { a_member = b_member = 0; } virtual void some_virtual_method() { } void set_b_member(int b ) { b_member = b; } int get_b_member() { return b_member; } protected: int b_member; }; int main() { B *b = new B; A *a = b; b-\u003eset_b_member( 20 ); b-\u003eset_a_member( 10 ); a-\u003ereset(); cout \u003c\u003c b-\u003eget_a_member() \u003c\u003c \" \" \u003c\u003c b-\u003eget_b_member() \u003c\u003c endl; return 0; } If you compile and run this program it will obviously print “0 0”. But how, you may ask. After all we did a-\u003ereset(). Without our understanding of polymorphism we could think that we’re calling method that belongs to class A.\nThe reason it works is because when compiler sees code that dereferences pointer to A it expects certain internal object structure and when it dereferences pointer to B it expects different object structure. Let us take a look at both of them.\nHowever even more important here is the structure of the virtual methods tables of both classes.\nIt is because of the virtual methods table structure compilers knows what virtual method to call. When it generates the code that dereferences pointer to A, it expects that first method in the virtual methods table of the object will be pointer to right reset() routine. It doesn’t really care if the pointer actually points to B object. It will call first method of the virtual methods table anyway.\nHow multiple inheritance works Multiple inheritance makes things much more complicated. The problem is that when class C inherits from both A and B, we should have both members of class A and class B in the instance of class C.\n#include using namespace std; class A { public: A() { a_member = 0; } protected: int a_member; }; class B { public: B() { b_member = 0; } protected: int b_member; }; class C : public A, public B { public: C() : A(), B() { c_member = 0; } protected: int c_member; }; int main() { C c; A *a1 = \u0026c; B *b1 = \u0026c; A *a2 = reinterpret_cast\u003cA *\u003e( \u0026c ); B *b2 = reinterpret_cast\u003cB *\u003e( \u0026c ); printf( \"%p %p %p\\n\", \u0026c, a1, b1 ); printf( \"%p %p %p\\n\", \u0026c, a2, b2 ); return 0; } Once we cast pointer to class C into class B, we cannot keep the value of the pointer as is because first fields in the object occupied by fields defined in class A (a_member). Therefore, when we do casting we have to do a very special kind of casting – the one that changes the actual value of the pointer.\nIf you compile and run above code snippet, you will see that all the values are the same except for b1, which should be 4 bytes bigger than other values.\nThis is what (C style casting in our case) casting does – it increments the value of the pointer to make sure that it points to the beginning of the, inherited from B, part of the object.\nIn case you wonder what other types of casting will do, here is a short description.\nDifference between different casting types There are five types of casting in C++.\nreinterpret_cast\u003c\u003e() static_cast\u003c\u003e() dynamic_cast\u003c\u003e() const_cast\u003c\u003e() C style cast. I guess you know already what const_cast\u003c\u003e() does. Also, it is only a compile time casting. C style cast is same as static_cast\u003c\u003e(). This leaves us with three types of casting.\nreinterpret_cast\u003c\u003e() static_cast\u003c\u003e() dynamic_cast\u003c\u003e() From the above example we learn that reinterpret_cast\u003c\u003e() does nothing to the pointer value and leaves it as is.\nstatic_cast\u003c\u003e() and dynamic_cast\u003c\u003e() both modify value of the pointer. The difference between two is that the later relies on RTTI to see if the casting is legal – it looks inside the object to see if it truly belongs to the type we’re trying to cast from. static_cast\u003c\u003e() on the other hand, simply increments the value of the pointer.\nPolymorphism and multiple inheritance Things getting even more complicated when we have virtual methods in each one of the classes A, B and C that we already met. Let’s add following virtual methods to the classes.\nvirtual void set_a( int new_a ) { a_member = new_a; } To class A.\nvirtual void set_b( int new_b ) { b_member = new_b; } To class B and\nvirtual void set_c( int new_c ) { c_member = new_c; } To class C.\nYou could have assumed that even in this case class C objects will have only one virtual tables methods, but this is not true. When you static_cast class C object into class B object, class B object must have its own virtual tables method. If we want to use same casting method as with regular objects (that is adding few bytes to the pointer to reach right portion of the object), then we have no choice but to place another virtual tables method in the middle of the object.\nAs a result, you can have many different virtual methods tables for the same class. The above diagram shows very simple case of inheritance and the truth is that it does not get more complicated than this. Take a look at the following, more complex, class hierarchy.\nIt may surprise you, but structure of the class X object will be quiet simple. In our previous example inheritance hierarchy had two branches. This one has three:\nA-C-F-X D-G-X B-E-H-X All end up with X of course. They are a little longer than in our previous example, but there is nothing special about them. The structure of the object will be the following:\nAs a rule of thumb, g++ (and friends) calculates the branches that lead to the target class, class X in our case. Next it creates a virtual methods table for each branch and places all virtual methods from all classes in the branch into virtual methods table. This includes pointer to virtual methods of the class itself.\nIf we project this rule onto our last example. A-C-F-X branch virtual methods table will include pointers to virtual methods from classes A, C, F and X. Same with other two branches.\nWhat if we try something even more complicated The thing is that you can’t. Lets say we try to create even more complicated hierarchy by changing class D from our previous example to inherit from class C.\nThis will immediately create ambiguous inheritance and the compiler will not hesitate to tell you that this is what happened. This is because now class X will have all members of classes A and C twice. Once it will have it via A-C-F-X branch and once via A-C-D-G-X branch. It will not tell you that there’s a problem immediately. Instead, once you will try to reference one of the members of X inherited from either A or C, g++ will tell you that it has two variations of the same member/method and that it does not know which one of them to call.\nThis what would be g++ output if you try to compile this file.\nmain.cc: In function 'int main()': main.cc:110: error: request for member 'set_a' is ambiguous main.cc:29: error: candidates are: virtual void A::set_a(int) main.cc:29: error: virtual void A::set_a(int) All this because I was trying to do x.set_a( 20 ); in line 110.\nFew words about C++ constructors I guess you know what constructors are good for. In light of what we’ve seen, you may ask yourself, who is building all those virtual methods tables and who writes right pointer into the object.\nObviously compiler builds all the virtual methods tables. And constructor is the one who fills in the right virtual methods table. And this is another reason why you cannot call constructor directly – you don’t want to mess up with virtual methods tables.\nConclusion For now, I think we had some very nice insight of what’s going on inside of the objects you create. Hope you find it useful. In case you have something to say, please leave comments here or send me emails to alexander.sandler@gmail.com.\n",
+  "wordCount" : "2357",
+  "inLanguage": "en",
+  "datePublished": "2008-09-18T18:15:09Z",
+  "dateModified": "2008-09-18T18:15:09Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://alexonlinux.com/essays/how-inheritance-encapsulation-and-polymorphism-work-in-cpp/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Alex on Linux",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://alexonlinux.com/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="../../" accesskey="h" title="Alex on Linux (Alt + H)">Alex on Linux</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="../../" title="Home">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="../../essays/" title="Essays">
+                    <span>Essays</span>
+                </a>
+            </li>
+            <li>
+                <a href="../../author/" title="Author">
+                    <span>Author</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      How inheritance, encapsulation and polymorphism work in C&#43;&#43;
+    </h1>
+    <div class="post-meta"><span title='2008-09-18 18:15:09 +0000 UTC'>September 18, 2008</span>&nbsp;·&nbsp;12 min
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="introduction">Introduction<a hidden class="anchor" aria-hidden="true" href="#introduction">#</a></h1>
+<p>Inheritance, encapsulation and polymorphism are undoubtedly the cornerstones of
+OOP/OOD in general and C++ in particular.</p>
+<p>When programming C, it is very easy to remember how things work. You know that
+when you add an <code>int</code> variable to a structure it mostly grows by four bytes. You
+know that <code>long</code> is either four or eight bytes long depending on the
+architecture you’re working with.</p>
+<p>Things are less obvious when moving to C++. OOP brings more abstractions to the
+program. As a result you are no longer sure if a+b sums two numbers or calls
+some overloaded operator method that concatenates contents of two files
+together.</p>
+<p>In this article, I would like to give you a short insight into what’s going on
+behind the scenes. In particular we’ll see how the three whales of OOP work in
+C++.</p>
+<p>Things that I am going to show in this article may differ from compiler to
+compiler. I will talk mostly about g++ (version 4.2.3). Note however, that same
+ideas apply everywhere.</p>
+<h1 id="encapsulation">Encapsulation<a hidden class="anchor" aria-hidden="true" href="#encapsulation">#</a></h1>
+<p>As you know, encapsulation is a principle by which same entity, the object,
+encapsulates data and methods that manipulate the data. You may be surprised to
+find out that underneath, class methods are just plain functions.</p>
+<h2 id="how-methods-work">How methods work<a hidden class="anchor" aria-hidden="true" href="#how-methods-work">#</a></h2>
+<p>In C++ there’s one fundamental difference between plain functions and class
+methods. Class methods receive one additional argument and that is the pointer
+to the object whose data the method is expected to manipulate. I.e. first
+argument to a method is pointer to <code>this</code>.</p>
+<p>To speed things up, C++ developers used single CPU register (ECX/RCX on
+x86/x86_64) to pass pointer to <code>this</code>, instead of passing it via stack as if it
+was a regular function argument (no longer true in x86_64).</p>
+<p>Otherwise, objects know nothing about methods that operate on them.</p>
+<h2 id="how-overloading-works">How overloading works<a hidden class="anchor" aria-hidden="true" href="#how-overloading-works">#</a></h2>
+<p>Another thing that we have to take care of in C++ is how to distinguish between
+<code>some_function()</code> and <code>some_class::some_function()</code>. Or between
+<code>some_class::some_function( int )</code> and <code>some_class::some_function()</code> I.e. what’s
+the difference between two methods with the same name that receive different
+number and type of arguments? What is the difference between method and function
+that has same name?</p>
+<p>Obviously, out of linker, compiler and preprocessor, linker is the one that
+should be aware of the above difference. This is because we may have
+<code>some_function()</code> in some distant object file. Linker is the component that
+should find this distant function and interconnect the call to the function and
+the actual function. Linker uses function name as a unique identifier of the
+function.</p>
+<p>To make things work, g++ and any other modern compiler, mangles the name of the
+method/function and makes sure that:</p>
+<ol>
+<li>Mangled method name includes name of the class it belongs to (if it belongs
+to any class).</li>
+<li>Mangled method name includes number and type of arguments method receives.</li>
+<li>Mangled method name includes namespace it belongs to.</li>
+</ol>
+<p>With these three, <code>some_class::some_function()</code> and <code>some_function()</code> will have
+totally different mangled name. See the following code sample.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> some_namespace
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">some_class</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        some_class() { }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">some_method</span>() { }
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">some_class</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    some_class() { }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">some_method</span>() { }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">some_method</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> a;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>g++</code> will turn:</p>
+<ul>
+<li><code>void *some_class::some_method()</code> into <code>_ZN10some_class11some_methodEv</code> <code>void some_namespace::some_class::some_method()</code> into
+<code>_ZN14some_namespace10some_class11some_methodEv</code></li>
+<li><code>void some_method()</code> into <code>_Z11some_methodv</code></li>
+</ul>
+<p>Adding integer argument to <code>void some_method()</code> will turn it from
+<code>_Z11some_methodv</code> to <code>_Z11some_methodi</code>.</p>
+<h3 id="how-mangling-solves-the-problem">How mangling solves the problem<a hidden class="anchor" aria-hidden="true" href="#how-mangling-solves-the-problem">#</a></h3>
+<p>So when you create two methods with same name, but with different arguments,
+compiler turns them into two functions with different names. Later, when linker
+links the code together it doesn’t know that these are two methods of the same
+class. From linkers standpoint, these are two different functions.</p>
+<h2 id="structure-and-size-of-the-object">Structure and size of the object<a hidden class="anchor" aria-hidden="true" href="#structure-and-size-of-the-object">#</a></h2>
+<p>You probably already know that C++ class and good old C structures are nearly
+the same thing. Perhaps the only difference is that all class members are
+private unless specified otherwise. On the contrary, all structure members are
+public.</p>
+<p>When looking at the memory layout of the object, it is very similar to C
+structure.</p>
+<p><img loading="lazy" src="../../assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/object_structure1-c0f00e8d60.png" alt="image"  />
+</p>
+<p>Differences begin when you add virtual methods. Once you add virtual methods to
+the class, compiler will create virtual methods table for the class. Then it
+will place pointer to the table in the beginning of each instance of this class.</p>
+<p><img loading="lazy" src="../../assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/object_structure2-d8a64cb716.png" alt="image"  />
+</p>
+<p>So, bear in mind that once your class has virtual methods, each object of this
+class will be four or eight bytes (depends on whether you have 64-bit support or
+not) bigger.</p>
+<p>Actually, pointer to the virtual methods table does not have to be at the
+beginning of the object. It is just handy to keep it at the beginning, so g++
+and most of the modern compilers do it this way.</p>
+<p>Adding virtual methods to the class will also increase amount of RAM your
+program consumes and its size on your hard drive.</p>
+<h1 id="how-inheritance-and-polymorphism-work">How inheritance and polymorphism work<a hidden class="anchor" aria-hidden="true" href="#how-inheritance-and-polymorphism-work">#</a></h1>
+<p>Lets say we have two classes. A and B. Class B inherits from class A.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">using</span> <span style="color:#66d9ef">namespace</span> std;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    A() { a_member <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> a_member;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">B</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> A
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    B() <span style="color:#f92672">:</span> A() { b_member <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> b_member;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    A <span style="color:#f92672">*</span>a <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> B;
+</span></span><span style="display:flex;"><span>    a<span style="color:#f92672">-&gt;</span>a_member <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The interesting thing to notice here is that <code>a</code> actually points to instance of
+class B. When dereferencing <code>a_member</code>, we’re actually dereferencing <code>a_member</code>
+that defined in class A, but belongs to class B (via inheritance). To make this
+happen, compiler has to make sure that common part of both classes (<code>a_member</code>
+in our case) located at the same offset in the object.</p>
+<p><img loading="lazy" src="../../assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/a_b1-0534206b8c.png" alt="image"  />
+</p>
+<p>Now what if we have some virtual methods.</p>
+<h2 id="how-basic-polymorphism-works">How basic polymorphism works<a hidden class="anchor" aria-hidden="true" href="#how-basic-polymorphism-works">#</a></h2>
+<p>Let’s change our example a bit and add some virtual methods.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">using</span> <span style="color:#66d9ef">namespace</span> std;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    A() { a_member <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">reset</span>() { a_member <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">set_a_member</span>( <span style="color:#66d9ef">int</span> a ) { a_member <span style="color:#f92672">=</span> a; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">get_a_member</span>() { <span style="color:#66d9ef">return</span> a_member; }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">protected</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> a_member;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">B</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> A
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    B() <span style="color:#f92672">:</span> A() { b_member <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">reset</span>() { a_member <span style="color:#f92672">=</span> b_member <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">some_virtual_method</span>() { }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">set_b_member</span>(<span style="color:#66d9ef">int</span> b ) { b_member <span style="color:#f92672">=</span> b; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">get_b_member</span>() { <span style="color:#66d9ef">return</span> b_member; }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">protected</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> b_member;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    B <span style="color:#f92672">*</span>b <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> B;
+</span></span><span style="display:flex;"><span>    A <span style="color:#f92672">*</span>a <span style="color:#f92672">=</span> b;
+</span></span><span style="display:flex;"><span>    b<span style="color:#f92672">-&gt;</span>set_b_member( <span style="color:#ae81ff">20</span> );
+</span></span><span style="display:flex;"><span>    b<span style="color:#f92672">-&gt;</span>set_a_member( <span style="color:#ae81ff">10</span> );
+</span></span><span style="display:flex;"><span>    a<span style="color:#f92672">-&gt;</span>reset();
+</span></span><span style="display:flex;"><span>    cout <span style="color:#f92672">&lt;&lt;</span> b<span style="color:#f92672">-&gt;</span>get_a_member() <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; &#34;</span> <span style="color:#f92672">&lt;&lt;</span> b<span style="color:#f92672">-&gt;</span>get_b_member() <span style="color:#f92672">&lt;&lt;</span>
+</span></span><span style="display:flex;"><span>        endl;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>If you compile and run this program it will obviously print “0 0”. But how, you
+may ask. After all we did <code>a-&gt;reset()</code>. Without our understanding of
+polymorphism we could think that we’re calling method that belongs to class A.</p>
+<p>The reason it works is because when compiler sees code that dereferences pointer
+to A it expects certain internal object structure and when it dereferences
+pointer to B it expects different object structure. Let us take a look at both
+of them.</p>
+<p><img loading="lazy" src="../../assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/a_b2-f66e52e93a.png" alt="image"  />
+</p>
+<p>However even more important here is the structure of the virtual methods tables
+of both classes.</p>
+<p><img loading="lazy" src="../../assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/a_b_virtuals-b1b162ddb5.png" alt="image"  />
+</p>
+<p>It is because of the virtual methods table structure compilers knows what
+virtual method to call. When it generates the code that dereferences pointer to
+A, it expects that first method in the virtual methods table of the object will
+be pointer to right <code>reset()</code> routine. It doesn’t really care if the pointer
+actually points to B object. It will call first method of the virtual methods
+table anyway.</p>
+<h2 id="how-multiple-inheritance-works">How multiple inheritance works<a hidden class="anchor" aria-hidden="true" href="#how-multiple-inheritance-works">#</a></h2>
+<p>Multiple inheritance makes things much more complicated. The problem is that
+when class C inherits from both A and B, we should have both members of class A
+and class B in the instance of class C.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">using</span> <span style="color:#66d9ef">namespace</span> std;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    A() { a_member <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">protected</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> a_member;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">B</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    B() { b_member <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">protected</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> b_member;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">C</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> A, <span style="color:#66d9ef">public</span> B
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    C() <span style="color:#f92672">:</span> A(), B() { c_member <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">protected</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> c_member;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    C c;
+</span></span><span style="display:flex;"><span>    A <span style="color:#f92672">*</span>a1 <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>c;
+</span></span><span style="display:flex;"><span>    B <span style="color:#f92672">*</span>b1 <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>c;
+</span></span><span style="display:flex;"><span>    A <span style="color:#f92672">*</span>a2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">reinterpret_cast</span><span style="color:#f92672">&lt;</span>A <span style="color:#f92672">*&gt;</span>( <span style="color:#f92672">&amp;</span>c );
+</span></span><span style="display:flex;"><span>    B <span style="color:#f92672">*</span>b2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">reinterpret_cast</span><span style="color:#f92672">&lt;</span>B <span style="color:#f92672">*&gt;</span>( <span style="color:#f92672">&amp;</span>c );
+</span></span><span style="display:flex;"><span>    printf( <span style="color:#e6db74">&#34;%p %p %p</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#f92672">&amp;</span>c, a1, b1 );
+</span></span><span style="display:flex;"><span>    printf( <span style="color:#e6db74">&#34;%p %p %p</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#f92672">&amp;</span>c, a2, b2 );
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><img loading="lazy" src="../../assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/inheritance1-6ffea1c9ce.png" alt="image"  />
+</p>
+<p>Once we cast pointer to class C into class B, we cannot keep the value of the
+pointer as is because first fields in the object occupied by fields defined in
+class A (<code>a_member</code>). Therefore, when we do casting we have to do a very special
+kind of casting – the one that changes the actual value of the pointer.</p>
+<p>If you compile and run above code snippet, you will see that all the values are
+the same except for b1, which should be 4 bytes bigger than other values.</p>
+<p><img loading="lazy" src="../../assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/inheritance2-8bad0425fe.png" alt="image"  />
+</p>
+<p>This is what (C style casting in our case) casting does – it increments the
+value of the pointer to make sure that it points to the beginning of the,
+inherited from B, part of the object.</p>
+<p>In case you wonder what other types of casting will do, here is a short
+description.</p>
+<h3 id="difference-between-different-casting-types">Difference between different casting types<a hidden class="anchor" aria-hidden="true" href="#difference-between-different-casting-types">#</a></h3>
+<p>There are five types of casting in C++.</p>
+<ol>
+<li>reinterpret_cast&lt;&gt;()</li>
+<li>static_cast&lt;&gt;()</li>
+<li>dynamic_cast&lt;&gt;()</li>
+<li>const_cast&lt;&gt;()</li>
+<li>C style cast.</li>
+</ol>
+<p>I guess you know already what const_cast&lt;&gt;() does. Also, it is only a compile
+time casting. C style cast is same as static_cast&lt;&gt;(). This leaves us with three
+types of casting.</p>
+<ol>
+<li>reinterpret_cast&lt;&gt;()</li>
+<li>static_cast&lt;&gt;()</li>
+<li>dynamic_cast&lt;&gt;()</li>
+</ol>
+<p>From the above example we learn that reinterpret_cast&lt;&gt;() does nothing to the
+pointer value and leaves it as is.</p>
+<p>static_cast&lt;&gt;() and dynamic_cast&lt;&gt;() both modify value of the pointer. The
+difference between two is that the later relies on RTTI to see if the casting is
+legal – it looks inside the object to see if it truly belongs to the type we’re
+trying to cast from. static_cast&lt;&gt;() on the other hand, simply increments the
+value of the pointer.</p>
+<h2 id="polymorphism-and-multiple-inheritance">Polymorphism and multiple inheritance<a hidden class="anchor" aria-hidden="true" href="#polymorphism-and-multiple-inheritance">#</a></h2>
+<p>Things getting even more complicated when we have virtual methods in each one of
+the classes A, B and C that we already met. Let’s add following virtual methods
+to the classes.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">set_a</span>( <span style="color:#66d9ef">int</span> new_a ) { a_member <span style="color:#f92672">=</span> new_a; }
+</span></span></code></pre></div><p>To class A.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">set_b</span>( <span style="color:#66d9ef">int</span> new_b ) { b_member <span style="color:#f92672">=</span> new_b; }
+</span></span></code></pre></div><p>To class B and</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">set_c</span>( <span style="color:#66d9ef">int</span> new_c ) { c_member <span style="color:#f92672">=</span> new_c; }
+</span></span></code></pre></div><p>To class C.</p>
+<p><img loading="lazy" src="../../assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/inheritance3-523d2db577.png" alt="image"  />
+</p>
+<p>You could have assumed that even in this case class C objects will have only one
+virtual tables methods, but this is not true. When you static_cast class C
+object into class B object, class B object must have its own virtual tables
+method. If we want to use same casting method as with regular objects (that is
+adding few bytes to the pointer to reach right portion of the object), then we
+have no choice but to place another virtual tables method in the middle of the
+object.</p>
+<p>As a result, you can have many different virtual methods tables for the same
+class. The above diagram shows very simple case of inheritance and the truth is
+that it does not get more complicated than this. Take a look at the following,
+more complex, class hierarchy.</p>
+<p><img loading="lazy" src="../../assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/hierarchy1-97b25b870c.png" alt="image"  />
+</p>
+<p>It may surprise you, but structure of the class X object will be quiet simple.
+In our previous example inheritance hierarchy had two branches. This one has
+three:</p>
+<ol>
+<li>A-C-F-X</li>
+<li>D-G-X</li>
+<li>B-E-H-X</li>
+</ol>
+<p>All end up with X of course. They are a little longer than in our previous
+example, but there is nothing special about them. The structure of the object
+will be the following:</p>
+<p><img loading="lazy" src="../../assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/classx-59322c14d9.png" alt="image"  />
+</p>
+<p>As a rule of thumb, g++ (and friends) calculates the branches that lead to the
+target class, class X in our case. Next it creates a virtual methods table for
+each branch and places all virtual methods from all classes in the branch into
+virtual methods table. This includes pointer to virtual methods of the class
+itself.</p>
+<p>If we project this rule onto our last example. A-C-F-X branch virtual methods
+table will include pointers to virtual methods from classes A, C, F and X. Same
+with other two branches.</p>
+<h3 id="what-if-we-try-something-even-more-complicated">What if we try something even more complicated<a hidden class="anchor" aria-hidden="true" href="#what-if-we-try-something-even-more-complicated">#</a></h3>
+<p>The thing is that you can’t. Lets say we try to create even more complicated
+hierarchy by changing class D from our previous example to inherit from class C.</p>
+<p><img loading="lazy" src="../../assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/hierarchy2-93030afbca.png" alt="image"  />
+</p>
+<p>This will immediately create ambiguous inheritance and the compiler will not
+hesitate to tell you that this is what happened. This is because now class X
+will have all members of classes A and C twice. Once it will have it via A-C-F-X
+branch and once via A-C-D-G-X branch. It will not tell you that there’s a
+problem immediately. Instead, once you will try to reference one of the members
+of X inherited from either A or C, g++ will tell you that it has two variations
+of the same member/method and that it does not know which one of them to call.</p>
+<p>This what would be g++ output if you try to compile <a href="http://www.alexonlinux.com/wp-content/uploads/2008/09/main.cc">this
+file</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>main.cc: In function <span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#66d9ef">int</span> main()<span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>main.cc:<span style="color:#ae81ff">110</span><span style="color:#f92672">:</span> error: request <span style="color:#66d9ef">for</span> member <span style="color:#960050;background-color:#1e0010">&#39;</span>set_a<span style="color:#960050;background-color:#1e0010">&#39;</span> is ambiguous
+</span></span><span style="display:flex;"><span>main.cc:<span style="color:#ae81ff">29</span><span style="color:#f92672">:</span> error: candidates are: <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> A<span style="color:#f92672">::</span>set_a(<span style="color:#66d9ef">int</span>)
+</span></span><span style="display:flex;"><span>main.cc:<span style="color:#ae81ff">29</span><span style="color:#f92672">:</span> error:                 <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> A<span style="color:#f92672">::</span>set_a(<span style="color:#66d9ef">int</span>)
+</span></span></code></pre></div><p>All this because I was trying to do <code>x.set_a( 20 );</code> in line 110.</p>
+<h2 id="few-words-about-c-constructors">Few words about C++ constructors<a hidden class="anchor" aria-hidden="true" href="#few-words-about-c-constructors">#</a></h2>
+<p>I guess you know what constructors are good for. In light of what we’ve seen,
+you may ask yourself, who is building all those virtual methods tables and who
+writes right pointer into the object.</p>
+<p>Obviously compiler builds all the virtual methods tables. And constructor is the
+one who fills in the right virtual methods table. And this is another reason why
+you cannot call constructor directly – you don’t want to mess up with virtual
+methods tables.</p>
+<h1 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h1>
+<p>For now, I think we had some very nice insight of what’s going on inside of the
+objects you create. Hope you find it useful. In case you have something to say,
+please leave comments here or send me emails to
+<a href="mailto:alexander.sandler@gmail.com">alexander.sandler@gmail.com</a>.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share How inheritance, encapsulation and polymorphism work in C&#43;&#43; on x"
+            href="https://x.com/intent/tweet/?text=How%20inheritance%2c%20encapsulation%20and%20polymorphism%20work%20in%20C%2b%2b&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2fhow-inheritance-encapsulation-and-polymorphism-work-in-cpp%2f&amp;hashtags=C%2b%2b%2ccall%2ccode%2cCPU%2cencapsulation%2cfunctions%2cidentifier%2cinheritance%2cmangling%2cmemory%2cmethod%2cnew%2cOOD%2cOOP%2cpolymorphism%2cprogming">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share How inheritance, encapsulation and polymorphism work in C&#43;&#43; on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2fhow-inheritance-encapsulation-and-polymorphism-work-in-cpp%2f&amp;title=How%20inheritance%2c%20encapsulation%20and%20polymorphism%20work%20in%20C%2b%2b&amp;summary=How%20inheritance%2c%20encapsulation%20and%20polymorphism%20work%20in%20C%2b%2b&amp;source=https%3a%2f%2falexonlinux.com%2fessays%2fhow-inheritance-encapsulation-and-polymorphism-work-in-cpp%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share How inheritance, encapsulation and polymorphism work in C&#43;&#43; on reddit"
+            href="https://reddit.com/submit?url=https%3a%2f%2falexonlinux.com%2fessays%2fhow-inheritance-encapsulation-and-polymorphism-work-in-cpp%2f&title=How%20inheritance%2c%20encapsulation%20and%20polymorphism%20work%20in%20C%2b%2b">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share How inheritance, encapsulation and polymorphism work in C&#43;&#43; on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2falexonlinux.com%2fessays%2fhow-inheritance-encapsulation-and-polymorphism-work-in-cpp%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share How inheritance, encapsulation and polymorphism work in C&#43;&#43; on whatsapp"
+            href="https://api.whatsapp.com/send?text=How%20inheritance%2c%20encapsulation%20and%20polymorphism%20work%20in%20C%2b%2b%20-%20https%3a%2f%2falexonlinux.com%2fessays%2fhow-inheritance-encapsulation-and-polymorphism-work-in-cpp%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share How inheritance, encapsulation and polymorphism work in C&#43;&#43; on telegram"
+            href="https://telegram.me/share/url?text=How%20inheritance%2c%20encapsulation%20and%20polymorphism%20work%20in%20C%2b%2b&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2fhow-inheritance-encapsulation-and-polymorphism-work-in-cpp%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share How inheritance, encapsulation and polymorphism work in C&#43;&#43; on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=How%20inheritance%2c%20encapsulation%20and%20polymorphism%20work%20in%20C%2b%2b&u=https%3a%2f%2falexonlinux.com%2fessays%2fhow-inheritance-encapsulation-and-polymorphism-work-in-cpp%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

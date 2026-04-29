@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Essays on Alex on Linux</title>
+    <link>https://alexonlinux.com/essays/</link>
+    <description>Recent content in Essays on Alex on Linux</description>
+    <generator>Hugo -- 0.123.7</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 05 Jul 2016 04:49:56 +0000</lastBuildDate>
+    <atom:link href="https://alexonlinux.com/essays/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Why you need a mutex to protect an int</title>
+      <link>https://alexonlinux.com/essays/why-you-need-a-mutex-to-protect-an-int/</link>
+      <pubDate>Tue, 05 Jul 2016 04:49:56 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/why-you-need-a-mutex-to-protect-an-int/</guid>
+      <description>This is a follow up on my previous essay about need to protect access to even simplest variables when working in multi-threaded environment. In this essay I would like to explain what’s going on under the hood and why you actually need some protection here.
+As in many other computer architectures, in x86 memory access is fairly slow. To give you some perspective, accessing register in CPU takes roughly .5 nano-seconds.</description>
+    </item>
+    <item>
+      <title>Cautionary tale about using threads and fork()</title>
+      <link>https://alexonlinux.com/essays/cautionary-tale-about-using-threads-and-fork/</link>
+      <pubDate>Mon, 25 May 2015 05:34:31 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/cautionary-tale-about-using-threads-and-fork/</guid>
+      <description>I ran into one interesting problem. I found a process stuck on mutex. This sounds like a common deadlock, but it wasn’t that obvious. Thread that was stuck is the only thread in the process.
+I clearly saw from printouts that that mutex was locked in the past by some other thread that no longer exist. Sometimes you can get into this kind of problems when you are not handling exceptions properly.</description>
+    </item>
+    <item>
+      <title>Bloom filters</title>
+      <link>https://alexonlinux.com/essays/bloom-filters/</link>
+      <pubDate>Wed, 04 Sep 2013 05:08:24 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/bloom-filters/</guid>
+      <description>Bloom filter is a data structure that contains set of elements. Unlike regular data structures it cannot contain data that is associated with certain key. Neither it can contain keys themselves. The only type of information it can contain is whether certain key belongs to a set or not.
+You must be wondering what it is useful for. Here’s typical scenario for using bloom filter. Lets say you have large data structure and you often have to check if particular member is in the data structure.</description>
+    </item>
+    <item>
+      <title>printf() vs stream IO in C&#43;&#43;</title>
+      <link>https://alexonlinux.com/essays/printf-vs-stream-io-in-cpp/</link>
+      <pubDate>Tue, 14 Aug 2012 21:10:51 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/printf-vs-stream-io-in-cpp/</guid>
+      <description>Before joining Dell I was mostly working in kernel writing in C programming language. At Dell I still work on mostly low level stuff, but this time it is user-mode, so I am not tied up to C anymore. We’re writing in C++ and I am learning C++. One of the less appealing things for me in C++ was streaming support and the way its input/output implemented. In particular I got used to printf() functions family and leaving those in favor of streams and cout was tough.</description>
+    </item>
+    <item>
+      <title>gcc macro language extensions</title>
+      <link>https://alexonlinux.com/essays/gcc-macro-language-extensions/</link>
+      <pubDate>Thu, 09 Feb 2012 00:28:41 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/gcc-macro-language-extensions/</guid>
+      <description>One of the great things about gcc and in particular its C/C++ preprocessor is various extensions that it has. In this essay I would like to briefly describe three of them. One allows to turn C/C++ token into a string. Here token is anything that you can pass as an argument to a macro. Second allows you concatenate two tokens to create new expression. The last one allows C/C++ macros with variable number of arguments.</description>
+    </item>
+    <item>
+      <title>UML cheatsheet</title>
+      <link>https://alexonlinux.com/essays/uml-cheatsheet/</link>
+      <pubDate>Mon, 19 Sep 2011 18:48:44 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/uml-cheatsheet/</guid>
+      <description>Every once in awhile, I have to draw a UML diagram. I rarely do serious designs with UML, however sometimes I do need to depict some piece of code in a diagram and UML seems to be the best notation around.
+Unfortunately, various sources of information on UML tend to over-complicate things. I am not software architect and drawing UMLs is not my job. So my UML skills are poor by definition.</description>
+    </item>
+    <item>
+      <title>Models for multithreaded applications</title>
+      <link>https://alexonlinux.com/essays/models-for-multithreaded-applications/</link>
+      <pubDate>Fri, 22 Apr 2011 00:00:18 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/models-for-multithreaded-applications/</guid>
+      <description>As you know, I changed a couple of workplaces during my career. Long story short, one interesting thing that I noticed in different companies is various models for multi-threaded programs (mostly for large embedded systems).
+Lets say we have a multi-threaded program. The program should handle heterogeneous tasks. On a very basic level, our program probably receives some data, processes it and produces an output. Question of how to manage threads usually arises in performance critical applications.</description>
+    </item>
+    <item>
+      <title>pthread_exit() in C&#43;&#43;</title>
+      <link>https://alexonlinux.com/essays/pthread-exit-in-cpp/</link>
+      <pubDate>Sat, 09 Oct 2010 11:28:03 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/pthread-exit-in-cpp/</guid>
+      <description>Today I ran into an interesting problem that I would like to share. I am working on multi-threaded code in C++. Here’s what happened.
+I started a thread that looks like this:
+try { do_something() } catch (...) { std::cout &amp;lt;&amp;lt; &amp;#34;Got unknown exception&amp;#34; &amp;lt;&amp;lt; std::endl; } The do_something() routine eventually called pthread_exit().
+Once I ran this piece of code, I instantly got an unknown exception notification. Long story short, here’s what I found out.</description>
+    </item>
+    <item>
+      <title>Call a constructor or allocate an object in-place</title>
+      <link>https://alexonlinux.com/essays/call-a-constructor-or-allocate-an-object-in-place/</link>
+      <pubDate>Sun, 04 Jul 2010 22:40:10 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/call-a-constructor-or-allocate-an-object-in-place/</guid>
+      <description>Since I joined Dell, my main field of research and work has somewhat changed. Now I am mostly working with C++ and file-systems. This world is not entirely new to me, but apparently I have a lot of stuff to learn.
+Today I’d like to talk about one nice trick that I learned few days ago.
+When working with large software systems, memory management becomes an imperative. In C, you can easily allocate a large chunk of memory and allocate structure right on that buffer.</description>
+    </item>
+    <item>
+      <title>How less processes its input</title>
+      <link>https://alexonlinux.com/essays/how-less-processes-its-input/</link>
+      <pubDate>Wed, 28 Apr 2010 15:37:37 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/how-less-processes-its-input/</guid>
+      <description>Here’s an interesting bit I ran into few days ago. I got curious how is that less (or more) can read file contents from standard input and yet it is able to process input that comes from user. Both of them come from standard input, yet these are quiet heterogeneous streams of information. So, how can it be?
+At first, I thought less reads entire input first. This would make standard input stream free to process key presses from the user.</description>
+    </item>
+    <item>
+      <title>What is direct I/O anyway?</title>
+      <link>https://alexonlinux.com/essays/what-is-direct-io-anyway/</link>
+      <pubDate>Mon, 15 Feb 2010 12:03:57 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/what-is-direct-io-anyway/</guid>
+      <description>Few days ago I’ve written an essay explaining how to do a direct I/O in Python. But then I thought that it might be a good idea to explain what direct I/O is. So, here we go.
+As surprising as it is, when you write some information to the disk, it doesn’t get there immediately. In Linux especially, the kernel tries to cache write requests in memory as much as it can.</description>
+    </item>
+    <item>
+      <title>Direct IO in Python</title>
+      <link>https://alexonlinux.com/essays/direct-io-in-python/</link>
+      <pubDate>Tue, 12 Jan 2010 09:50:06 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/direct-io-in-python/</guid>
+      <description>Doing file I/O of any kind in Python is really easy. You can start with plain open() and friends, working with Python’s file objects. by the way, Python’s open() resembles C’s fopen() so closely that I can’t stop thinking that open() may be based on fopen().
+When its not enough, you can always upgrade to open() and close() from os module. Opening man page on open() (open(2)) reveals all those O_something options that you can pass to os.</description>
+    </item>
+    <item>
+      <title>Rethinking linked list insertion</title>
+      <link>https://alexonlinux.com/essays/rethinking-linked-list-insertion/</link>
+      <pubDate>Sat, 19 Dec 2009 14:24:36 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/rethinking-linked-list-insertion/</guid>
+      <description>There is one nice thing in looking for a new job. That is, you meet lots of new people and have a chance to learn from them. For example in one of the companies I was asked about something called anti-debugging. I didn’t have a clue what that is and had to ask for an explanation. Apparently, this is a set of techniques used to fool a debugger and make the code undebuggable.</description>
+    </item>
+    <item>
+      <title>MSI-X – the right way to spread interrupt load</title>
+      <link>https://alexonlinux.com/essays/msi-x-the-right-way-to-spread-interrupt-load/</link>
+      <pubDate>Wed, 18 Nov 2009 09:46:11 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/msi-x-the-right-way-to-spread-interrupt-load/</guid>
+      <description>When considering ways to spread interrupts from one device among multiple cores, I can’t not to mention MSI-X. The thing is that MSI-X is actually the right way to do the job.
+Interrupt affinity, which I discussed here and here, has a fundamental problem. That is inevitable CPU cache misses. To emphasise this, think about what happens when your computer receives a packet from the network. Packet belongs to some connection.</description>
+    </item>
+    <item>
+      <title>Why interrupt affinity with multiple cores is not such a good thing</title>
+      <link>https://alexonlinux.com/essays/why-interrupt-affinity-with-multiple-cores-is-not-such-a-good-thing/</link>
+      <pubDate>Thu, 17 Sep 2009 14:44:23 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/why-interrupt-affinity-with-multiple-cores-is-not-such-a-good-thing/</guid>
+      <description>One of the features of x86 architecture is ability to spread interrupts evenly among multiple cores. Benefits of such configuration seems to be obvious. Interrupts consume CPU time and by spreading them on all cores we avoid bottle-necks.
+I’ve written an article explaining this mechanism in greater detail. Yet let me remind you how it works in two words.
+Every x86 motherboard has a chip called IO-APIC. This is a device that controls interrupt delivery within your system.</description>
+    </item>
+    <item>
+      <title>C/C&#43;&#43; reference counting with atomic variables and gcc</title>
+      <link>https://alexonlinux.com/essays/cc-reference-counting-with-atomic-variables-and-gcc/</link>
+      <pubDate>Wed, 27 May 2009 13:08:51 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/cc-reference-counting-with-atomic-variables-and-gcc/</guid>
+      <description>Introduction Lets say we have a data structure that manages objects and we would like to manipulate the data structure and the objects from two or more threads. To achieve maximum performance we have to distinguish between mechanism that we use to protect the data structure itself, and the mechanism that we use to protect actual objects.
+What reference counting needed for? To explain why two mechanisms provide best performance and atomic variables aid us, consider following scenario.</description>
+    </item>
+    <item>
+      <title>pthread mutex vs pthread spinlock</title>
+      <link>https://alexonlinux.com/essays/pthread-mutex-vs-pthread-spinlock/</link>
+      <pubDate>Sun, 17 May 2009 14:16:41 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/pthread-mutex-vs-pthread-spinlock/</guid>
+      <description>Update 06/16/2009: On several occasions, commentators to this article pointed out that this essay is somewhat incomplete. Therefore, before I continue, I would like to make some things clear.
+Before considering the code below, please note that spinlocks are totally useless on uni-processor computers. This is due to a nature of spinlocks, which I will describe in future essays.
+Also, it is not the intent of this article to show that spinlocks better than mutexes in all circumstances.</description>
+    </item>
+    <item>
+      <title>A new kind of virtualization</title>
+      <link>https://alexonlinux.com/essays/a-new-kind-of-virtualization/</link>
+      <pubDate>Wed, 06 May 2009 12:39:32 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/a-new-kind-of-virtualization/</guid>
+      <description>There are plenty of virtualization technologies. There are organizations like VMware, VirtualBox and XEN, whose virtualization allows one to run several virtual computers using one physical computer.
+I worked at a company called ScaleMP. ScaleMP’s technology, vSMP, turns multiple physical computers into one large computer.
+Today I was looking for something different. I was looking for technology that turns multi-core physical computer into a virtual computer with a single core, whose power is a combined power of all physical CPUs.</description>
+    </item>
+    <item>
+      <title>Python’s optparse for human beings</title>
+      <link>https://alexonlinux.com/essays/pythons-optparse-for-human-beings/</link>
+      <pubDate>Wed, 29 Apr 2009 10:23:17 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/pythons-optparse-for-human-beings/</guid>
+      <description>Introduction This article extends optparse’s documentation. optparse is a Python module that allows your program to easily parse command line options it receives. In addition, it takes care of some of the very common tasks, such as handling -h command line option.
+optparse is one of those modules that are an absolutely must have for almost every project. However, because we start new project so seldom, it is difficult to remember all those recipes that we come up with, every time we add a new command line option.</description>
+    </item>
+    <item>
+      <title>Signal handling in Linux</title>
+      <link>https://alexonlinux.com/essays/signal-handling-in-linux/</link>
+      <pubDate>Sun, 19 Apr 2009 20:16:17 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/signal-handling-in-linux/</guid>
+      <description>Introduction Perhaps any engineer developing for Linux encounters this problem. What’s is the right way to terminate the program? What are the ways to receive notifications from operating system about events that occur.
+Traditional Unix systems have the answers ready. The answer to these questions is signals.
+This article addresses these questions. Here, I’ll try to explain what signals are, their nature. We’ll talk about what are the right ways to handle signals, what signals to handle and what are the pitfalls of signal handling in Linux in particular.</description>
+    </item>
+    <item>
+      <title>Backup and restore your Linux installation</title>
+      <link>https://alexonlinux.com/essays/backup-and-restore-your-linux-installation/</link>
+      <pubDate>Wed, 08 Apr 2009 16:18:40 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/backup-and-restore-your-linux-installation/</guid>
+      <description>Introduction Backing up Linux installation and restoring it, is perhaps one of the most fundamental tasks that every system administrator has to deal with.
+Here are some important points about backup methods that we will discuss in this article.
+This article is about backing up from a command line. Incremental and periodic backups are good for some things. Yet when it comes to an operating system installation, the whole point of backing up your system is to save you some time reinstalling it, in case something goes wrong.</description>
+    </item>
+    <item>
+      <title>Creating new application on top of SSH</title>
+      <link>https://alexonlinux.com/essays/creating-new-application-on-top-of-ssh/</link>
+      <pubDate>Mon, 23 Mar 2009 15:03:16 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/creating-new-application-on-top-of-ssh/</guid>
+      <description>Introduction As you know, you can use SSH for two things. First, there’s a remote access. You can get access to a command line on a remote computer. Second use is for transferring files. OpenSSH suite comes with a handy tool called scp which allows you to copy files to and from a remote computer over SSH. Files being transferred securely, without exposing their content to someone who may be sniffing our traffic.</description>
+    </item>
+    <item>
+      <title>SSH crash course</title>
+      <link>https://alexonlinux.com/essays/ssh-crash-course/</link>
+      <pubDate>Tue, 17 Mar 2009 19:07:06 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/ssh-crash-course/</guid>
+      <description>About this article I would like to do two things in this article. First I would like to tell you about SSH. How to make it work. How to use public key cryptography to login to a remote computer. How to execute remote commands and copy files to/from a remote machine.
+On the other hand, I would like this document to be a sort of reference guide document. For that reason, I provide a list of links to various places in the document, that show you how to do actual stuff without too much talking around.</description>
+    </item>
+    <item>
+      <title>How to handle SIGSEGV, but also generate a core dump</title>
+      <link>https://alexonlinux.com/essays/how-to-handle-sigsegv-but-also-generate-a-core-dump/</link>
+      <pubDate>Sun, 08 Feb 2009 00:03:43 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/how-to-handle-sigsegv-but-also-generate-a-core-dump/</guid>
+      <description>Recently I ran into this problem. How do you capture SIGSEGV with a signal handler and still generate a core file?
+The problem is that once you have your own signal handler for SIGSEGV, Linux will not call default signal handler which generates the core file. So, once you got SIGSEGV, consider all that useful information about about origin of the exception, lost.
+Luckily, there’s a solution. Here’s what I did.</description>
+    </item>
+    <item>
+      <title>Multithreaded simple data type access and atomic variables</title>
+      <link>https://alexonlinux.com/essays/multithreaded-simple-data-type-access-and-atomic-variables/</link>
+      <pubDate>Tue, 23 Dec 2008 13:55:29 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/multithreaded-simple-data-type-access-and-atomic-variables/</guid>
+      <description>Introduction In this article I would like to continue subject I started in my previous two essays (essay 1 and essay 2). Question I am trying to answer is what is the most efficient, yet safe way of accessing simple data type variables from two or more threads. I.e. how to change a variable from two threads at the same time, without screwing its value.
+In my first essay I’ve shown how easy it is to turn variable value into garbage by modifying it from two or more threads.</description>
+    </item>
+    <item>
+      <title>pthread spinlocks</title>
+      <link>https://alexonlinux.com/essays/pthread-spinlocks/</link>
+      <pubDate>Sun, 09 Nov 2008 09:23:39 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/pthread-spinlocks/</guid>
+      <description>Continuing my previous essay, I would like to talk about relatively new feature in glibc and pthreads in particular. I am talking about spinlocks.
+Quiet often you want to protect some simple data structures from simultaneous access by two or more threads. As in my previous essay, this can even be a simple integer. Using mutexes and semaphores (critical sections if you wish) to protect simple integer is an overkill and here’s why.</description>
+    </item>
+    <item>
+      <title>Do you need a mutex to protect an int?</title>
+      <link>https://alexonlinux.com/essays/do-you-need-a-mutex-to-protect-an-int/</link>
+      <pubDate>Thu, 23 Oct 2008 17:16:23 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/do-you-need-a-mutex-to-protect-an-int/</guid>
+      <description>Recently I ran into few pieces of code here and there that assumed that int is an atomic type. I.e. when you modify value of the variable from two or more different threads at the same time, all of the changes you’ve made to the value will remain intact.
+But really, can you modify variables of basic types (integers, floats, etc), from two or more threads, at the same time, without screwing their value?</description>
+    </item>
+    <item>
+      <title>How inheritance, encapsulation and polymorphism work in C&#43;&#43;</title>
+      <link>https://alexonlinux.com/essays/how-inheritance-encapsulation-and-polymorphism-work-in-cpp/</link>
+      <pubDate>Thu, 18 Sep 2008 18:15:09 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/how-inheritance-encapsulation-and-polymorphism-work-in-cpp/</guid>
+      <description>Introduction Inheritance, encapsulation and polymorphism are undoubtedly the cornerstones of OOP/OOD in general and C++ in particular.
+When programming C, it is very easy to remember how things work. You know that when you add an int variable to a structure it mostly grows by four bytes. You know that long is either four or eight bytes long depending on the architecture you’re working with.
+Things are less obvious when moving to C++.</description>
+    </item>
+    <item>
+      <title>32bit vs 64bit computers, the QA</title>
+      <link>https://alexonlinux.com/essays/32bit-vs-64bit-computers-the-qa/</link>
+      <pubDate>Tue, 26 Aug 2008 12:05:00 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/32bit-vs-64bit-computers-the-qa/</guid>
+      <description>Introduction Many wonder what is the real difference between 64-bit and 32-bit computers. Is paying a little extra for 64-bit support really worth it?
+What 64-bit support mean? This can mean many things actually. This article dedicated to recent (relatively of course) addition of the 64-bit support in AMD’s and Intel’s micro-processors. Processors supporting 64-bit calculations exists for many years. However these were industry class processors, very expensive and powerful. Couple of year ago, first AMD and then Intel began selling 64-bit processors designed with home user in mind.</description>
+    </item>
+    <item>
+      <title>Swap vs. no swap</title>
+      <link>https://alexonlinux.com/essays/swap-vs-no-swap/</link>
+      <pubDate>Thu, 21 Aug 2008 11:43:25 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/swap-vs-no-swap/</guid>
+      <description>Introduction This short article deals with simple question. How exactly lack of swap partition affects Linux’s performance. What would happen if you turn the swap off?
+The obvious Memory leaks The obvious price one would have to pay for turning the swap off is lack of so called virtual memory. The term virtual memory refers to several different things really. What I mean is that when a program leaks memory, the memory it has leaked will remain unused as long as the program still running.</description>
+    </item>
+    <item>
+      <title>Few problems that you may encounter when booting Linux</title>
+      <link>https://alexonlinux.com/essays/few-problems-that-you-may-encounter-when-booting-linux/</link>
+      <pubDate>Sat, 26 Jul 2008 12:08:30 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/few-problems-that-you-may-encounter-when-booting-linux/</guid>
+      <description>Introduction I thought I’d write a few things that I do with kernel when administrating my Linux machines. There are plenty of “how to compile your kernel” guides out there and I won’t write another one. Instead I want to mention few things that often neglected in those guides.
+Let me give you an example. One very common situation is when you are trying to boot with your newly compiled kernel and it won’t boot.</description>
+    </item>
+    <item>
+      <title>sed – the missing manual</title>
+      <link>https://alexonlinux.com/essays/sed-the-missing-manual/</link>
+      <pubDate>Wed, 16 Jul 2008 08:28:54 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/sed-the-missing-manual/</guid>
+      <description>Introduction sed is an exceptionally powerful and often overlooked tool. Its most common use is in scripts, where we want to replace part of the string matching certain pattern. While this is the most common use, it’s far from being its only use.
+In this manual I’ll try to describe sed’s most useful features.
+Why sed Rules? As with most of the Unix command line utilities, sed reads data from the standard input and writes the result into the standard output.</description>
+    </item>
+    <item>
+      <title>Aligned vs. unaligned memory access</title>
+      <link>https://alexonlinux.com/essays/aligned-vs-unaligned-memory-access/</link>
+      <pubDate>Tue, 03 Jun 2008 18:27:13 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/aligned-vs-unaligned-memory-access/</guid>
+      <description>Introduction So many times I’ve heart people mentioning aligned memory access. I even protected memory alignment considerations when argued over some software design with my colleagues. I wanted to add few padding bytes into some packed structure to make the structure memory aligned and my colleagues could not understand why I am doing this. This is when I started wondering why I am bothering anyway. I mean, this memory alignment thing, it probably does something useful, but on some esoteric architectures like ALPHA and alike.</description>
+    </item>
+    <item>
+      <title>Opening and modifying the initrd</title>
+      <link>https://alexonlinux.com/essays/opening-and-modifying-the-initrd/</link>
+      <pubDate>Sun, 01 Jun 2008 14:26:33 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/opening-and-modifying-the-initrd/</guid>
+      <description>Introduction Ever wondered what’s inside of the initrd file? This article tells you how to look into the initrd and even modify it.
+Few words about initrd Linux uses the initrd or initial ram-disk during the boot process. Linux kernel is very modular as you know. While the kernel main file contains only the most needed stuff, rest of the kernel, drivers included, reside in separate files – the kernel modules.</description>
+    </item>
+    <item>
+      <title>tcpdump for Dummies</title>
+      <link>https://alexonlinux.com/essays/tcpdump-for-dummies/</link>
+      <pubDate>Sun, 18 May 2008 16:29:11 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/tcpdump-for-dummies/</guid>
+      <description>Introduction In this article I would like to talk about one of the most useful tools in my networking toolbox and that is tcpdump. Unfortunately mastering this tool completely is not an easy task. Yet stuff you do the most is relatively simple and may become a good springboard when diving into more complex topics.
+tcpdump Uses tcpdump is a packet sniffer. It is able to capture traffic that passes through a machine.</description>
+    </item>
+    <item>
+      <title>SMP affinity and proper interrupt handling in Linux</title>
+      <link>https://alexonlinux.com/essays/smp-affinity-and-proper-interrupt-handling-in-linux/</link>
+      <pubDate>Tue, 15 Apr 2008 15:11:29 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/smp-affinity-and-proper-interrupt-handling-in-linux/</guid>
+      <description>Introduction Hardware interrupts has always been expensive. Somehow these small pieces of software consume so much CPU power and hardware and software engineers has always been trying to change this state of affairs. Some significant progress has been made. Still hardware interrupts consume lots of CPU power.
+You will rarely see effects of interrupt handling on desktop systems. Take a look at your /proc/interrupts file. This file enlists all of your hardware devices and how many interrupts received by each and one of them on each CPU.</description>
+    </item>
+    <item>
+      <title>How to obtain a unique thread identifier on Linux</title>
+      <link>https://alexonlinux.com/essays/how-to-obtain-a-unique-thread-identifier-on-linux/</link>
+      <pubDate>Tue, 25 Mar 2008 21:35:18 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/how-to-obtain-a-unique-thread-identifier-on-linux/</guid>
+      <description>From some reason this topic never got enough attention in libc. POSIX threads library does addresses this issue, however what starts in POSIX library stays in POSIX library. pthread_self() and friends will get you an identifier that is unique accross your program, but not accross your system. Although thread is a system object, the system is unaware of the identifier POSIX library allocated for the thread. Thus the thread identifier allocated by the POSIX library does identify your thread within boundaries of your program, yet every-one else knows nothing about this identifier and its meaning.</description>
+    </item>
+    <item>
+      <title>How debugger works</title>
+      <link>https://alexonlinux.com/essays/how-debugger-works/</link>
+      <pubDate>Mon, 24 Mar 2008 11:39:18 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/how-debugger-works/</guid>
+      <description>Introduction In this article, I’d like to tell you how real debugger works. What happens under the hood and why it happens. We’ll even write our own small debugger and see it in action.
+I will talk about Linux, although same principles apply to other operating systems. Also, we’ll talk about x86 architecture. This is because it is the most common architecture today. On the other hand, even if you’re working with other architecture, you will find this article useful because, again, same principles work everywhere.</description>
+    </item>
+    <item>
+      <title>Useful Linux Networking Commands</title>
+      <link>https://alexonlinux.com/essays/useful-linux-networking-commands/</link>
+      <pubDate>Sun, 23 Dec 2007 17:22:30 +0000</pubDate>
+      <guid>https://alexonlinux.com/essays/useful-linux-networking-commands/</guid>
+      <description>This article describes most useful Linux networking commands, as simple as it sounds.
+The truth is that I am writing this article more for myself. I am rarely doing complex networking configurations. As a result, when I have to configure something, I often forget commands and their syntax. Often it takes hours to find out that the only reason why certain route command was not working is because I forgot to add some netmask parameter.</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>tcpdump for Dummies | Alex on Linux</title>
+<meta name="keywords" content="arp, connection, debug, destination, ethereal, ethernet, expression, ftp, http, icmp, network, packets, port, protocol, source, ssh, synchronization, tcp, tcpdump, telnet, unix, wireshark">
+<meta name="description" content="Introduction In this article I would like to talk about one of the most useful tools in my networking toolbox and that is tcpdump. Unfortunately mastering this tool completely is not an easy task. Yet stuff you do the most is relatively simple and may become a good springboard when diving into more complex topics.
+tcpdump Uses tcpdump is a packet sniffer. It is able to capture traffic that passes through a machine.">
+<meta name="author" content="">
+<link rel="canonical" href="https://alexonlinux.com/essays/tcpdump-for-dummies/">
+<link crossorigin="anonymous" href="../../assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://alexonlinux.com/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://alexonlinux.com/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://alexonlinux.com/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://alexonlinux.com/apple-touch-icon.png">
+<link rel="mask-icon" href="https://alexonlinux.com/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://alexonlinux.com/essays/tcpdump-for-dummies/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<meta property="og:title" content="tcpdump for Dummies" />
+<meta property="og:description" content="Introduction In this article I would like to talk about one of the most useful tools in my networking toolbox and that is tcpdump. Unfortunately mastering this tool completely is not an easy task. Yet stuff you do the most is relatively simple and may become a good springboard when diving into more complex topics.
+tcpdump Uses tcpdump is a packet sniffer. It is able to capture traffic that passes through a machine." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://alexonlinux.com/essays/tcpdump-for-dummies/" /><meta property="article:section" content="essays" />
+<meta property="article:published_time" content="2008-05-18T16:29:11+00:00" />
+<meta property="article:modified_time" content="2008-05-18T16:29:11+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="tcpdump for Dummies"/>
+<meta name="twitter:description" content="Introduction In this article I would like to talk about one of the most useful tools in my networking toolbox and that is tcpdump. Unfortunately mastering this tool completely is not an easy task. Yet stuff you do the most is relatively simple and may become a good springboard when diving into more complex topics.
+tcpdump Uses tcpdump is a packet sniffer. It is able to capture traffic that passes through a machine."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Essays",
+      "item": "https://alexonlinux.com/essays/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "tcpdump for Dummies",
+      "item": "https://alexonlinux.com/essays/tcpdump-for-dummies/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "tcpdump for Dummies",
+  "name": "tcpdump for Dummies",
+  "description": "Introduction In this article I would like to talk about one of the most useful tools in my networking toolbox and that is tcpdump. Unfortunately mastering this tool completely is not an easy task. Yet stuff you do the most is relatively simple and may become a good springboard when diving into more complex topics.\ntcpdump Uses tcpdump is a packet sniffer. It is able to capture traffic that passes through a machine.",
+  "keywords": [
+    "arp", "connection", "debug", "destination", "ethereal", "ethernet", "expression", "ftp", "http", "icmp", "network", "packets", "port", "protocol", "source", "ssh", "synchronization", "tcp", "tcpdump", "telnet", "unix", "wireshark"
+  ],
+  "articleBody": "Introduction In this article I would like to talk about one of the most useful tools in my networking toolbox and that is tcpdump. Unfortunately mastering this tool completely is not an easy task. Yet stuff you do the most is relatively simple and may become a good springboard when diving into more complex topics.\ntcpdump Uses tcpdump is a packet sniffer. It is able to capture traffic that passes through a machine. It operates on a packet level, meaning that it captures the actual packets that fly in and out of your computer. It can save the packets into a file. You can save whole packets or only the headers. Later you can “play” recorded file and apply different filters on the packets, telling tcpdump to ignore packets that you are not interested to see.\nUnder the hood, tcpdump understands protocols and host names. It will do all in its power to see what host sent each packet and will tell you its name instead of the IP address.\nIt is exceptionally useful tool for debugging what might have caused certain networking related problem. It is an excellent tool to learn new things.\nInvocation Invoking tcpdump is easy. First thing that you have to remember is that you should either be logged in as root or be a sudoer on the computer – sudoer is someone who is entitled to gain administrator rights on computer for short period of time using sudo command.\nRunning tcpdump without any arguments makes it capture packets on first network interface (excluding lo) and print short description of each packet to output. This may cause a bit of a headache in case you are using network to connect to the machine. If you are connected with SSH or telnet (rlogin?), running tcpdump will produce a line of text for each incoming or outgoing packet. This line of text will cause SSH daemon to send a packet with this line, thus causing tcpdump to produce another line of text. And this will not stop until you do something about it.\nSimple filtering So first thing that we will learn about tcpdump is how to filter out SSH and telnet packets. We will study the basics of tcpdump filtering later in this guide, but for now just remember this syntax.\n# tcpdump not port 22 “not port 22” is a filter specification that tells tcpdump to filter out packets with IP source or destination port 22. As you know port 22 is SSH port. Basically, when you tell tcpdump something like this, it will make tcpdump ignore all SSH packets – exactly what we needed.\nTelnet on the other hand, uses port 23. So if you are connecting via telnet, you can filter that out with:\n# tcpdump not port 23 Clear and simple!\nReading tcpdump’s output By default tcpdump produces one line of text per every packet it intercepts. Each line starts with a time stamp. It tells you very precise time when packet arrived.\nNext comes protocol name. Unfortunately, tcpdump understands very limited number of protocols. It won’t tell you the difference between packets belonging to HTTP and for instance FTP stream. Instead, it will mark such packets as IP packets. It does have some limited understanding of TCP. For instance it identifies TCP synchronization packets such as SYN, ACK, FIN and others. This information printed after source and destination IP addresses (if it IP packet).\nSource and destination addresses follow protocol name. For IP packets, these are IP addresses. For other protocols, tcpdump does not print any identifiers unless explicitly asked to do so (see -e command line switch below).\nFinally, tcpdump prints some information about the packet. For instance, it prints TCP sequence numbers, flags, ARP/ICMP commands, etc.\nHere’s an example of typical tcpdump output.\n17:50:03.089893 IP 69.61.72.101.www \u003e 212.150.66.73.48777: P 1366488174:1366488582 (408) ack 2337505545 win 7240 This packet is part of HTTP data stream. You can see meaning of each and every field in the packet description in tcpdump’s manual page.\nHere’s another example\n17:50:00.718266 arp who-has 69.61.72.185 tell 69.61.72.1 This is ARP packet. It’s slightly more self explanatory than TCP packets. Again, to see exact meaning of each field in the packet description see tcpdump’s manual page.\nInvocation continued Now, when we know how to invoke tcpdump even when connecting to the computer over some net, let’s see what command line switches are available for us.\nChoosing an interface We’ll start with a simple one. How to dump packets that arrived and sent through a certain network interface. -i command line argument does exactly this.\n# tcpdump -i eth1 Will cause tcpdump to capture packets from network interface eth1. Or, considering our SSH/telnet experience:\n# tcpdump -i eth1 not port 22 Finally, you can specify any as interface name, to tell tcpdump to listen to all interfaces.\n# tcpdump -i any not port 22 Turning off name resolution As we debug networking issues, we may encounter a problem with how tcpdump works out of the box. The problem is that it tries to resolve every single IP address that it meets. I.e. when it sees an IP packet it asks DNS server for names of the computers behind IP address. It works flawlessly most of the time. However, there are two problems.\nFirst, it slows down packet interception. It’s not a big deal when there are only few packets, but when there are thousands and tens of thousands it introduces a delay into the process. Amount of delay can be different, depending on the traffic.\nAnother, much more serious problem occurs when there is no DNS server around or when DNS server is not working properly. If this is the case, tcpdump spends few seconds trying to figure out two hostnames for each IP packet. This means virtually stopping intercepting the traffic.\nLuckily there is a way around. There is an option that causes tcpdump to stop detecting hostnames and that is -n.\n# tcpdump -n And here are few variations of how you can use this option in conjunction with options that we have learned already.\n# tcpdump -n -i eth1 # tcpdump -ni eth1 not port 22 Limiting number of packets to intercept Here are few more useful options. Sometimes amount of traffic that goes in and out of your computer is very high, while all you want to see is just few packets. Often you want to see who sends you the traffic, but when you try to capture anything with tcpdump it dumps so many packets that you cannot understand anything. This is the case when -c command line switch becomes handy.\nIt tells tcpdump to limit number of packets it intercepts. You specify number of packets you want to see. tcpdump will capture that number of packets and exit. This is how you use it.\n# tcpdump -c 10 Or with options that we’ve learned before.\n# tcpdump -ni eth1 -c 10 not port 22 This will limit number of packets that tcpdump will receive to 10. Once received 10 packets, tcpdump will exit.\nSaving captured data One of the most useful tcpdump features allows capturing incoming and outgoing packets into a file and then playing this file back. By the way, you can play this file not only with tcpdump, but also with WireShark (former Ethereal), the graphical packet analyzer.\nYou can do this with -w command line switch. It should be followed by the name of the file that will contain the packets. Like this:\n# tcpdump -w file.cap Or adding options that we’ve already seen\n# tcpdump -ni eth1 -w file.cap not port 22 Changing packet size in the capture file By default, when capturing packets into a file, it will save only 68 bytes of the data from each packet. Rest of the information will be thrown away.\nOne of the things I do often when capturing traffic into a file, is to change the saved packet size. The thing is that disk space that is required to save the those few bytes is very cheap and available most of the time. Spending few spare megabytes of your disk space on capture isn’t too painful. On the other hand, loosing valuable portion of packets might be very critical.\nSo, what I usually do when capturing into a file is running tcpdump with -s command line switch. It tells tcpdump how many bytes for each packet to save. Specifying 0 as a packet’s snapshot length tells tcpdump to save whole packet. Here how it works:\n# tcpdump -w file.cap -s 0 And with conjunction with options that we already saw:\n# tcpdump -ni eth1 -w file.cap -s 0 -c 1000 not port 22 Obviously you can save as much data as you want. Specifying 1000 bytes will do the job for you. Just keep in mind that there are so called jumbo frames those size can be as big as 8Kb.\nReading from capture file Now, when we have captured some traffic into a file, we would like to play it back. -r command like switch tells tcpdump that it should read the data from a file, instead of capturing packets from interfaces. This is how it works.\n# tcpdump -r file.cap With capture file, we can easily analyze the packets and understand what’s inside. tcpdump introduces several options that will help us with this task. Lets see few of them.\nLooking into packets There are several options that allow one to see more information about the packet. There is a problem though. tcpdump in general isn’t giving you too much information about packets. It doesn’t understand different protocols.\nIf you want to see packet’s content, it is better to use tools like Wireshark. It does understand protocols, analyzes them and allows you to see different fields, not only in TCP header, but in layer 7 protocols headers.\ntcpdump is a command line tool and as most of the command line tools, its ability to present information is quiet limited. Yet, it still has few options that control the way packets presented.\nSeeing Ethernet header for each packet -e command line switch, causes tcpdump to present Ethernet (link level protocol) header for each printed packet. Lets see an example.\n# tcpdump -e -n not port 22 Controlling time stamp There are four command line switches that control the way how tcpdump prints time stamp. First, there is -t option. It makes tcpdump not to print time stamps. Next comes -tt. It causes tcpdump to print time stamp as number of seconds since Jan. 1st 1970 and a fraction of a second. -ttt prints the delta between this line and a previous one. Finally, -tttt causes tcpdump to print time stamp in it’s regular format preceeded by date.\nControlling verbosity -v causes tcpdump to print more information about each packet. With -vv tcpdump prints even more information. As you could guess, -vvv produces even more information. Finally -vvvv will produce an error message telling you there is no such option:D\nPrinting content of the packet -x command line switch will make tcpdump to print each packet in hexadecimal format. Number of bytes that will be printed remains somewhat a mystery. As is, it will print first 82 bytes of the packet, excluding ethernet header. You can control number of bytes printed using -s command line switch.\nIn case you want to see ethernet header as well, use -xx. It will cause tcpdump to print extra 14 bytes for ethernet header.\nSimilarily -X and -XX will print contents of packet in hexadecimal and ASCII formats. The later will cause tcpdump to include ethernet header into printout.\nPacket filtering We already saw a simple filter. It causes tcpdump to ignore SSH packets, allowing us to run tcpdump from remote. Now lets try to understand the language that tcpdump uses to evaluate filter expressions.\nPacket matching We should understand that tcpdump applies our filter on every single incoming and outgoing packet. If packet matches the filter, tcpdump aknownledges the packet and depending on command line switches either saves it to file or dumps it to the screen. Otherwise, tcpdump will ignore the packet and account it only when telling how many packets received, dropped and filtered out when it exits.\nTo demostrate this, lets go back to not port 22 expression. tcpdump ignores packets that either sourced or destined to port 22. When such packet arrives, tcpdump applies filter on it and since the result is false, it will drop the packet.\nMore qualifiers So, from what we’ve seen so far, we can conclude that tcpdump understands a word port and understands expression negation with not. Actually, negating an expression is part of complex expressions syntax and we will talk about complex expressions a little later. In the meantime, lets see few more packet qualifiers that we can use in tcpdump expressions.\nWe’ve seen that port qualifier specifies either source or destination port number. In case we want to specify only the source port or only the destination port we can use src port or dst port. For instance, using following expression we can see all outgoing HTTP packets.\n# tcpdump -n dst port 80 We can also specify ranges of ports. portrange, src portrange and dst portrange qualifiers do exactly this. For instance, lets see a command that captures all telnet and SSH packets.\n# tcpdump -n portrange 22-23 Specifying addresses Using dst host, src host and host qualifiers you can specify source, destination or any of them IP addresses. For example\n# tcpdump src host alexandersandler.net Will print all packets originating from alexandersandler.net computer.\nYou can also specify Ethernet addresses. You do that with ether src, ether dst and ether host qualifiers. Each should be followed by MAC address of either source, destination or source or destination machines.\nYou can specify networks as well. The net, src net and dst net qualifiers do exactly this. Their syntax however slighly more complex than those of a single host. This is due to a netmask that has to be specified.\nYou can use two basic forms of network specifications. One using netmask and the other so called CIDR notation. Here are few examples.\n# tcpdump src net 67.207.148.0 mask 255.255.255.0 Or same command using CIDR notation.\n# tcpdump src net 67.207.148.0/24 Note the word mask that does the job of specifying the network in first example. Second example is much shorter.\nOther qualifiers There are several useful qualifiers that don’t fall under any of the categories I already covered.\nFor instance, you can specify that you are interested in packets with specific length. length qualifier does this. less and greater qualifiers tell tcpdump that you are interested in packets whose length is less or greater than value you specified.\nHere’s an example that demonstrates these qualifiers in use.\n# tcpdump -ni eth1 greater 1000 Will capture only packets whose size is greater than 1000 bytes.\nComplex filter expressions As we already saw we can build more complex filter expressions using tcpdump filters language. Actually, tcpdump allows exceptionally complex filtering expressions.\nWe’ve seen not port 22 expression. Applying this expression on certain packet will produce logical true for packets that are not sourced or destined to port 22. Or in two words, not negates the expression.\nIn addition to expression negation, we can build more complex expressions combining two smaller expression into one large using and and or keywords. In addition, you can use brackets to group several expressions together.\nFor example, lets see a tcpdump filter that causes tcpdump to capture packets larger then 100 bytes originating from google.com or from microsoft.com.\n# tcpdump -XX greater 100 and \\(src host google.com or src host microsoft.com\\) and and or keywords in tcpdump filter language have same precedence and are evaluated left to right. This means that without brackets, tcpdump could have captured packets from microsoft.com disregarding packet size. With brackets, tcpdump first makes sure that all packets are greater than 100 bytes and only then checks their origin.\nNote the backslash symbol (“\\”) before brackets. We have to place them before brackets because of shell. Unix shell has special understanding of what brackets used for. Hence we have to tell shell to leave these particular brackets alone and pass them as they are to tcpdump. Backslash characters do exactly this.\nTalking about precedence, we have to keep in mind that in tcpdump’s filter expression language not has higher precedence than and and or. tcpdump’s manual page has very nice example and emphasizes the meaning of this.\nnot host vs and host ace and\nnot (host vs or host ace) are two different expressions. Because not has higher precedence over and and or, filter from the first example will capture packets not to/from vs, but to/from ace. Second filter example on the other hand will capture packets that are not to/from vs and to/from ace. I.e. first will capture packet from ace to some other host (but not to vs). Yet second example won’t capture this packet.\nRepeating qualifiers To conclude this article, I would like to tell you one more thing that may become handy when writing complex tcpdump filter expressions.\nTake a look at the following example.\n# tcpdump -XX greater 100 and \\(src host google.com or microsoft.com\\) We already saw this example, with one little exception. In previous example we had a src host qualifier before microsoft.com and now its gone. The thing is that if we want to use same qualifier two times in a row, we don’t have to specify it twice. Instead we can just write qualifier’s parameter and tcpdump will know what to do.\nThis makes tcpdump filter expression language much easier to understand and much more readable.\nAfterword I hope you found this article useful. In case you have questions, suggestions or you would like to share your appreciation to the author;-), don’t hesitate to mail me to alexander.sandler@gmail.com\n",
+  "wordCount" : "2992",
+  "inLanguage": "en",
+  "datePublished": "2008-05-18T16:29:11Z",
+  "dateModified": "2008-05-18T16:29:11Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://alexonlinux.com/essays/tcpdump-for-dummies/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Alex on Linux",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://alexonlinux.com/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="../../" accesskey="h" title="Alex on Linux (Alt + H)">Alex on Linux</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="../../" title="Home">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="../../essays/" title="Essays">
+                    <span>Essays</span>
+                </a>
+            </li>
+            <li>
+                <a href="../../author/" title="Author">
+                    <span>Author</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      tcpdump for Dummies
+    </h1>
+    <div class="post-meta"><span title='2008-05-18 16:29:11 +0000 UTC'>May 18, 2008</span>&nbsp;·&nbsp;15 min
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="introduction">Introduction<a hidden class="anchor" aria-hidden="true" href="#introduction">#</a></h1>
+<p>In this article I would like to talk about one of the most useful tools in my
+networking toolbox and that is tcpdump. Unfortunately mastering this tool
+completely is not an easy task. Yet stuff you do the most is relatively simple
+and may become a good springboard when diving into more complex topics.</p>
+<h1 id="tcpdump-uses"><code>tcpdump</code> Uses<a hidden class="anchor" aria-hidden="true" href="#tcpdump-uses">#</a></h1>
+<p>tcpdump is a packet sniffer. It is able to capture traffic that passes through a
+machine. It operates on a packet level, meaning that it captures the actual
+packets that fly in and out of your computer. It can save the packets into a
+file. You can save whole packets or only the headers. Later you can “play”
+recorded file and apply different filters on the packets, telling tcpdump to
+ignore packets that you are not interested to see.</p>
+<p>Under the hood, tcpdump understands protocols and host names. It will do all in
+its power to see what host sent each packet and will tell you its name instead
+of the IP address.</p>
+<p>It is exceptionally useful tool for debugging what might have caused certain
+networking related problem. It is an excellent tool to learn new things.</p>
+<h1 id="invocation">Invocation<a hidden class="anchor" aria-hidden="true" href="#invocation">#</a></h1>
+<p>Invoking tcpdump is easy. First thing that you have to remember is that you
+should either be logged in as root or be a sudoer on the computer – sudoer is
+someone who is entitled to gain administrator rights on computer for short
+period of time using <code>sudo</code> command.</p>
+<p>Running tcpdump without any arguments makes it capture packets on first network
+interface (excluding lo) and print short description of each packet to output.
+This may cause a bit of a headache in case you are using network to connect to
+the machine. If you are connected with SSH or telnet (rlogin?), running tcpdump
+will produce a line of text for each incoming or outgoing packet. This line of
+text will cause SSH daemon to send a packet with this line, thus causing tcpdump
+to produce another line of text. And this will not stop until you do something
+about it.</p>
+<h2 id="simple-filtering">Simple filtering<a hidden class="anchor" aria-hidden="true" href="#simple-filtering">#</a></h2>
+<p>So first thing that we will learn about tcpdump is how to filter out SSH and
+telnet packets. We will study the basics of tcpdump filtering later in this
+guide, but for now just remember this syntax.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump not port 22
+</span></span></code></pre></div><p>“not port 22” is a filter specification that tells tcpdump to filter out packets
+with IP source or destination port 22. As you know port 22 is SSH port.
+Basically, when you tell tcpdump something like this, it will make tcpdump
+ignore all SSH packets – exactly what we needed.</p>
+<p>Telnet on the other hand, uses port 23. So if you are connecting via telnet, you
+can filter that out with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump not port 23
+</span></span></code></pre></div><p>Clear and simple!</p>
+<h2 id="reading-tcpdumps-output">Reading <code>tcpdump</code>’s output<a hidden class="anchor" aria-hidden="true" href="#reading-tcpdumps-output">#</a></h2>
+<p>By default tcpdump produces one line of text per every packet it intercepts.
+Each line starts with a time stamp. It tells you very precise time when packet
+arrived.</p>
+<p>Next comes protocol name. Unfortunately, tcpdump understands very limited number
+of protocols. It won’t tell you the difference between packets belonging to HTTP
+and for instance FTP stream. Instead, it will mark such packets as IP packets.
+It does have some limited understanding of TCP. For instance it identifies TCP
+synchronization packets such as SYN, ACK, FIN and others. This information
+printed after source and destination IP addresses (if it IP packet).</p>
+<p>Source and destination addresses follow protocol name. For IP packets, these are
+IP addresses. For other protocols, tcpdump does not print any identifiers unless
+explicitly asked to do so (see <code>-e</code> command line switch below).</p>
+<p>Finally, tcpdump prints some information about the packet. For instance, it
+prints TCP sequence numbers, flags, ARP/ICMP commands, etc.</p>
+<p>Here’s an example of typical tcpdump output.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>17:50:03.089893 IP 69.61.72.101.www &gt; 212.150.66.73.48777: P 1366488174:1366488582
+</span></span><span style="display:flex;"><span>(408) ack 2337505545 win 7240 &lt;nop,nop,timestamp 1491222906 477679143&gt;
+</span></span></code></pre></div><p>This packet is part of HTTP data stream. You can see meaning of each and every
+field in the packet description in tcpdump’s manual page.</p>
+<p>Here’s another example</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>17:50:00.718266 arp who-has 69.61.72.185 tell 69.61.72.1
+</span></span></code></pre></div><p>This is ARP packet. It’s slightly more self explanatory than TCP packets. Again,
+to see exact meaning of each field in the packet description see tcpdump’s
+manual page.</p>
+<h2 id="invocation-continued">Invocation continued<a hidden class="anchor" aria-hidden="true" href="#invocation-continued">#</a></h2>
+<p>Now, when we know how to invoke tcpdump even when connecting to the computer
+over some net, let’s see what command line switches are available for us.</p>
+<h3 id="choosing-an-interface">Choosing an interface<a hidden class="anchor" aria-hidden="true" href="#choosing-an-interface">#</a></h3>
+<p>We’ll start with a simple one. How to dump packets that arrived and sent through
+a certain network interface. <code>-i</code> command line argument does exactly this.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -i eth1
+</span></span></code></pre></div><p>Will cause tcpdump to capture packets from network interface <code>eth1</code>. Or,
+considering our SSH/telnet experience:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -i eth1 not port 22
+</span></span></code></pre></div><p>Finally, you can specify <code>any</code> as interface name, to tell tcpdump to listen to
+all interfaces.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -i any not port 22
+</span></span></code></pre></div><h3 id="turning-off-name-resolution">Turning off name resolution<a hidden class="anchor" aria-hidden="true" href="#turning-off-name-resolution">#</a></h3>
+<p>As we debug networking issues, we may encounter a problem with how tcpdump works
+out of the box. The problem is that it tries to resolve every single IP address
+that it meets. I.e. when it sees an IP packet it asks DNS server for names of
+the computers behind IP address. It works flawlessly most of the time. However,
+there are two problems.</p>
+<p>First, it slows down packet interception. It’s not a big deal when there are
+only few packets, but when there are thousands and tens of thousands it
+introduces a delay into the process. Amount of delay can be different, depending
+on the traffic.</p>
+<p>Another, much more serious problem occurs when there is no DNS server around or
+when DNS server is not working properly. If this is the case, tcpdump spends few
+seconds trying to figure out two hostnames for each IP packet. This means
+virtually stopping intercepting the traffic.</p>
+<p>Luckily there is a way around. There is an option that causes tcpdump to stop
+detecting hostnames and that is <code>-n</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -n
+</span></span></code></pre></div><p>And here are few variations of how you can use this option in conjunction with
+options that we have learned already.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -n -i eth1
+</span></span><span style="display:flex;"><span># tcpdump -ni eth1 not port 22
+</span></span></code></pre></div><h3 id="limiting-number-of-packets-to-intercept">Limiting number of packets to intercept<a hidden class="anchor" aria-hidden="true" href="#limiting-number-of-packets-to-intercept">#</a></h3>
+<p>Here are few more useful options. Sometimes amount of traffic that goes in and
+out of your computer is very high, while all you want to see is just few
+packets. Often you want to see who sends you the traffic, but when you try to
+capture anything with tcpdump it dumps so many packets that you cannot
+understand anything. This is the case when <code>-c</code> command line switch becomes
+handy.</p>
+<p>It tells tcpdump to limit number of packets it intercepts. You specify number of
+packets you want to see. tcpdump will capture that number of packets and exit.
+This is how you use it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -c 10
+</span></span></code></pre></div><p>Or with options that we’ve learned before.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -ni eth1 -c 10 not port 22
+</span></span></code></pre></div><p>This will limit number of packets that tcpdump will receive to 10. Once received
+10 packets, tcpdump will exit.</p>
+<h3 id="saving-captured-data">Saving captured data<a hidden class="anchor" aria-hidden="true" href="#saving-captured-data">#</a></h3>
+<p>One of the most useful tcpdump features allows capturing incoming and outgoing
+packets into a file and then playing this file back. By the way, you can play
+this file not only with tcpdump, but also with WireShark (former Ethereal), the
+graphical packet analyzer.</p>
+<p>You can do this with <code>-w</code> command line switch. It should be followed by the name
+of the file that will contain the packets. Like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -w file.cap
+</span></span></code></pre></div><p>Or adding options that we’ve already seen</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -ni eth1 -w file.cap not port 22
+</span></span></code></pre></div><h3 id="changing-packet-size-in-the-capture-file">Changing packet size in the capture file<a hidden class="anchor" aria-hidden="true" href="#changing-packet-size-in-the-capture-file">#</a></h3>
+<p>By default, when capturing packets into a file, it will save only 68 bytes of
+the data from each packet. Rest of the information will be thrown away.</p>
+<p>One of the things I do often when capturing traffic into a file, is to change
+the saved packet size. The thing is that disk space that is required to save the
+those few bytes is very cheap and available most of the time. Spending few spare
+megabytes of your disk space on capture isn’t too painful. On the other hand,
+loosing valuable portion of packets might be very critical.</p>
+<p>So, what I usually do when capturing into a file is running tcpdump with <code>-s</code>
+command line switch. It tells tcpdump how many bytes for each packet to save.
+Specifying 0 as a packet’s snapshot length tells tcpdump to save whole packet.
+Here how it works:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -w file.cap -s 0
+</span></span></code></pre></div><p>And with conjunction with options that we already saw:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -ni eth1 -w file.cap -s 0 -c 1000 not port 22
+</span></span></code></pre></div><p>Obviously you can save as much data as you want. Specifying 1000 bytes will do
+the job for you. Just keep in mind that there are so called jumbo frames those
+size can be as big as 8Kb.</p>
+<h3 id="reading-from-capture-file">Reading from capture file<a hidden class="anchor" aria-hidden="true" href="#reading-from-capture-file">#</a></h3>
+<p>Now, when we have captured some traffic into a file, we would like to play it
+back. <code>-r</code> command like switch tells tcpdump that it should read the data from a
+file, instead of capturing packets from interfaces. This is how it works.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -r file.cap
+</span></span></code></pre></div><p>With capture file, we can easily analyze the packets and understand what’s
+inside. tcpdump introduces several options that will help us with this task.
+Lets see few of them.</p>
+<h2 id="looking-into-packets">Looking into packets<a hidden class="anchor" aria-hidden="true" href="#looking-into-packets">#</a></h2>
+<p>There are several options that allow one to see more information about the
+packet. There is a problem though. tcpdump in general isn’t giving you too much
+information about packets. It doesn’t understand different protocols.</p>
+<p>If you want to see packet’s content, it is better to use tools like Wireshark.
+It does understand protocols, analyzes them and allows you to see different
+fields, not only in TCP header, but in layer 7 protocols headers.</p>
+<p>tcpdump is a command line tool and as most of the command line tools, its
+ability to present information is quiet limited. Yet, it still has few options
+that control the way packets presented.</p>
+<h3 id="seeing-ethernet-header-for-each-packet">Seeing Ethernet header for each packet<a hidden class="anchor" aria-hidden="true" href="#seeing-ethernet-header-for-each-packet">#</a></h3>
+<p><code>-e</code> command line switch, causes tcpdump to present Ethernet (link level
+protocol) header for each printed packet. Lets see an example.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -e -n not port 22
+</span></span></code></pre></div><h3 id="controlling-time-stamp">Controlling time stamp<a hidden class="anchor" aria-hidden="true" href="#controlling-time-stamp">#</a></h3>
+<p>There are four command line switches that control the way how tcpdump prints
+time stamp. First, there is <code>-t</code> option. It makes tcpdump not to print time
+stamps. Next comes <code>-tt</code>. It causes tcpdump to print time stamp as number of
+seconds since Jan. 1st 1970 and a fraction of a second. <code>-ttt</code> prints the delta
+between this line and a previous one. Finally, <code>-tttt</code> causes tcpdump to print
+time stamp in it’s regular format preceeded by date.</p>
+<h3 id="controlling-verbosity">Controlling verbosity<a hidden class="anchor" aria-hidden="true" href="#controlling-verbosity">#</a></h3>
+<p><code>-v</code> causes tcpdump to print more information about each packet. With <code>-vv</code>
+tcpdump prints even more information. As you could guess, <code>-vvv</code> produces even
+more information. Finally <code>-vvvv</code> will produce an error message telling you
+there is no such option:D</p>
+<h3 id="printing-content-of-the-packet">Printing content of the packet<a hidden class="anchor" aria-hidden="true" href="#printing-content-of-the-packet">#</a></h3>
+<p><code>-x</code> command line switch will make tcpdump to print each packet in hexadecimal
+format. Number of bytes that will be printed remains somewhat a mystery. As is,
+it will print first 82 bytes of the packet, excluding ethernet header. You can
+control number of bytes printed using <code>-s</code> command line switch.</p>
+<p>In case you want to see ethernet header as well, use <code>-xx</code>. It will cause
+tcpdump to print extra 14 bytes for ethernet header.</p>
+<p>Similarily <code>-X</code> and <code>-XX</code> will print contents of packet in hexadecimal and ASCII
+formats. The later will cause tcpdump to include ethernet header into printout.</p>
+<h1 id="packet-filtering">Packet filtering<a hidden class="anchor" aria-hidden="true" href="#packet-filtering">#</a></h1>
+<p>We already saw a simple filter. It causes tcpdump to ignore SSH packets,
+allowing us to run tcpdump from remote. Now lets try to understand the language
+that tcpdump uses to evaluate filter expressions.</p>
+<h2 id="packet-matching">Packet matching<a hidden class="anchor" aria-hidden="true" href="#packet-matching">#</a></h2>
+<p>We should understand that tcpdump applies our filter on every single incoming
+and outgoing packet. If packet matches the filter, tcpdump aknownledges the
+packet and depending on command line switches either saves it to file or dumps
+it to the screen. Otherwise, tcpdump will ignore the packet and account it only
+when telling how many packets received, dropped and filtered out when it exits.</p>
+<p>To demostrate this, lets go back to <code>not port 22</code> expression. tcpdump ignores
+packets that either sourced or destined to port 22. When such packet arrives,
+tcpdump applies filter on it and since the result is false, it will drop the
+packet.</p>
+<h2 id="more-qualifiers">More qualifiers<a hidden class="anchor" aria-hidden="true" href="#more-qualifiers">#</a></h2>
+<p>So, from what we’ve seen so far, we can conclude that tcpdump understands a word
+<code>port</code> and understands expression negation with <code>not</code>. Actually, negating an
+expression is part of complex expressions syntax and we will talk about complex
+expressions a little later. In the meantime, lets see few more packet qualifiers
+that we can use in tcpdump expressions.</p>
+<p>We’ve seen that <code>port</code> qualifier specifies either source or destination port
+number. In case we want to specify only the source port or only the destination
+port we can use <code>src port</code> or <code>dst port</code>. For instance, using following
+expression we can see all outgoing HTTP packets.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -n dst port 80
+</span></span></code></pre></div><p>We can also specify ranges of ports. <code>portrange</code>, <code>src portrange</code> and <code>dst portrange</code> qualifiers do exactly this. For instance, lets see a command that
+captures all telnet and SSH packets.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -n portrange 22-23
+</span></span></code></pre></div><h3 id="specifying-addresses">Specifying addresses<a hidden class="anchor" aria-hidden="true" href="#specifying-addresses">#</a></h3>
+<p>Using <code>dst host</code>, <code>src host</code> and <code>host</code> qualifiers you can specify source,
+destination or any of them IP addresses. For example</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump src host alexandersandler.net
+</span></span></code></pre></div><p>Will print all packets originating from alexandersandler.net computer.</p>
+<p>You can also specify Ethernet addresses. You do that with <code>ether src</code>,
+<code>ether dst</code> and <code>ether host</code> qualifiers. Each should be followed by MAC address
+of either source, destination or source or destination machines.</p>
+<p>You can specify networks as well. The <code>net</code>, <code>src net</code> and <code>dst net</code> qualifiers
+do exactly this. Their syntax however slighly more complex than those of a
+single host. This is due to a netmask that has to be specified.</p>
+<p>You can use two basic forms of network specifications. One using netmask and the
+other so called CIDR notation. Here are few examples.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump src net 67.207.148.0 mask 255.255.255.0
+</span></span></code></pre></div><p>Or same command using CIDR notation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump src net 67.207.148.0/24
+</span></span></code></pre></div><p>Note the word <code>mask</code> that does the job of specifying the network in first
+example. Second example is much shorter.</p>
+<h3 id="other-qualifiers">Other qualifiers<a hidden class="anchor" aria-hidden="true" href="#other-qualifiers">#</a></h3>
+<p>There are several useful qualifiers that don’t fall under any of the categories
+I already covered.</p>
+<p>For instance, you can specify that you are interested in packets with specific
+length. <code>length</code> qualifier does this. <code>less</code> and <code>greater</code> qualifiers tell
+tcpdump that you are interested in packets whose length is less or greater than
+value you specified.</p>
+<p>Here’s an example that demonstrates these qualifiers in use.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -ni eth1 greater 1000
+</span></span></code></pre></div><p>Will capture only packets whose size is greater than 1000 bytes.</p>
+<h2 id="complex-filter-expressions">Complex filter expressions<a hidden class="anchor" aria-hidden="true" href="#complex-filter-expressions">#</a></h2>
+<p>As we already saw we can build more complex filter expressions using tcpdump
+filters language. Actually, tcpdump allows exceptionally complex filtering
+expressions.</p>
+<p>We’ve seen <code>not port 22</code> expression. Applying this expression on certain packet
+will produce logical true for packets that are not sourced or destined to port
+22. Or in two words, <code>not</code> negates the expression.</p>
+<p>In addition to expression negation, we can build more complex expressions
+combining two smaller expression into one large using <code>and</code> and <code>or</code> keywords.
+In addition, you can use brackets to group several expressions together.</p>
+<p>For example, lets see a tcpdump filter that causes tcpdump to capture packets
+larger then 100 bytes originating from google.com or from microsoft.com.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -XX greater 100 and \(src host google.com or src host microsoft.com\)
+</span></span></code></pre></div><p><code>and</code> and <code>or</code> keywords in tcpdump filter language have same precedence and are
+evaluated left to right. This means that without brackets, tcpdump could have
+captured packets from microsoft.com disregarding packet size. With brackets,
+tcpdump first makes sure that all packets are greater than 100 bytes and only
+then checks their origin.</p>
+<p>Note the backslash symbol (“\”) before brackets. We have to place them before
+brackets because of shell. Unix shell has special understanding of what brackets
+used for. Hence we have to tell shell to leave these particular brackets alone
+and pass them as they are to tcpdump. Backslash characters do exactly this.</p>
+<p>Talking about precedence, we have to keep in mind that in tcpdump’s filter
+expression language <code>not</code> has higher precedence than <code>and</code> and <code>or</code>. tcpdump’s
+manual page has very nice example and emphasizes the meaning of this.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>not host vs and host ace
+</span></span></code></pre></div><p>and</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>not (host vs or host ace)
+</span></span></code></pre></div><p>are two different expressions. Because <code>not</code> has higher precedence over <code>and</code>
+and <code>or</code>, filter from the first example will capture packets not to/from vs, but
+to/from ace. Second filter example on the other hand will capture packets that
+are not to/from vs and to/from ace. I.e. first will capture packet from ace to
+some other host (but not to vs). Yet second example won’t capture this packet.</p>
+<h3 id="repeating-qualifiers">Repeating qualifiers<a hidden class="anchor" aria-hidden="true" href="#repeating-qualifiers">#</a></h3>
+<p>To conclude this article, I would like to tell you one more thing that may
+become handy when writing complex tcpdump filter expressions.</p>
+<p>Take a look at the following example.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># tcpdump -XX greater 100 and \(src host google.com or microsoft.com\)
+</span></span></code></pre></div><p>We already saw this example, with one little exception. In previous example we
+had a <code>src host</code> qualifier before microsoft.com and now its gone. The thing is
+that if we want to use same qualifier two times in a row, we don’t have to
+specify it twice. Instead we can just write qualifier’s parameter and tcpdump
+will know what to do.</p>
+<p>This makes tcpdump filter expression language much easier to understand and much
+more readable.</p>
+<h1 id="afterword">Afterword<a hidden class="anchor" aria-hidden="true" href="#afterword">#</a></h1>
+<p>I hope you found this article useful. In case you have questions, suggestions or
+you would like to share your appreciation to the author;-), don’t hesitate to
+mail me to <a href="mailto:alexander.sandler@gmail.com">alexander.sandler@gmail.com</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share tcpdump for Dummies on x"
+            href="https://x.com/intent/tweet/?text=tcpdump%20for%20Dummies&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2ftcpdump-for-dummies%2f&amp;hashtags=arp%2cconnection%2cdebug%2cdestination%2cethereal%2cethernet%2cexpression%2cftp%2chttp%2cicmp%2cnetwork%2cpackets%2cport%2cprotocol%2csource%2cssh%2csynchronization%2ctcp%2ctcpdump%2ctelnet%2cunix%2cwireshark">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share tcpdump for Dummies on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2ftcpdump-for-dummies%2f&amp;title=tcpdump%20for%20Dummies&amp;summary=tcpdump%20for%20Dummies&amp;source=https%3a%2f%2falexonlinux.com%2fessays%2ftcpdump-for-dummies%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share tcpdump for Dummies on reddit"
+            href="https://reddit.com/submit?url=https%3a%2f%2falexonlinux.com%2fessays%2ftcpdump-for-dummies%2f&title=tcpdump%20for%20Dummies">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share tcpdump for Dummies on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2falexonlinux.com%2fessays%2ftcpdump-for-dummies%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share tcpdump for Dummies on whatsapp"
+            href="https://api.whatsapp.com/send?text=tcpdump%20for%20Dummies%20-%20https%3a%2f%2falexonlinux.com%2fessays%2ftcpdump-for-dummies%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share tcpdump for Dummies on telegram"
+            href="https://telegram.me/share/url?text=tcpdump%20for%20Dummies&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2ftcpdump-for-dummies%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share tcpdump for Dummies on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=tcpdump%20for%20Dummies&u=https%3a%2f%2falexonlinux.com%2fessays%2ftcpdump-for-dummies%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

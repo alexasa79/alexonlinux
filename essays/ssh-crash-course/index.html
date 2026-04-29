@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>SSH crash course | Alex on Linux</title>
+<meta name="keywords" content="linux, open, protocol, scp, security, session, ssh, telnet">
+<meta name="description" content="About this article I would like to do two things in this article. First I would like to tell you about SSH. How to make it work. How to use public key cryptography to login to a remote computer. How to execute remote commands and copy files to/from a remote machine.
+On the other hand, I would like this document to be a sort of reference guide document. For that reason, I provide a list of links to various places in the document, that show you how to do actual stuff without too much talking around.">
+<meta name="author" content="">
+<link rel="canonical" href="https://alexonlinux.com/essays/ssh-crash-course/">
+<link crossorigin="anonymous" href="../../assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://alexonlinux.com/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://alexonlinux.com/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://alexonlinux.com/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://alexonlinux.com/apple-touch-icon.png">
+<link rel="mask-icon" href="https://alexonlinux.com/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://alexonlinux.com/essays/ssh-crash-course/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<meta property="og:title" content="SSH crash course" />
+<meta property="og:description" content="About this article I would like to do two things in this article. First I would like to tell you about SSH. How to make it work. How to use public key cryptography to login to a remote computer. How to execute remote commands and copy files to/from a remote machine.
+On the other hand, I would like this document to be a sort of reference guide document. For that reason, I provide a list of links to various places in the document, that show you how to do actual stuff without too much talking around." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://alexonlinux.com/essays/ssh-crash-course/" /><meta property="article:section" content="essays" />
+<meta property="article:published_time" content="2009-03-17T19:07:06+00:00" />
+<meta property="article:modified_time" content="2009-03-17T19:07:06+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="SSH crash course"/>
+<meta name="twitter:description" content="About this article I would like to do two things in this article. First I would like to tell you about SSH. How to make it work. How to use public key cryptography to login to a remote computer. How to execute remote commands and copy files to/from a remote machine.
+On the other hand, I would like this document to be a sort of reference guide document. For that reason, I provide a list of links to various places in the document, that show you how to do actual stuff without too much talking around."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Essays",
+      "item": "https://alexonlinux.com/essays/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "SSH crash course",
+      "item": "https://alexonlinux.com/essays/ssh-crash-course/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "SSH crash course",
+  "name": "SSH crash course",
+  "description": "About this article I would like to do two things in this article. First I would like to tell you about SSH. How to make it work. How to use public key cryptography to login to a remote computer. How to execute remote commands and copy files to/from a remote machine.\nOn the other hand, I would like this document to be a sort of reference guide document. For that reason, I provide a list of links to various places in the document, that show you how to do actual stuff without too much talking around.",
+  "keywords": [
+    "linux", "open", "protocol", "scp", "security", "session", "ssh", "telnet"
+  ],
+  "articleBody": "About this article I would like to do two things in this article. First I would like to tell you about SSH. How to make it work. How to use public key cryptography to login to a remote computer. How to execute remote commands and copy files to/from a remote machine.\nOn the other hand, I would like this document to be a sort of reference guide document. For that reason, I provide a list of links to various places in the document, that show you how to do actual stuff without too much talking around.\nYou can read the document from beginning to the end or you can jump to a place that you need right away.\nHere are the jump to links.\nIntroduction Some years ago, when I realized that telnet is out and SSH is in, I was mostly confused about SSH. I heart that it allows you to login to a remote machine without username and password. Yet when I heart people talking about all those cryptography keys I was definite not to get into it. It seemed too complicated for me. So I used it same way as I used telnet before it – with username and password.\nWhat I really needed is a document that describes all those nifty things that you can do with SSH, in simple words. Without getting into too many technical details, yet explaining enough out of it, to turn SSH into useful and handy tool instead of a hostile thing that only gurus know how to operate.\nYears passed and as I myself learned how to use SSH, including some of its more advanced features, I decided to write such a document.\nAlthough all information I present in this document is available on the internet, I think I managed to assemble here things that you need the most.\nPart 1. Basics Intro I believe all Linux distributions today come with command line SSH client, called ssh. We should distinguish between two things here. First, there is SSH the protocol. But also, there is ssh, the program that speaks SSH protocol. ssh is part of larger OpenSSH suite. OpenSSH is what most of the people have.\nConnecting to remote host – simple case Simplest case is when you want to connect to a remote computer using same username as you used to login to your current account. For example, lets say you are logged in on a computer named A and your username is alex. You want to connect to computer B. This is what you type in:\n$ ssh B Instead of hostname (B), you can use an IP address of course. Unless configured otherwise, ssh will ask you to provide a password for the user – alex in our case. Once you type in correct password and hit enter, you will find yourself logged into computer B as user alex.\nThere might be additional step in between. ssh may ask you to confirm authenticity of the remote host. Usually it happens first time you connect. ssh will present you something called RSA/DSA host fingerprint and will ask you whether you like it or not – yes or no. For now answer yes, but make sure to read about this later in this section of the article.\nLet me assume you will not always use same username when connecting from one host to another (not to mention that it is unlikely that you will use username alex). To tell ssh what username to use when connecting to a remote computer, use @ notation. Like this:\n$ ssh alex@B or like this:\n$ ssh john@192.168.1.1 RSA/DSA host fingerprint One of the most important features of SSH protocol is security. This means obviously encrypting the data that passes between your computer and a remote computer, but not only. Another thing that embedded into SSH is taking care that you are connecting to right computer. To explain this, I have to introduce a villain.\nVillain is a guy who tries to break into our computer or perhaps sniff our traffic attempting to steal some valuable information. He can try to replace parts of information that fly between two connected computers to tempt us to expose some valuable information. He can even try to replace a remote computer to make it look like a real thing, while we are feeding it with valuable information. In two words, villain is a bad guy and we try to protect ourselves with SSH.\nAs I said, villain can try to replace remote computer. To make sure that it didn’t happen, we want to know for sure what computer we’re connecting to. For this reason, during its installation, OpenSSH suite creates a signature of the computer. This signature called RSA or DSA host fingerprint.\nRSA and DSA are two methods of encrypting data. SSH supports both of them and any of them can be used. Differences between two are less important. On my Ubuntu system, RSA is the default, but I guess it can be different. Fow now, what is important is to see what method we’re using. I’ll tell you a little later what for.\nWhen you’re connecting to a remote computer for the first time, its host fingerprint being saved on your machine. Actually, first ssh asks you if the signature it received from a remote computer is right. You can rely on ssh to do things right, but you can actually check and make sure that the fingerprint is right. If you have an access to a remote computer some other than via SSH, you can read its fingerprint and compare it to value ssh has given to you.\nTo read host fingerprint use following command:\n$ ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub 2048 96:72:48:4f:69:70:45:b2:39:3d:55:75:78:52:ce:a7 /etc/ssh/ssh_host_rsa_key.pub (RSA) $ ssh-keygen -l -f /etc/ssh/ssh_host_dsa_key.pub 1024 17:bd:cd:fb:09:82:9b:70:36:3f:b5:a4:4e:f4:84:d9 /etc/ssh/ssh_host_dsa_key.pub (DSA) First command returns RSA fingerprint. Second command returns DSA fingerprint. You can use these fingerprints to make sure that you’re connecting to a right computer.\nWhat happens when host fingerprint changes First lets try to understand why this may happen. First option is the villain case that we’ve already mentioned. In this case we should go to police, etc. But this is not the only case. Host fingerprint can change if, for instance, someone has reinstalled the operating system on the computer. Another option is when computer’s IP address has changed, but we still connect to the same IP address which is by now already taken by other computer. In any of these cases host fingerprint of the remote computer changes. Lets see what ssh will tell us when this happens.\n$ ssh alex@192.168.1.1 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ @ WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY! Someone could be eavesdropping on you right now (man-in-the-middle attack)! It is also possible that the RSA host key has just been changed. The fingerprint for the RSA key sent by the remote host is 96:72:48:4f:69:70:45:b2:39:3d:55:75:78:52:ce:a7. Please contact your system administrator. Add correct host key in /home/alex/.ssh/known_hosts to get rid of this message. Offending key in /home/alex/.ssh/known_hosts:1 RSA host key for localhost has changed and you have requested strict checking. Host key verification failed. It is big and slightly overwhelming, but at least you won’t miss it:-)\nHow to handle expected host fingerprint change Often you do something to a remote computer that may cause its host fingerprint to change. For instance, you could have reinstalled operating system on a remote computer. In this case it is totally normal that ssh throws that big and scary error message on us. Yet it won’t let us to connect to a remote system and we want to fix this.\nssh saves host fingerprints on a local disk, in a file named /home//.ssh/known_hosts. What we want to do is to delete certain host from the file and by that cause ssh to confirm host fingerprint with us again, as if we were connecting for the first time.\nTo do this, we will use following command:\n$ ssh-keygen -R 192.168.1.1 /home/alex/.ssh/known_hosts updated. Original contents retained as /home/alex/.ssh/known_hosts.old Obviously, change 192.168.1.1 to either hostname or IP address or a hostname of remote computer you’re connecting to.\nAs you can see, the above command deletes localy saved remote host fingerprint from known_hosts file, but keeps a backup copy of the file (known_hosts.old) in case we need it. In case you want to restore known_hosts file, you can simply copy a backup file overwriting the original one.\nAlso, note that known_hosts file sits in your home directory. Meaning that if you log into different user account, ssh will start saving remote host fingerprints from scratch.\nExecuting command on a remote computer It is as simple as connecting to a remote computer. All you have to do is to append a command you want to execute on a remote computer to ssh command that we’ve used to connect to the computer. For example:\n$ ssh alex@192.168.1.1 ls This will run ls command on computer 192.168.1.1, in alex’s home directory.\nThis way you can run almost any command on a remote computer. But keep in mind one thing. You may want to put command that you want to run on a remote computer in single quotes – shell does not expand commands in single quotes. Take a look at the following example:\n$ ssh alex@192.168.1.1 echo \"Hello World\" \u003e file.txt This command obviously writes something to a file named file.txt, but on what computer? In this particular case, shell will interpret \u003e character and will write output of ssh command to a file named file.txt. But this is not we wanted. So to make sure that shell will not interfere us, we will put the command in single quotes. Like this:\n$ ssh alex@192.168.1.1 'echo \"Hello World\" \u003e file.txt' In case you want to put a single quote in the actual command, this is how you can do it:\n$ ssh alex@192.168.1.1 'echo '\"'\"'Hello World'\"'\"' \u003e file.txt' To make it easier for you to understand number of quotes let me split the command into several pieces to make it more readable.\n'echo ' \"'\" 'Hello World' \"'\" ' \u003e file.txt' Note that to put single quotes into final command, I first close single quote I’ve opened, then put single quote in between double quotes.\nSecurely copying files to and from a remote computer scp is part of OpenSSH suite. It is the command used to copy files from/to a remote computer. In terms of security it works same way as ssh. I.e. it is host fingerprint aware and will ask you to confirm a fingerprint once you access some host for the first time.\nOn the other hand it works same way as cp. With scp like with regular cp you copy a file from one place to another. Also, as with cp you can copy several files into one location.\nThe syntax is the same as with cp. First you specify what to copy, then you specify where to copy. The difference is however that you can specify a remote host using special notation that I will show you a little later.\nscp uses following notation to specify remote files and directories: [username@]:. I.e. first you type username followed by @, then you type hostname and finally you enter colon followed by file/directory name. As with ssh, username (@ included) part is optional and if omitted scp will use username you’ve logged in with. Let’s see few examples:\n$ scp alex@alexandersandler.net:/home/alex/wav.wav . Here I am copying file named sample.wav located in home directory of user alex on alexandersandler.net host, to my current directory. But wait a second, wouldn’t it be easier to do it this way:\n$ scp alex@alexandersandler.net:~/wav.wav . It appears that scp has absolutely no problem to understand ~ instead of user’s home directory, exactly like in shell does.\nCopying multiple files $ scp alex@alexandersandler.net:~/works/project/* . This will copy all files from directory /home/alex/works/project/ on alexandersandler.net to my current directory. Note that scp has no problem with wildcards. Note that as with cp, the wildcard is not recursive. I.e. it will copy all files from /home/alex/works/project/ directory, but will not copy its sub-directories.\nHere’s another example.\n$ scp ~/works/another_project/* alex@alexandersandler.net:~/tmp/ In this example, we copy all files from ~/works/another_project/ directory on our computer to alexandersandler.net. Again, the operation is not recursive. But what if we want it to be recursive? Here comes the first difference between cp and scp. With cp you use -R command line switch. With scp you use -r command line switch. Like this:\n$ scp -r ~/works/another_project/* alex@alexandersandler.net:~/tmp/ Talking about command line switches, here’s another scp command line switch that I use a lot. -C tells scp to compress the data before sending it. Depending on content of the files you’re transferring, this can make scp much faster. Here’s an example that demonstrates how to use it.\n$ scp -C -r ~/works/last_project/* john@alexandersandler.net:~/works/last_project/ Like I already mentioned, scp uses same security mechanism as ssh. All files transferred are encrypted and when using scp for the first time, like with ssh it will ask you to confirm a host fingerprint. Then it will ask for a password, exactly as ssh does.\nPart 2. Encryption Login without entering password? Oh yes. Actually its quite simple. To make this work, we will have to create and install so called identity file. You may also heart it being referred as public/private key or certificate. Don’t these terms to scare you. It is very simple. Keep reading.\nHow modern cryptography works What are keys Computers use pair of keys to encrypt messages they sent between each other. Each key is a sequence of numbers. It can contain as many as thousands of numbers, or just a few of them.\nThese keys are tricky. Once you encrypt something with one key, you can only decrypt it with its pair key. I.e. if you encrypt a message with key A, you can only decrypt it with key B. There is no difference between the keys. I.e. if you encrypt with key A, you can decrypt with key B and if you encrypt with key B, you can decrypt with key A.\nI won’t get into details of how keys get generated and how computers encrypt messages keys. There are several ways of doing this and it usually involve complex mathematical transformations. In case you’re still curious, remember those RSA and DSA things? These are algorythms that computer use to generate keys and encrypt messages using those keys. You can find more information about each one of them on wikipedia.\nPublic/private key Remember that we need two keys to encrypt/decrypt messages. In computers, usually one of them called private key and the other called public key. This is because computer sends public key to whoever asks for it, making it publicly available. Private key, on the other hand, kept in secret. But why computers send public keys away? Doesn’t it negate whole idea of secrecy?\nHow actual encryption works Remember a villain guy I mentioned? In addition to replacing a computer we’re connecting to, villain can do two additional things to steal information from us. First villain can try to decrypt messages we send to another computer. Second, villain may be unable to decrypt the messages, but he may try to intercept them and replace the data with his own. This can cause remote computer to expose valuable information.\nLets see how key cryptography prevents these two problems. Lets say we have two computers – computer A and computer B. Each one of them has a pair of keys – the public and the private key.\nSecure session between them begins with key exchange. Each computer sends its public key to another computer. Then, to send private information from computer A to computer B, computer A does this:\nEncrypts the message with his own private key. Encrypts the result of step 1, with B’s public key. 2nd step makes sure that even if villain intercepts the message, he won’t be able to decrypt it because he doesn’t have B’s private key – message was encrypted with B’s public key, so to decrypt it we need B’s private key.\n1st step makes sure that villain won’t be able to replace a message with his own. He can get B’s public key because, well, it is public, but it cannot encrypt the message with A’s private key because it is private to A. Computer B on the other hand has A’s public key, so it can decrypt messages encrypted with A’s private key.\nThis scheme is indeed amazing and it works for making the Internet secure. But lets get back to SSH.\nSSH identities In SSH, a pair of public/private keys called identity. Keys usually kept in two files. First file contains only the public key. Second file contains both public and private keys. In case you’re wondering why SSH developers have chosen to keep both private and public keys together, it is just more convenient this way. We send public key away so we better have it separate and ready for use. On the other hand, private key is a secret key. It is useless without public key. Then why not to put public key into private key file, to allow us to restore public key from private key file in future? And what if we want to copy private key? Handling one file is lot easier.\nHow to generate identity files OpenSSH suite comes with a program named ssh-keygen. It generates identity files. This is how you run it.\n$ ssh-keygen Generating public/private rsa key pair. Enter file in which to save the key (/home/alex/.ssh/id_rsa): Enter passphrase (empty for no passphrase): Enter same passphrase again: Your identification has been saved in /home/alex/.ssh/id_rsa. Your public key has been saved in /home/alex/.ssh/id_rsa.pub. The key fingerprint is: 77:d1:f8:78:31:03:ec:d9:e8:55:58:9a:d7:b2:4d:ef alex@alexandersandler.net The key's randomart image is: +--[ RSA 2048]----+ | .. o.| | .+.oo| | .o+O.+| | ++oX.| | S ..o.+ o| | . ... . | | E| | | | | +-----------------+ As with known_hosts file, identity files kept in /home//.ssh directory. Names of the files are id_rsa and id_rsa.pub for private key and public key files respectively. These files include RSA identity. For DSA, file names are id_dsa and id_dsa.pub. If you have slightly older version of OpenSSH suite, you may have files named identity and identity.pub. These are SSH protocol version 1 identity files.\nNote that while we’re generating identity files, we are asked for a password. This allows us to protect the session to a remote computer with both identity file and a password. We’ll talk about this in a minute. Now, lets see how to use your identity files.\nHow to install identity file Before I explain how to do install identity files on remote computer, let me say few words about why to do it. Once you’ve identity file installed, ssh will no longer authenticate you with a password. Instead it will use your identity files. Now if you’ve supplied a password, when ssh-keygen asked you for it, ssh will still ask you for that password.\nUsing a password when generating identity files basically gives you an option to have stronger security then regular username/password pair. This way, you’re protecting yourself with both identity files (you’re the only guy who has them) and a password.\nIf you’ve specified blank password, it will let you in, without asking further questions. I.e. you can use identity files to login to a remote computer, without supplying a password and if you’re using same username then even without supplying a username. Just type in ssh and you’re in.\nNote that when you’re installing identity files, you’re basically giving your public key to a remote host. Yet you keep your private key file secret and don’t give it to anyone. This is exactly the same process I have mentioned in the How actual encryption works section of this article.\nNow to the actual installation. Modern versions of OpenSSH come with nifty script called ssh-copy-id. It will copy identity file (your public key) from home directory on your current computer (/home//.ssh/id_rsa.pub), to a remote computer. Let’s see it in action.\n$ ssh-copy-id alex@192.168.1.1 ssh-copy-id will ask you for a password as ssh would, but once you’ve entered the password, you will no longer have to do it again (unless your identity files protected with password). Note that ssh-copy-id has some requirements. When running it, you should already have identity files under your user account. Also, your identity files shouldn’t be installed on the host you’re connecting to, for user you’re connecting with. You can install your identity files under several different user accounts on remote computer.\nThere is something that may not be entierly clear to you just yet. I am talking about the correlation between identity files and user accounts on both local and remote computer. To understand it, we should learn how to install identity files manually.\nInstalling identity files manually ssh-copy-id may not be installed on your system. Or it may produce an error message and we wouldn’t know where it came from. To address these issues we have to understand identity files installation process.\nActually its quiet simple. First of all you have to understand that identity files located in your user’s home directory. Meaning that even if you’ve installed alex’s identity on some remote computer, you won’t be able to login to that computer when locally you’re logged in as john. This is because when ssh tries to authenticate you on a remote system, it looks for identity files (private key) in your home directory.\nSecond, ssh saves installed identity files (public keys) under /home//.ssh/authorized_keys file. Again this is a home directory of the user account you’re trying to log into and if you try logging into different account, ssh will ignore identity files you’ve installed originally.\nIdentity file installation involves one simple step – copying content id_rsa.pub (or id_dsa.pub) file on local computer into authorized_keys file on remote computer. Content of identity files is usually single line of text. You should copy it as such. If you add a line break symbol in the middle, ssh will not recognize this identity. Moreover, it may break other identities, so be very careful when modifying authorized_keys file. Luckily, if you make a mistake, you can always fix it later.\nLets have a look at a session that demonstrates entire process of generating identity files and installing them on remote computer, manually. I am logged into computer named alexandersandler.net as alex and trying to log into 192.168.1.1, again, as alex.\n$ ssh-keygen Generating public/private rsa key pair. Enter file in which to save the key (/home/alex/.ssh/id_rsa): Enter passphrase (empty for no passphrase): Enter same passphrase again: Your identification has been saved in /home/alex/.ssh/id_rsa. Your public key has been saved in /home/alex/.ssh/id_rsa.pub. The key fingerprint is: 03:e3:7f:03:fa:e9:c6:01:85:12:f7:a4:38:36:19:cd alex@alexandersandler.net The key's randomart image is: +--[ RSA 2048]----+ | ..... | | .+.o | | +.E o | | . * o . | | B S . | | . = * . | | . + * | | . o . | | | +-----------------+ $ cat ~/.ssh/id_rsa.pub ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAqgfxOyV0SiQrF+7qq9lOjPvJsacWagHo3LDnv 5n/ZWnZzvTXHk/gZNL2VoUqnaEuf4P/9apepvIVlLrwoUt6x2goGnErvchhn2Tf/MoHNHQ0px 10EYxYfcFfyRs1w/8i/uM1ySnnTv+fbjdKSFMJeqYKhsTeY06p2f7i+QpJVOMQ68ccaY10wj0 fP4wS6AR/6jXfCWeiOtRWZiZ1amf+w1HPIYxN5iLhDpcEK07eC/0GhBnqOcWgi9okHDxEY0nP bKjsmnA7Lg4yBNCVbDIAx/zdMADTKtskH9gOrX+NJmLQSx4NEq802s6FP1YazaInhDQ9syQ2t +HihmQPwCKETw== alex@alexandersandler.net This is our public key, or identity. Lets copy the key to clipboard, connect to remote computer, 192.168.1.1 in our case, and install the identity.\n$ ssh alex@192.168.1.1 The authenticity of host '192.168.1.1 (192.168.1.1)' can't be established. RSA key fingerprint is 96:72:48:4f:69:70:45:b2:39:3d:55:75:78:52:ce:a7. Are you sure you want to continue connecting (yes/no)? yes Warning: Permanently added '192.168.1.1' (RSA) to the list of known hosts. alex@192.168.1.1's password: Linux 192.168.1.1 2.6.24.3 #1 SMP Thu Apr 10 11:20:13 EDT 2008 x86_64 The programs included with the Ubuntu system are free software; the exact distribution terms for each program are described in the individual files in /usr/share/doc/*/copyright. Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by applicable law. To access official Ubuntu documentation, please visit: http://help.ubuntu.com/ You have new mail. Last login: Mon Mar 9 10:16:50 2009 from alexandersandler.net Note that this is the first time I am connecting to this computer, so I was asked to confirm host fingerprint and asked for a password. Well, the truth is that this is not the first time I am connecting to this computer. I just made things look like this is the first time;-)\nalex@localhost:~$ echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAqgfxOyV0SiQrF +7qq9lOjPvJsacWagHo3LDnv5n/ZWnZzvTXHk/gZNL2VoUqnaEuf4P/9apepvIVlLrwoUt6x2 goGnErvchhn2Tf/MoHNHQ0px10EYxYfcFfyRs1w/8i/uM1ySnnTv+fbjdKSFMJeqYKhsTeY06 p2f7i+QpJVOMQ68ccaY10wj0fP4wS6AR/6jXfCWeiOtRWZiZ1amf+w1HPIYxN5iLhDpcEK07e C/0GhBnqOcWgi9okHDxEY0nPbKjsmnA7Lg4yBNCVbDIAx/zdMADTKtskH9gOrX+NJmLQSx4NE q802s6FP1YazaInhDQ9syQ2t+HihmQPwCKETw== alex@alexandersandler.net' \u003e\u003e ~/.ssh/authorized_keys alex@localhost:~$ exit Now we have key installed and it is time to see it in action. Lets try connecting to the machine again.\n$ ssh alex@192.168.1.1 Linux 192.168.1.1 2.6.24.3 #1 SMP Thu Apr 10 11:20:13 EDT 2008 x86_64 The programs included with the Ubuntu system are free software; the exact distribution terms for each program are described in the individual files in /usr/share/doc/*/copyright. Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by applicable law. To access official Ubuntu documentation, please visit: http://help.ubuntu.com/ You have new mail. Last login: Mon Mar 9 10:16:50 2009 from alexandersandler.net alex@localhost:~$ Note that ssh didn’t ask us to provide password. It works!\nPart 3. Advanced SSH X forwarding Introduction You may already know this or may not, but X Windows server (the one that you use to have graphical user interface in Linux) allows you to present a UI for a program on a remote computer. Actually, this is the reason why it is called Xserver. X Windows server is a server because it gives programs a way to present their user interfaces. X Server serves programs. Actual programs on the other hand are X Windows clients. They use X Windows server to present themselves on screen.\nYou may be wondering what it is useful for and I won’t blame you. The truth is that it may become exceptionally handy in certain situations. Imagine yourself connecting to a certain computer using telnet or SSH. As you know, both telnet and SSH allow you to run textual shell. Sometimes it suffices, sometimes it doesn’t. What if text only shell is not enough?\nThis is when the server function of the X Windows server becomes handy. If you have a X Windows server on a computer that you directly work with, you can tell programs on your remote computer to use X Windows server on your local computer and present themselves on your local computer. I.e. you type in xterm inside of your telnet or SSH session, while connected to a remote computer, and xterm window appears right in front of you, on your local computer, despite the actual program runs on a remote computer miles away. Every command you type in the xterm being executed on a remote computer, but you work with it as if it was running on your computer.\nRemote X Windows server configuration You don’t want to allow just any program to present itself on your computer. If access to your X Windows server was completely open, someone could try to catch a moment when you run firefox and run firefox of his own, on his own computer, but on your screen. This could make you think that you’re working with program that runs locally, while it actually runs on a remote computer. When something like this happens, every piece of information you type into your browser is available to the villain. Including your browsing history and even your passwords.\nObviously access to X Windows server has to be closed by default and it is. Formerly, two programs controlled who can use your X Windows server: xauth and xhost. There are however, two problems with these two. First of all using them is inconvenient. To present remote application on your local X Windows server you had to run two commands with quiet complex syntax every session. You could make the configuration persistent, but then you had to do it yourself. It was automatically done for you.\nAnother problem is lack of security. X Windows server uses protocol named XDMCP. It is insecure. As a result someone who has access to your traffic could watch you browsing the internet.\nHow SSH fixes the situation If you run ssh with -Y command line switch, ssh will automatically configure X Windows forwarding to your local X Windows server. This means that when you run ssh with -Y switch, every command or program that has UI, will present itself on your X Windows server computer, rather than on remote computer. No need to run xhost and xauth. ssh does this for you.\nWhat if -Y doesn’t work Both SSH client and SSH server has an option to enable/disable -Y command line switch. Moreover, by default OpenSSH ships with -Y disabled, meaning that you won’t be Hable to use this command line switch out of the box. Luckily, most of Linux distributors enable this option in OpenSSH configuration files. However, there is a slight chance that your Linux distribution has strict security settings and keeps X forwarding disabled.\nIf this is the case, we will have to enable X forwarding. To see how, read next section of this article.\nConfiguration In this section, I would like to cover few of the most useful OpenSSH configuration options.\nAllowing login as root Perhaps one of the first things that I needed with SSH is to allow me to login as root. Before you allow this, bare in mind that this is a bad practice. Working as root is generally a bad idea even if you are developing drivers for Linux – something that very root access.\nTo allow root access, we have to tell SSH server to accept such connections. To do this, we have to modify SSH server’s configuration file and tell sshd (that’s the name of SSH server program) to reread it’s configuration. SSH server configuration file is /etc/ssh/sshd_config. Note that to modify the file you will need root access.\nOption that controls root access called PermitRootLogin. To allow root login, simply append:\nPermitRootLogin yes to the end of the file.\nOnce done we have to tell sshd to reload configuration. Strictly speaking this is distribution dependant, but the command you have to run most likely looks like this:\n/etc/init.d/sshd reload or\n/etc/init.d/ssh reload First variance works on OpenSuSE. Second works on Ubuntu.\nX forwarding We’ve seen how to enable X Windows forwarding with -Y command line switch. But how about doing this automatically? This is doable. Another thing that you may want to do is to disable X forwarding. Again, this is doable.\nTo enable X forwarding automatically, you have to modify ssh’ configuration file /etc/ssh/ssh_config and append ForwardX11Trusted directive. Like this:\nForwardX11Trusted yes No need to reload anything. Once you save the file, ssh will automatically imply -Y on every new connection.\nOn the other hand, to prohibit clients from using -Y, we should remove X11Forwarding directive from /etc/ssh/sshd_config. OpenSSH disables this option by default, but many Linux distributors enable it. So, if X forwarding works for you, this means that there’s “X11Forwarding yes” line somewhere in /etc/ssh/sshd_config.\nOther options There are very nice manual pages for both /etc/ssh/ssh_config and /etc/ssh/sshd_config files named ssh_config and sshd_config respectively. Both manual pages include documentation for all ssh and sshd options that are available.\nConclusion I hope you’ve found this article useful. In case you have further questions, don’t hesitate to send them to me. My email is alexander.sandler@gmail.com.\n",
+  "wordCount" : "5234",
+  "inLanguage": "en",
+  "datePublished": "2009-03-17T19:07:06Z",
+  "dateModified": "2009-03-17T19:07:06Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://alexonlinux.com/essays/ssh-crash-course/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Alex on Linux",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://alexonlinux.com/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="../../" accesskey="h" title="Alex on Linux (Alt + H)">Alex on Linux</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="../../" title="Home">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="../../essays/" title="Essays">
+                    <span>Essays</span>
+                </a>
+            </li>
+            <li>
+                <a href="../../author/" title="Author">
+                    <span>Author</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      SSH crash course
+    </h1>
+    <div class="post-meta"><span title='2009-03-17 19:07:06 +0000 UTC'>March 17, 2009</span>&nbsp;·&nbsp;25 min
+
+</div>
+  </header> 
+  <div class="post-content"><h2 id="about-this-article">About this article<a hidden class="anchor" aria-hidden="true" href="#about-this-article">#</a></h2>
+<p>I would like to do two things in this article. First I would like to tell you
+about SSH. How to make it work. How to use public key cryptography to login to a
+remote computer. How to execute remote commands and copy files to/from a remote
+machine.</p>
+<p>On the other hand, I would like this document to be a sort of reference guide
+document. For that reason, I provide a list of links to various places in the
+document, that show you how to do actual stuff without too much talking around.</p>
+<p>You can read the document from beginning to the end or you can jump to a place
+that you need right away.</p>
+<p>Here are the jump to links.</p>
+<h1 id="introduction">Introduction<a hidden class="anchor" aria-hidden="true" href="#introduction">#</a></h1>
+<p>Some years ago, when I realized that telnet is out and SSH is in, I was mostly
+confused about SSH. I heart that it allows you to login to a remote machine
+without username and password. Yet when I heart people talking about all those
+cryptography keys I was definite not to get into it. It seemed too complicated
+for me. So I used it same way as I used telnet before it – with username and
+password.</p>
+<p>What I really needed is a document that describes all those nifty things that
+you can do with SSH, in simple words. Without getting into too many technical
+details, yet explaining enough out of it, to turn SSH into useful and handy tool
+instead of a hostile thing that only gurus know how to operate.</p>
+<p>Years passed and as I myself learned how to use SSH, including some of its more
+advanced features, I decided to write such a document.</p>
+<p>Although all information I present in this document is available on the
+internet, I think I managed to assemble here things that you need the most.</p>
+<h1 id="part-1-basics">Part 1. Basics<a hidden class="anchor" aria-hidden="true" href="#part-1-basics">#</a></h1>
+<h2 id="intro">Intro<a hidden class="anchor" aria-hidden="true" href="#intro">#</a></h2>
+<p>I believe all Linux distributions today come with command line SSH client,
+called <code>ssh</code>. We should distinguish between two things here. First, there is SSH
+the protocol. But also, there is <code>ssh</code>, the program that speaks SSH protocol.
+<code>ssh</code> is part of larger OpenSSH suite. OpenSSH is what most of the people have.</p>
+<h2 id="connecting-to-remote-host--simple-case">Connecting to remote host – simple case<a hidden class="anchor" aria-hidden="true" href="#connecting-to-remote-host--simple-case">#</a></h2>
+<p>Simplest case is when you want to connect to a remote computer using same
+username as you used to login to your current account. For example, lets say you
+are logged in on a computer named A and your username is <code>alex</code>. You want to
+connect to computer B. This is what you type in:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh B
+</span></span></code></pre></div><p>Instead of hostname (B), you can use an IP address of course. Unless configured
+otherwise, <code>ssh</code> will ask you to provide a password for the user – <code>alex</code> in our
+case. Once you type in correct password and hit enter, you will find yourself
+logged into computer B as user <code>alex</code>.</p>
+<blockquote>
+<p>There might be additional step in between. <code>ssh</code> may ask you to confirm
+authenticity of the remote host. Usually it happens first time you connect.
+<code>ssh</code> will present you something called RSA/DSA host fingerprint and will ask
+you whether you like it or not – yes or no. For now answer yes, but make sure
+to read about this later in this section of the article.</p>
+</blockquote>
+<p>Let me assume you will not always use same username when connecting from one
+host to another (not to mention that it is unlikely that you will use username
+<code>alex</code>). To tell <code>ssh</code> what username to use when connecting to a remote
+computer, use <code>&lt;username&gt;@&lt;hostname&gt;</code> notation. Like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh alex@B
+</span></span></code></pre></div><p>or like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh john@192.168.1.1
+</span></span></code></pre></div><h3 id="rsadsa-host-fingerprint">RSA/DSA host fingerprint<a hidden class="anchor" aria-hidden="true" href="#rsadsa-host-fingerprint">#</a></h3>
+<p>One of the most important features of SSH protocol is security. This means
+obviously encrypting the data that passes between your computer and a remote
+computer, but not only. Another thing that embedded into SSH is taking care that
+you are connecting to right computer. To explain this, I have to introduce a
+villain.</p>
+<blockquote>
+<p>Villain is a guy who tries to break into our computer or perhaps sniff our
+traffic attempting to steal some valuable information. He can try to replace
+parts of information that fly between two connected computers to tempt us to
+expose some valuable information. He can even try to replace a remote computer
+to make it look like a real thing, while we are feeding it with valuable
+information. In two words, villain is a bad guy and we try to protect
+ourselves with SSH.</p>
+</blockquote>
+<p>As I said, villain can try to replace remote computer. To make sure that it
+didn’t happen, we want to know for sure what computer we’re connecting to. For
+this reason, during its installation, OpenSSH suite creates a signature of the
+computer. This signature called RSA or DSA host fingerprint.</p>
+<blockquote>
+<p>RSA and DSA are two methods of encrypting data. SSH supports both of them and
+any of them can be used. Differences between two are less important. On my
+Ubuntu system, RSA is the default, but I guess it can be different. Fow now,
+what is important is to see what method we’re using. I’ll tell you a little
+later what for.</p>
+</blockquote>
+<p>When you’re connecting to a remote computer for the first time, its host
+fingerprint being saved on your machine. Actually, first <code>ssh</code> asks you if the
+signature it received from a remote computer is right. You can rely on <code>ssh</code> to
+do things right, but you can actually check and make sure that the fingerprint
+is right. If you have an access to a remote computer some other than via SSH,
+you can read its fingerprint and compare it to value <code>ssh</code> has given to you.</p>
+<p>To read host fingerprint use following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub
+</span></span><span style="display:flex;"><span>2048 96:72:48:4f:69:70:45:b2:39:3d:55:75:78:52:ce:a7 /etc/ssh/ssh_host_rsa_key.pub (RSA)
+</span></span><span style="display:flex;"><span>$ ssh-keygen -l -f /etc/ssh/ssh_host_dsa_key.pub
+</span></span><span style="display:flex;"><span>1024 17:bd:cd:fb:09:82:9b:70:36:3f:b5:a4:4e:f4:84:d9 /etc/ssh/ssh_host_dsa_key.pub (DSA)
+</span></span></code></pre></div><p>First command returns RSA fingerprint. Second command returns DSA fingerprint.
+You can use these fingerprints to make sure that you’re connecting to a right
+computer.</p>
+<h3 id="what-happens-when-host-fingerprint-changes">What happens when host fingerprint changes<a hidden class="anchor" aria-hidden="true" href="#what-happens-when-host-fingerprint-changes">#</a></h3>
+<p>First lets try to understand why this may happen. First option is the villain
+case that we’ve already mentioned. In this case we should go to police, etc. But
+this is not the only case. Host fingerprint can change if, for instance, someone
+has reinstalled the operating system on the computer. Another option is when
+computer’s IP address has changed, but we still connect to the same IP address
+which is by now already taken by other computer. In any of these cases host
+fingerprint of the remote computer changes. Lets see what <code>ssh</code> will tell us
+when this happens.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh alex@192.168.1.1
+</span></span><span style="display:flex;"><span>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+</span></span><span style="display:flex;"><span>@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+</span></span><span style="display:flex;"><span>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+</span></span><span style="display:flex;"><span>IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+</span></span><span style="display:flex;"><span>Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+</span></span><span style="display:flex;"><span>It is also possible that the RSA host key has just been changed.
+</span></span><span style="display:flex;"><span>The fingerprint for the RSA key sent by the remote host is
+</span></span><span style="display:flex;"><span>96:72:48:4f:69:70:45:b2:39:3d:55:75:78:52:ce:a7.
+</span></span><span style="display:flex;"><span>Please contact your system administrator.
+</span></span><span style="display:flex;"><span>Add correct host key in /home/alex/.ssh/known_hosts to get rid of this message.
+</span></span><span style="display:flex;"><span>Offending key in /home/alex/.ssh/known_hosts:1
+</span></span><span style="display:flex;"><span>RSA host key for localhost has changed and you have requested strict checking.
+</span></span><span style="display:flex;"><span>Host key verification failed.
+</span></span></code></pre></div><p>It is big and slightly overwhelming, but at least you won’t miss it:-)</p>
+<h3 id="how-to-handle-expected-host-fingerprint-change">How to handle expected host fingerprint change<a hidden class="anchor" aria-hidden="true" href="#how-to-handle-expected-host-fingerprint-change">#</a></h3>
+<p>Often you do something to a remote computer that may cause its host fingerprint
+to change. For instance, you could have reinstalled operating system on a remote
+computer. In this case it is totally normal that <code>ssh</code> throws that big and scary
+error message on us. Yet it won’t let us to connect to a remote system and we
+want to fix this.</p>
+<p><code>ssh</code> saves host fingerprints on a local disk, in a file named
+<code>/home/&lt;username&gt;/.ssh/known_hosts</code>. What we want to do is to delete certain
+host from the file and by that cause <code>ssh</code> to confirm host fingerprint with us
+again, as if we were connecting for the first time.</p>
+<p>To do this, we will use following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh-keygen -R 192.168.1.1
+</span></span><span style="display:flex;"><span>/home/alex/.ssh/known_hosts updated.
+</span></span><span style="display:flex;"><span>Original contents retained as /home/alex/.ssh/known_hosts.old
+</span></span></code></pre></div><p>Obviously, change 192.168.1.1 to either hostname or IP address or a hostname of
+remote computer you’re connecting to.</p>
+<p>As you can see, the above command deletes localy saved remote host fingerprint
+from <code>known_hosts</code> file, but keeps a backup copy of the file (<code>known_hosts.old</code>)
+in case we need it. In case you want to restore <code>known_hosts</code> file, you can
+simply copy a backup file overwriting the original one.</p>
+<p>Also, note that <code>known_hosts</code> file sits in your home directory. Meaning that if
+you log into different user account, <code>ssh</code> will start saving remote host
+fingerprints from scratch.</p>
+<h2 id="executing-command-on-a-remote-computer">Executing command on a remote computer<a hidden class="anchor" aria-hidden="true" href="#executing-command-on-a-remote-computer">#</a></h2>
+<p>It is as simple as connecting to a remote computer. All you have to do is to
+append a command you want to execute on a remote computer to <code>ssh</code> command that
+we’ve used to connect to the computer. For example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh alex@192.168.1.1 ls
+</span></span></code></pre></div><p>This will run <code>ls</code> command on computer 192.168.1.1, in <code>alex</code>’s home directory.</p>
+<p>This way you can run almost any command on a remote computer. But keep in mind
+one thing. You may want to put command that you want to run on a remote computer
+in single quotes – shell does not expand commands in single quotes. Take a look
+at the following example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh alex@192.168.1.1 echo &#34;Hello World&#34; &gt; file.txt
+</span></span></code></pre></div><p>This command obviously writes something to a file named <code>file.txt</code>, but on what
+computer? In this particular case, shell will interpret <code>&gt;</code> character and will
+write output of <code>ssh</code> command to a file named <code>file.txt</code>. But this is not we
+wanted. So to make sure that shell will not interfere us, we will put the
+command in single quotes. Like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh alex@192.168.1.1 &#39;echo &#34;Hello World&#34; &gt; file.txt&#39;
+</span></span></code></pre></div><p>In case you want to put a single quote in the actual command, this is how you
+can do it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh alex@192.168.1.1 &#39;echo &#39;&#34;&#39;&#34;&#39;Hello World&#39;&#34;&#39;&#34;&#39; &gt; file.txt&#39;
+</span></span></code></pre></div><p>To make it easier for you to understand number of quotes let me split the
+command into several pieces to make it more readable.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>&#39;echo &#39;
+</span></span><span style="display:flex;"><span>&#34;&#39;&#34;
+</span></span><span style="display:flex;"><span>&#39;Hello World&#39;
+</span></span><span style="display:flex;"><span>&#34;&#39;&#34;
+</span></span><span style="display:flex;"><span>&#39; &gt; file.txt&#39;
+</span></span></code></pre></div><p>Note that to put single quotes into final command, I first close single quote
+I’ve opened, then put single quote in between double quotes.</p>
+<h2 id="securely-copying-files-to-and-from-a-remote-computer">Securely copying files to and from a remote computer<a hidden class="anchor" aria-hidden="true" href="#securely-copying-files-to-and-from-a-remote-computer">#</a></h2>
+<p><code>scp</code> is part of OpenSSH suite. It is the command used to copy files from/to a
+remote computer. In terms of security it works same way as <code>ssh</code>. I.e. it is
+host fingerprint aware and will ask you to confirm a fingerprint once you access
+some host for the first time.</p>
+<p>On the other hand it works same way as <code>cp</code>. With <code>scp</code> like with regular <code>cp</code>
+you copy a file from one place to another. Also, as with <code>cp</code> you can copy
+several files into one location.</p>
+<p>The syntax is the same as with <code>cp</code>. First you specify what to copy, then you
+specify where to copy. The difference is however that you can specify a remote
+host using special notation that I will show you a little later.</p>
+<p><code>scp</code> uses following notation to specify remote files and directories:
+<code>[username@]&lt;hostname&gt;:&lt;directory|file&gt;</code>. I.e. first you type username followed
+by <code>@</code>, then you type hostname and finally you enter colon followed by
+file/directory name. As with <code>ssh</code>, username (<code>@</code> included) part is optional and
+if omitted <code>scp</code> will use username you’ve logged in with. Let’s see few
+examples:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ scp alex@alexandersandler.net:/home/alex/wav.wav .
+</span></span></code></pre></div><p>Here I am copying file named <code>sample.wav</code> located in home directory of user
+<code>alex</code> on <code>alexandersandler.net</code> host, to my current directory. But wait a
+second, wouldn’t it be easier to do it this way:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ scp alex@alexandersandler.net:~/wav.wav .
+</span></span></code></pre></div><p>It appears that <code>scp</code> has absolutely no problem to understand <code>~</code> instead of
+user’s home directory, exactly like in shell does.</p>
+<h3 id="copying-multiple-files">Copying multiple files<a hidden class="anchor" aria-hidden="true" href="#copying-multiple-files">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ scp alex@alexandersandler.net:~/works/project/* .
+</span></span></code></pre></div><p>This will copy all files from directory <code>/home/alex/works/project/</code> on
+<code>alexandersandler.net</code> to my current directory. Note that <code>scp</code> has no problem
+with wildcards. Note that as with <code>cp</code>, the wildcard is not recursive. I.e. it
+will copy all files from <code>/home/alex/works/project/</code> directory, but will not
+copy its sub-directories.</p>
+<p>Here’s another example.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ scp ~/works/another_project/* alex@alexandersandler.net:~/tmp/
+</span></span></code></pre></div><p>In this example, we copy all files from <code>~/works/another_project/</code> directory on
+our computer to <code>alexandersandler.net</code>. Again, the operation is not recursive.
+But what if we want it to be recursive? Here comes the first difference between
+<code>cp</code> and <code>scp</code>. With <code>cp</code> you use <code>-R</code> command line switch. With <code>scp</code> you use
+<code>-r</code> command line switch. Like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ scp -r ~/works/another_project/* alex@alexandersandler.net:~/tmp/
+</span></span></code></pre></div><p>Talking about command line switches, here’s another <code>scp</code> command line switch
+that I use a lot. <code>-C</code> tells <code>scp</code> to compress the data before sending it.
+Depending on content of the files you’re transferring, this can make <code>scp</code> much
+faster. Here’s an example that demonstrates how to use it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ scp -C -r ~/works/last_project/* john@alexandersandler.net:~/works/last_project/
+</span></span></code></pre></div><p>Like I already mentioned, <code>scp</code> uses same security mechanism as <code>ssh</code>. All files
+transferred are encrypted and when using <code>scp</code> for the first time, like with
+<code>ssh</code> it will ask you to confirm a host fingerprint. Then it will ask for a
+password, exactly as <code>ssh</code> does.</p>
+<h1 id="part-2-encryption">Part 2. Encryption<a hidden class="anchor" aria-hidden="true" href="#part-2-encryption">#</a></h1>
+<h2 id="login-without-entering-password">Login without entering password?<a hidden class="anchor" aria-hidden="true" href="#login-without-entering-password">#</a></h2>
+<p>Oh yes. Actually its quite simple. To make this work, we will have to create and
+install so called identity file. You may also heart it being referred as
+public/private key or certificate. Don’t these terms to scare you. It is very
+simple. Keep reading.</p>
+<h2 id="how-modern-cryptography-works">How modern cryptography works<a hidden class="anchor" aria-hidden="true" href="#how-modern-cryptography-works">#</a></h2>
+<h3 id="what-are-keys">What are keys<a hidden class="anchor" aria-hidden="true" href="#what-are-keys">#</a></h3>
+<p>Computers use pair of keys to encrypt messages they sent between each other.
+Each key is a sequence of numbers. It can contain as many as thousands of
+numbers, or just a few of them.</p>
+<p>These keys are tricky. Once you encrypt something with one key, you can only
+decrypt it with its pair key. I.e. if you encrypt a message with key A, you can
+only decrypt it with key B. There is no difference between the keys. I.e. if you
+encrypt with key A, you can decrypt with key B and if you encrypt with key B,
+you can decrypt with key A.</p>
+<p>I won’t get into details of how keys get generated and how computers encrypt
+messages keys. There are several ways of doing this and it usually involve
+complex mathematical transformations. In case you’re still curious, remember
+those RSA and DSA things? These are algorythms that computer use to generate
+keys and encrypt messages using those keys. You can find more information about
+each one of them on wikipedia.</p>
+<h3 id="publicprivate-key">Public/private key<a hidden class="anchor" aria-hidden="true" href="#publicprivate-key">#</a></h3>
+<p>Remember that we need two keys to encrypt/decrypt messages. In computers,
+usually one of them called private key and the other called public key. This is
+because computer sends public key to whoever asks for it, making it publicly
+available. Private key, on the other hand, kept in secret. But why computers
+send public keys away? Doesn’t it negate whole idea of secrecy?</p>
+<h3 id="how-actual-encryption-works">How actual encryption works<a hidden class="anchor" aria-hidden="true" href="#how-actual-encryption-works">#</a></h3>
+<p>Remember a villain guy I mentioned? In addition to replacing a computer we’re
+connecting to, villain can do two additional things to steal information from
+us. First villain can try to decrypt messages we send to another computer.
+Second, villain may be unable to decrypt the messages, but he may try to
+intercept them and replace the data with his own. This can cause remote computer
+to expose valuable information.</p>
+<p>Lets see how key cryptography prevents these two problems. Lets say we have two
+computers – computer A and computer B. Each one of them has a pair of keys – the
+public and the private key.</p>
+<p>Secure session between them begins with key exchange. Each computer sends its
+public key to another computer. Then, to send private information from computer
+A to computer B, computer A does this:</p>
+<ol>
+<li>Encrypts the message with his own private key.</li>
+<li>Encrypts the result of step 1, with B’s public key.</li>
+</ol>
+<p>2nd step makes sure that even if villain intercepts the message, he won’t be
+able to decrypt it because he doesn’t have B’s private key – message was
+encrypted with B’s public key, so to decrypt it we need B’s private key.</p>
+<p>1st step makes sure that villain won’t be able to replace a message with his
+own. He can get B’s public key because, well, it is public, but it cannot
+encrypt the message with A’s private key because it is private to A. Computer B
+on the other hand has A’s public key, so it can decrypt messages encrypted with
+A’s private key.</p>
+<p>This scheme is indeed amazing and it works for making the Internet secure. But
+lets get back to SSH.</p>
+<h2 id="ssh-identities">SSH identities<a hidden class="anchor" aria-hidden="true" href="#ssh-identities">#</a></h2>
+<p>In SSH, a pair of public/private keys called identity. Keys usually kept in two
+files. First file contains only the public key. Second file contains both public
+and private keys. In case you’re wondering why SSH developers have chosen to
+keep both private and public keys together, it is just more convenient this way.
+We send public key away so we better have it separate and ready for use. On the
+other hand, private key is a secret key. It is useless without public key. Then
+why not to put public key into private key file, to allow us to restore public
+key from private key file in future? And what if we want to copy private key?
+Handling one file is lot easier.</p>
+<h3 id="how-to-generate-identity-files">How to generate identity files<a hidden class="anchor" aria-hidden="true" href="#how-to-generate-identity-files">#</a></h3>
+<p>OpenSSH suite comes with a program named <code>ssh-keygen</code>. It generates identity
+files. This is how you run it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh-keygen
+</span></span><span style="display:flex;"><span>Generating public/private rsa key pair.
+</span></span><span style="display:flex;"><span>Enter file in which to save the key (/home/alex/.ssh/id_rsa):
+</span></span><span style="display:flex;"><span>Enter passphrase (empty for no passphrase):
+</span></span><span style="display:flex;"><span>Enter same passphrase again:
+</span></span><span style="display:flex;"><span>Your identification has been saved in /home/alex/.ssh/id_rsa.
+</span></span><span style="display:flex;"><span>Your public key has been saved in /home/alex/.ssh/id_rsa.pub.
+</span></span><span style="display:flex;"><span>The key fingerprint is:
+</span></span><span style="display:flex;"><span>77:d1:f8:78:31:03:ec:d9:e8:55:58:9a:d7:b2:4d:ef alex@alexandersandler.net
+</span></span><span style="display:flex;"><span>The key&#39;s randomart image is:
+</span></span><span style="display:flex;"><span>+--[ RSA 2048]----+
+</span></span><span style="display:flex;"><span>|           ..  o.|
+</span></span><span style="display:flex;"><span>|            .+.oo|
+</span></span><span style="display:flex;"><span>|           .o+O.+|
+</span></span><span style="display:flex;"><span>|            ++oX.|
+</span></span><span style="display:flex;"><span>|        S ..o.+ o|
+</span></span><span style="display:flex;"><span>|         . ... . |
+</span></span><span style="display:flex;"><span>|                E|
+</span></span><span style="display:flex;"><span>|                 |
+</span></span><span style="display:flex;"><span>|                 |
+</span></span><span style="display:flex;"><span>+-----------------+
+</span></span></code></pre></div><p>As with <code>known_hosts</code> file, identity files kept in <code>/home/&lt;username&gt;/.ssh</code>
+directory. Names of the files are <code>id_rsa</code> and <code>id_rsa.pub</code> for private key and
+public key files respectively. These files include RSA identity. For DSA, file
+names are <code>id_dsa</code> and <code>id_dsa.pub</code>. If you have slightly older version of
+OpenSSH suite, you may have files named <code>identity</code> and <code>identity.pub</code>. These are
+SSH protocol version 1 identity files.</p>
+<p>Note that while we’re generating identity files, we are asked for a password.
+This allows us to protect the session to a remote computer with both identity
+file and a password. We’ll talk about this in a minute. Now, lets see how to use
+your identity files.</p>
+<h3 id="how-to-install-identity-file">How to install identity file<a hidden class="anchor" aria-hidden="true" href="#how-to-install-identity-file">#</a></h3>
+<p>Before I explain how to do install identity files on remote computer, let me say
+few words about why to do it. Once you’ve identity file installed, <code>ssh</code> will no
+longer authenticate you with a password. Instead it will use your identity
+files. Now if you’ve supplied a password, when <code>ssh-keygen</code> asked you for it,
+<code>ssh</code> will still ask you for that password.</p>
+<p>Using a password when generating identity files basically gives you an option to
+have stronger security then regular username/password pair. This way, you’re
+protecting yourself with both identity files (you’re the only guy who has them)
+and a password.</p>
+<p>If you’ve specified blank password, it will let you in, without asking further
+questions. I.e. you can use identity files to login to a remote computer,
+without supplying a password and if you’re using same username then even without
+supplying a username. Just type in <code>ssh &lt;hostname&gt;</code> and you’re in.</p>
+<p>Note that when you’re installing identity files, you’re basically giving your
+public key to a remote host. Yet you keep your private key file secret and don’t
+give it to anyone. This is exactly the same process I have mentioned in the <em>How
+actual encryption works</em> section of this article.</p>
+<p>Now to the actual installation. Modern versions of OpenSSH come with nifty
+script called <code>ssh-copy-id</code>. It will copy identity file (your public key) from
+home directory on your current computer (<code>/home/&lt;user&gt;/.ssh/id_rsa.pub</code>), to a
+remote computer. Let’s see it in action.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh-copy-id alex@192.168.1.1
+</span></span></code></pre></div><p><code>ssh-copy-id</code> will ask you for a password as <code>ssh</code> would, but once you’ve
+entered the password, you will no longer have to do it again (unless your
+identity files protected with password). Note that <code>ssh-copy-id</code> has some
+requirements. When running it, you should already have identity files under your
+user account. Also, your identity files shouldn’t be installed on the host
+you’re connecting to, for user you’re connecting with. You can install your
+identity files under several different user accounts on remote computer.</p>
+<p>There is something that may not be entierly clear to you just yet. I am talking
+about the correlation between identity files and user accounts on both local and
+remote computer. To understand it, we should learn how to install identity files
+manually.</p>
+<h3 id="installing-identity-files-manually">Installing identity files manually<a hidden class="anchor" aria-hidden="true" href="#installing-identity-files-manually">#</a></h3>
+<p><code>ssh-copy-id</code> may not be installed on your system. Or it may produce an error
+message and we wouldn’t know where it came from. To address these issues we have
+to understand identity files installation process.</p>
+<p>Actually its quiet simple. First of all you have to understand that identity
+files located in your user’s home directory. Meaning that even if you’ve
+installed <code>alex</code>’s identity on some remote computer, you won’t be able to login
+to that computer when locally you’re logged in as john. This is because when
+<code>ssh</code> tries to authenticate you on a remote system, it looks for identity files
+(private key) in your home directory.</p>
+<p>Second, <code>ssh</code> saves installed identity files (public keys) under
+<code>/home/&lt;user&gt;/.ssh/authorized_keys</code> file. Again this is a home directory of the
+user account you’re trying to log into and if you try logging into different
+account, <code>ssh</code> will ignore identity files you’ve installed originally.</p>
+<p>Identity file installation involves one simple step – copying content
+<code>id_rsa.pub</code> (or <code>id_dsa.pub</code>) file on local computer into <code>authorized_keys</code>
+file on remote computer. Content of identity files is usually single line of
+text. You should copy it as such. If you add a line break symbol in the middle,
+<code>ssh</code> will not recognize this identity. Moreover, it may break other identities,
+so be very careful when modifying <code>authorized_keys</code> file. Luckily, if you make a
+mistake, you can always fix it later.</p>
+<p>Lets have a look at a session that demonstrates entire process of generating
+identity files and installing them on remote computer, manually. I am logged
+into computer named <code>alexandersandler.net</code> as <code>alex</code> and trying to log into
+<code>192.168.1.1</code>, again, as <code>alex</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh-keygen
+</span></span><span style="display:flex;"><span>Generating public/private rsa key pair.
+</span></span><span style="display:flex;"><span>Enter file in which to save the key (/home/alex/.ssh/id_rsa):
+</span></span><span style="display:flex;"><span>Enter passphrase (empty for no passphrase):
+</span></span><span style="display:flex;"><span>Enter same passphrase again:
+</span></span><span style="display:flex;"><span>Your identification has been saved in /home/alex/.ssh/id_rsa.
+</span></span><span style="display:flex;"><span>Your public key has been saved in /home/alex/.ssh/id_rsa.pub.
+</span></span><span style="display:flex;"><span>The key fingerprint is:
+</span></span><span style="display:flex;"><span>03:e3:7f:03:fa:e9:c6:01:85:12:f7:a4:38:36:19:cd alex@alexandersandler.net
+</span></span><span style="display:flex;"><span>The key&#39;s randomart image is:
+</span></span><span style="display:flex;"><span>+--[ RSA 2048]----+
+</span></span><span style="display:flex;"><span>|      .....      |
+</span></span><span style="display:flex;"><span>|      .+.o       |
+</span></span><span style="display:flex;"><span>|      +.E o      |
+</span></span><span style="display:flex;"><span>|     . * o .     |
+</span></span><span style="display:flex;"><span>|      B S .      |
+</span></span><span style="display:flex;"><span>|     . = * .     |
+</span></span><span style="display:flex;"><span>|      . + *      |
+</span></span><span style="display:flex;"><span>|       . o .     |
+</span></span><span style="display:flex;"><span>|                 |
+</span></span><span style="display:flex;"><span>+-----------------+
+</span></span><span style="display:flex;"><span>$ cat ~/.ssh/id_rsa.pub
+</span></span><span style="display:flex;"><span>ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAqgfxOyV0SiQrF+7qq9lOjPvJsacWagHo3LDnv
+</span></span><span style="display:flex;"><span>5n/ZWnZzvTXHk/gZNL2VoUqnaEuf4P/9apepvIVlLrwoUt6x2goGnErvchhn2Tf/MoHNHQ0px
+</span></span><span style="display:flex;"><span>10EYxYfcFfyRs1w/8i/uM1ySnnTv+fbjdKSFMJeqYKhsTeY06p2f7i+QpJVOMQ68ccaY10wj0
+</span></span><span style="display:flex;"><span>fP4wS6AR/6jXfCWeiOtRWZiZ1amf+w1HPIYxN5iLhDpcEK07eC/0GhBnqOcWgi9okHDxEY0nP
+</span></span><span style="display:flex;"><span>bKjsmnA7Lg4yBNCVbDIAx/zdMADTKtskH9gOrX+NJmLQSx4NEq802s6FP1YazaInhDQ9syQ2t
+</span></span><span style="display:flex;"><span>+HihmQPwCKETw== alex@alexandersandler.net
+</span></span></code></pre></div><p>This is our public key, or identity. Lets copy the key to clipboard, connect to
+remote computer, 192.168.1.1 in our case, and install the identity.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh alex@192.168.1.1
+</span></span><span style="display:flex;"><span>The authenticity of host &#39;192.168.1.1 (192.168.1.1)&#39; can&#39;t be established.
+</span></span><span style="display:flex;"><span>RSA key fingerprint is 96:72:48:4f:69:70:45:b2:39:3d:55:75:78:52:ce:a7.
+</span></span><span style="display:flex;"><span>Are you sure you want to continue connecting (yes/no)? yes
+</span></span><span style="display:flex;"><span>Warning: Permanently added &#39;192.168.1.1&#39; (RSA) to the list of known hosts.
+</span></span><span style="display:flex;"><span>alex@192.168.1.1&#39;s password:
+</span></span><span style="display:flex;"><span>Linux 192.168.1.1 2.6.24.3 #1 SMP Thu Apr 10 11:20:13 EDT 2008 x86_64
+</span></span><span style="display:flex;"><span>The programs included with the Ubuntu system are free software;
+</span></span><span style="display:flex;"><span>the exact distribution terms for each program are described in the
+</span></span><span style="display:flex;"><span>individual files in /usr/share/doc/*/copyright.
+</span></span><span style="display:flex;"><span>Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+</span></span><span style="display:flex;"><span>applicable law.
+</span></span><span style="display:flex;"><span>To access official Ubuntu documentation, please visit:
+</span></span><span style="display:flex;"><span>http://help.ubuntu.com/
+</span></span><span style="display:flex;"><span>You have new mail.
+</span></span><span style="display:flex;"><span>Last login: Mon Mar  9 10:16:50 2009 from alexandersandler.net
+</span></span></code></pre></div><p>Note that this is the first time I am connecting to this computer, so I was
+asked to confirm host fingerprint and asked for a password. Well, the truth is
+that this is not the first time I am connecting to this computer. I just made
+things look like this is the first time;-)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>alex@localhost:~$ echo &#39;ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAqgfxOyV0SiQrF
+</span></span><span style="display:flex;"><span>+7qq9lOjPvJsacWagHo3LDnv5n/ZWnZzvTXHk/gZNL2VoUqnaEuf4P/9apepvIVlLrwoUt6x2
+</span></span><span style="display:flex;"><span>goGnErvchhn2Tf/MoHNHQ0px10EYxYfcFfyRs1w/8i/uM1ySnnTv+fbjdKSFMJeqYKhsTeY06
+</span></span><span style="display:flex;"><span>p2f7i+QpJVOMQ68ccaY10wj0fP4wS6AR/6jXfCWeiOtRWZiZ1amf+w1HPIYxN5iLhDpcEK07e
+</span></span><span style="display:flex;"><span>C/0GhBnqOcWgi9okHDxEY0nPbKjsmnA7Lg4yBNCVbDIAx/zdMADTKtskH9gOrX+NJmLQSx4NE
+</span></span><span style="display:flex;"><span>q802s6FP1YazaInhDQ9syQ2t+HihmQPwCKETw== alex@alexandersandler.net&#39;
+</span></span><span style="display:flex;"><span>&gt;&gt; ~/.ssh/authorized_keys
+</span></span><span style="display:flex;"><span>alex@localhost:~$ exit
+</span></span></code></pre></div><p>Now we have key installed and it is time to see it in action. Lets try
+connecting to the machine again.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>$ ssh alex@192.168.1.1
+</span></span><span style="display:flex;"><span>Linux 192.168.1.1 2.6.24.3 #1 SMP Thu Apr 10 11:20:13 EDT 2008 x86_64
+</span></span><span style="display:flex;"><span>The programs included with the Ubuntu system are free software;
+</span></span><span style="display:flex;"><span>the exact distribution terms for each program are described in the
+</span></span><span style="display:flex;"><span>individual files in /usr/share/doc/*/copyright.
+</span></span><span style="display:flex;"><span>Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+</span></span><span style="display:flex;"><span>applicable law.
+</span></span><span style="display:flex;"><span>To access official Ubuntu documentation, please visit:
+</span></span><span style="display:flex;"><span>http://help.ubuntu.com/
+</span></span><span style="display:flex;"><span>You have new mail.
+</span></span><span style="display:flex;"><span>Last login: Mon Mar  9 10:16:50 2009 from alexandersandler.net
+</span></span><span style="display:flex;"><span>alex@localhost:~$
+</span></span></code></pre></div><p>Note that <code>ssh</code> didn’t ask us to provide password. It works!</p>
+<h1 id="part-3-advanced-ssh">Part 3. Advanced SSH<a hidden class="anchor" aria-hidden="true" href="#part-3-advanced-ssh">#</a></h1>
+<h2 id="x-forwarding">X forwarding<a hidden class="anchor" aria-hidden="true" href="#x-forwarding">#</a></h2>
+<h3 id="introduction-1">Introduction<a hidden class="anchor" aria-hidden="true" href="#introduction-1">#</a></h3>
+<p>You may already know this or may not, but X Windows server (the one that you use
+to have graphical user interface in Linux) allows you to present a UI for a
+program on a remote computer. Actually, this is the reason why it is called
+X<strong>server</strong>. X Windows server is a server because it gives programs a way to
+present their user interfaces. X Server serves programs. Actual programs on the
+other hand are X Windows clients. They use X Windows server to present
+themselves on screen.</p>
+<p>You may be wondering what it is useful for and I won’t blame you. The truth is
+that it may become exceptionally handy in certain situations. Imagine yourself
+connecting to a certain computer using telnet or SSH. As you know, both telnet
+and SSH allow you to run textual shell. Sometimes it suffices, sometimes it
+doesn’t. What if text only shell is not enough?</p>
+<p>This is when the server function of the X Windows server becomes handy. If you
+have a X Windows server on a computer that you directly work with, you can tell
+programs on your remote computer to use X Windows server on your local computer
+and present themselves on your local computer. I.e. you type in <code>xterm</code> inside
+of your telnet or SSH session, while connected to a remote computer, and <code>xterm</code>
+window appears right in front of you, on your local computer, despite the actual
+program runs on a remote computer miles away. Every command you type in the
+<code>xterm</code> being executed on a remote computer, but you work with it as if it was
+running on your computer.</p>
+<h3 id="remote-x-windows-server-configuration">Remote X Windows server configuration<a hidden class="anchor" aria-hidden="true" href="#remote-x-windows-server-configuration">#</a></h3>
+<p>You don’t want to allow just any program to present itself on your computer. If
+access to your X Windows server was completely open, someone could try to catch
+a moment when you run firefox and run firefox of his own, on his own computer,
+but on your screen. This could make you think that you’re working with program
+that runs locally, while it actually runs on a remote computer. When something
+like this happens, every piece of information you type into your browser is
+available to the villain. Including your browsing history and even your
+passwords.</p>
+<p>Obviously access to X Windows server has to be closed by default and it is.
+Formerly, two programs controlled who can use your X Windows server: <code>xauth</code> and
+<code>xhost</code>. There are however, two problems with these two. First of all using them
+is inconvenient. To present remote application on your local X Windows server
+you had to run two commands with quiet complex syntax every session. You could
+make the configuration persistent, but then you had to do it yourself. It was
+automatically done for you.</p>
+<p>Another problem is lack of security. X Windows server uses protocol named XDMCP.
+It is insecure. As a result someone who has access to your traffic could watch
+you browsing the internet.</p>
+<h3 id="how-ssh-fixes-the-situation">How SSH fixes the situation<a hidden class="anchor" aria-hidden="true" href="#how-ssh-fixes-the-situation">#</a></h3>
+<p>If you run <code>ssh</code> with <code>-Y</code> command line switch, <code>ssh</code> will automatically
+configure X Windows forwarding to your local X Windows server. This means that
+when you run <code>ssh</code> with <code>-Y</code> switch, every command or program that has UI, will
+present itself on your X Windows server computer, rather than on remote
+computer. No need to run <code>xhost</code> and <code>xauth</code>. <code>ssh</code> does this for you.</p>
+<h4 id="what-if--y-doesnt-work">What if -Y doesn’t work<a hidden class="anchor" aria-hidden="true" href="#what-if--y-doesnt-work">#</a></h4>
+<p>Both SSH client and SSH server has an option to enable/disable -Y command line
+switch. Moreover, by default OpenSSH ships with -Y disabled, meaning that you
+won’t be Hable to use this command line switch out of the box. Luckily, most of
+Linux distributors enable this option in OpenSSH configuration files. However,
+there is a slight chance that your Linux distribution has strict security
+settings and keeps X forwarding disabled.</p>
+<p>If this is the case, we will have to enable X forwarding. To see how, read next
+section of this article.</p>
+<h2 id="configuration">Configuration<a hidden class="anchor" aria-hidden="true" href="#configuration">#</a></h2>
+<p>In this section, I would like to cover few of the most useful OpenSSH
+configuration options.</p>
+<h3 id="allowing-login-as-root">Allowing login as root<a hidden class="anchor" aria-hidden="true" href="#allowing-login-as-root">#</a></h3>
+<p>Perhaps one of the first things that I needed with SSH is to allow me to login
+as root. Before you allow this, bare in mind that this is a bad practice.
+Working as root is generally a bad idea even if you are developing drivers for
+Linux – something that very root access.</p>
+<p>To allow root access, we have to tell SSH server to accept such connections. To
+do this, we have to modify SSH server’s configuration file and tell <code>sshd</code>
+(that’s the name of SSH server program) to reread it’s configuration. SSH server
+configuration file is <code>/etc/ssh/sshd_config</code>. Note that to modify the file you
+will need root access.</p>
+<p>Option that controls root access called <code>PermitRootLogin</code>. To allow root login,
+simply append:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>PermitRootLogin yes
+</span></span></code></pre></div><p>to the end of the file.</p>
+<p>Once done we have to tell <code>sshd</code> to reload configuration. Strictly speaking this
+is distribution dependant, but the command you have to run most likely looks
+like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>/etc/init.d/sshd reload
+</span></span></code></pre></div><p>or</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>/etc/init.d/ssh reload
+</span></span></code></pre></div><p>First variance works on OpenSuSE. Second works on Ubuntu.</p>
+<h3 id="x-forwarding-1">X forwarding<a hidden class="anchor" aria-hidden="true" href="#x-forwarding-1">#</a></h3>
+<p>We’ve seen how to enable X Windows forwarding with -Y command line switch. But
+how about doing this automatically? This is doable. Another thing that you may
+want to do is to disable X forwarding. Again, this is doable.</p>
+<p>To enable X forwarding automatically, you have to modify <code>ssh</code>’ configuration
+file <code>/etc/ssh/ssh_config</code> and append <code>ForwardX11Trusted</code> directive. Like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>ForwardX11Trusted yes
+</span></span></code></pre></div><p>No need to reload anything. Once you save the file, <code>ssh</code> will automatically
+imply <code>-Y</code> on every new connection.</p>
+<p>On the other hand, to prohibit clients from using -Y, we should remove
+X11Forwarding directive from /etc/ssh/sshd_config. OpenSSH disables this option
+by default, but many Linux distributors enable it. So, if X forwarding works for
+you, this means that there’s “X11Forwarding yes” line somewhere in
+/etc/ssh/sshd_config.</p>
+<h3 id="other-options">Other options<a hidden class="anchor" aria-hidden="true" href="#other-options">#</a></h3>
+<p>There are very nice manual pages for both <code>/etc/ssh/ssh_config</code> and
+<code>/etc/ssh/sshd_config</code> files named <code>ssh_config</code> and <code>sshd_config</code> respectively.
+Both manual pages include documentation for all <code>ssh</code> and <code>sshd</code> options that
+are available.</p>
+<h1 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h1>
+<p>I hope you’ve found this article useful. In case you have further questions,
+don’t hesitate to send them to me. My email is <a href="mailto:alexander.sandler@gmail.com">alexander.sandler@gmail.com</a>.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SSH crash course on x"
+            href="https://x.com/intent/tweet/?text=SSH%20crash%20course&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2fssh-crash-course%2f&amp;hashtags=linux%2copen%2cprotocol%2cscp%2csecurity%2csession%2cssh%2ctelnet">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SSH crash course on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2fssh-crash-course%2f&amp;title=SSH%20crash%20course&amp;summary=SSH%20crash%20course&amp;source=https%3a%2f%2falexonlinux.com%2fessays%2fssh-crash-course%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SSH crash course on reddit"
+            href="https://reddit.com/submit?url=https%3a%2f%2falexonlinux.com%2fessays%2fssh-crash-course%2f&title=SSH%20crash%20course">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SSH crash course on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2falexonlinux.com%2fessays%2fssh-crash-course%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SSH crash course on whatsapp"
+            href="https://api.whatsapp.com/send?text=SSH%20crash%20course%20-%20https%3a%2f%2falexonlinux.com%2fessays%2fssh-crash-course%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SSH crash course on telegram"
+            href="https://telegram.me/share/url?text=SSH%20crash%20course&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2fssh-crash-course%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SSH crash course on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=SSH%20crash%20course&u=https%3a%2f%2falexonlinux.com%2fessays%2fssh-crash-course%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

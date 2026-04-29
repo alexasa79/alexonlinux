@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Backup and restore your Linux installation | Alex on Linux</title>
+<meta name="keywords" content="backup, compression, disk, hard disk, ide, partition, restore, scsi">
+<meta name="description" content="Introduction Backing up Linux installation and restoring it, is perhaps one of the most fundamental tasks that every system administrator has to deal with.
+Here are some important points about backup methods that we will discuss in this article.
+This article is about backing up from a command line. Incremental and periodic backups are good for some things. Yet when it comes to an operating system installation, the whole point of backing up your system is to save you some time reinstalling it, in case something goes wrong.">
+<meta name="author" content="">
+<link rel="canonical" href="https://alexonlinux.com/essays/backup-and-restore-your-linux-installation/">
+<link crossorigin="anonymous" href="../../assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://alexonlinux.com/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://alexonlinux.com/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://alexonlinux.com/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://alexonlinux.com/apple-touch-icon.png">
+<link rel="mask-icon" href="https://alexonlinux.com/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://alexonlinux.com/essays/backup-and-restore-your-linux-installation/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<meta property="og:title" content="Backup and restore your Linux installation" />
+<meta property="og:description" content="Introduction Backing up Linux installation and restoring it, is perhaps one of the most fundamental tasks that every system administrator has to deal with.
+Here are some important points about backup methods that we will discuss in this article.
+This article is about backing up from a command line. Incremental and periodic backups are good for some things. Yet when it comes to an operating system installation, the whole point of backing up your system is to save you some time reinstalling it, in case something goes wrong." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://alexonlinux.com/essays/backup-and-restore-your-linux-installation/" /><meta property="article:section" content="essays" />
+<meta property="article:published_time" content="2009-04-08T16:18:40+00:00" />
+<meta property="article:modified_time" content="2009-04-08T16:18:40+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Backup and restore your Linux installation"/>
+<meta name="twitter:description" content="Introduction Backing up Linux installation and restoring it, is perhaps one of the most fundamental tasks that every system administrator has to deal with.
+Here are some important points about backup methods that we will discuss in this article.
+This article is about backing up from a command line. Incremental and periodic backups are good for some things. Yet when it comes to an operating system installation, the whole point of backing up your system is to save you some time reinstalling it, in case something goes wrong."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Essays",
+      "item": "https://alexonlinux.com/essays/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Backup and restore your Linux installation",
+      "item": "https://alexonlinux.com/essays/backup-and-restore-your-linux-installation/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Backup and restore your Linux installation",
+  "name": "Backup and restore your Linux installation",
+  "description": "Introduction Backing up Linux installation and restoring it, is perhaps one of the most fundamental tasks that every system administrator has to deal with.\nHere are some important points about backup methods that we will discuss in this article.\nThis article is about backing up from a command line. Incremental and periodic backups are good for some things. Yet when it comes to an operating system installation, the whole point of backing up your system is to save you some time reinstalling it, in case something goes wrong.",
+  "keywords": [
+    "backup", "compression", "disk", "hard disk", "ide", "partition", "restore", "scsi"
+  ],
+  "articleBody": "Introduction Backing up Linux installation and restoring it, is perhaps one of the most fundamental tasks that every system administrator has to deal with.\nHere are some important points about backup methods that we will discuss in this article.\nThis article is about backing up from a command line. Incremental and periodic backups are good for some things. Yet when it comes to an operating system installation, the whole point of backing up your system is to save you some time reinstalling it, in case something goes wrong. Hence, spending couple of hours configuring incremental and periodical backup for your system just to save you an hour or two reinstalling, in case something goes wrong, seems rather irrational. We will talk about how to save disk space and backup your system even if the hard disk that will hold the backup is smaller than hard disk with the installation. If these bullets talk to you, then you’re reading the right article.\nCreating the backup What to backup The actual command that does the backup is quiet simple. However, before backing up we have to decide what to backup. Here are our options.\nWe can backup content of the entire hard disk. We can backup content of the Linux installation partition. What is good for you depends on a structure of a partition table on the hard disk that contains Linux installation.\nOne common configuration (and my favorite) is when you have only two partitions on the hard disk, one for Linux installation and the other for swap. In this case it is probably wiser to backup your entire hard disk. Indeed, hard disk space occupied by swap partition will be wasted, but on the other hand restoring Linux installation from full hard disk backup is much easier. Easier means less commands to execute to restore the installation and this usually translates into smaller chances of unsuccessful data restoration.\nAnother common configuration is when you have several partitions on the hard disk. In this case, we may want to backup only the partition that contains Linux installation. The command that does the backup is nearly the same, in this case. But restoring the data will be more difficult. The chances are that you will not have any problem whatsoever, so don’t let those couple of extra commands to scare you.\nBottom line is that it depends on how much information you want to backup. If your hard disk, in addition to Linux installation, occupied by some data, it is probably wiser to backup only the Linux partition. In any case I’ll demonstrate you how to backup both, entire hard disk and the partition.\nFiguring out device file Second thing you have to figure out is the device file that represents hard disk or partition that you want to backup. Usually, mount command without any arguments should give you the answer. Have a look:\nalex ~ -\u003e mount /dev/sda1 on / type ext3 (rw,relatime,errors=remount-ro) tmpfs on /lib/init/rw type tmpfs (rw,nosuid,mode=0755) /proc on /proc type proc (rw,noexec,nosuid,nodev) sysfs on /sys type sysfs (rw,noexec,nosuid,nodev) varrun on /var/run type tmpfs (rw,nosuid,mode=0755) varlock on /var/lock type tmpfs (rw,noexec,nosuid,nodev,mode=1777) udev on /dev type tmpfs (rw,mode=0755) tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev) devpts on /dev/pts type devpts (rw,noexec,nosuid,gid=5,mode=620) alex ~ -\u003e mount command, without any arguments, gives you a list of mounted file-systems and corresponding device files. For each file-system, it tells you on type . Since we are backing up Linux installation, we are looking for device file that mounted on root directory (/). In my case this is /dev/sda1.\nNote that usually device files with number and the end represent a single partition. If you want to know device file of the entire hard disk, strip the number off. For instance, /dev/sda1 represents first partition on /dev/sda.\nIn case you’re still not sure what is the correct device file, device files that start with /dev/sd usually stand for SCSI and USB disks. Device files that start with /dev/hd stand for IDE disks. And remember, if you want to backup Linux partition, use device file whose name ends with a number. For entire hard disk, use device file whose name ends with a letter.\nPreparations Before you make actual backup, you have to make sure that the hard disk or a partition you are backing up is not in use by any programs. This is important because if your hard disk is in the middle of something while being backed up, this will inevitably create a data corruption when you restore it. Depending on what kind of things you do with your hard disk, the corruption can be quiet serious.\nThe best way to avoid a corruption is to boot from a Live Linux CD (Knoppix, or Ubuntu Desktop installation CD). If you know that your hard disk is not heavily used, you may try to backup live, mounted hard disk. In this case, try to bring down services that may use the hard disk while its being backed up.\nIf you’re backing up mounted hard disk or a partition, run sync before doing the backup. This will flush the data from memory buffers to disks (Linux keeps portions of information from hard disks in memory to speed up hard disk access), reducing chances of data corruption even further.\nPrepare the media that will contain the backup. This may be NFS mount or another hard disk. Just make sure it is accessible.\nActual backup One of the issues with backups is that usually you need as much disk space for the backup as the size of the hard disk or a partition you’re backing up. Obviously, you can compress the backup, but normally you still first create backup and then compress it.\nLuckily, there’s a way to backup and compress data on the fly, so that you need as much free space as a compressed backup will occupy. This is how you do it:\nalex ~ -\u003e dd if=/dev/sda | bzip2 -c \u003e /media/sdb/sda.bz2 Lets try to understand how it works.\nFirst we use dd to read data from /dev/sda. When you read something from a device file, Linux kernel returns you the content of the actual disk. Same thing happens if you read from device file that represents a partition. Only this time, Linux returns you the content of the partition.\nUsually we run dd with at least two arguments: if specifies input file, and of specifies output file. It appears that if skipping one of them, dd will use standard output or standard input instead. Hence dd command we use here, sends contents of the device to standard output.\nOutput of dd command, being sent via pipe to bzip2 command. bzip2 is a compression program. When called with -c command line switch, it compresses whatever it reads from its standard input and sends the result to its standard output. This is why we send bzip2’s output to /media/sdb/sda.bz2 file. This is the file that will contain the backup once the command finishes.\nNote that the file should not be on the disk or partition that we backup. For that reason, I mounted additional hard disk to /media/sdb directory.\nRestoring from backup Preparations First of all, you will need a Live Linux CD. Knoppix CD or Ubuntu LiveCD should do the job. It is needed because you need a Linux to restore the backup, but you cannot use Linux installed on your hard drive because, well, you are going to erase it with a restored backup.\nWhen restoring the Linux installation from backup, your life will be so much easier if you use same hard disk and partition. Even if it is a different hard disk, try replacing old one with the new one and not add it as additional disk. The reason for this is device files allocation.\nWhen Linux kernel detects several hard disks in your computer, it allocate device files for them. Device files allocation are /dev/sda for first disk, /dev/sdb for second disk, etc. When you install Linux on one of them, it will reference itself by its device file. But here is the catch. Name of the device file that represent certain hard disk is position dependent. I.e. if you switch in places first and second disks in your computer, disk that has been represented by sda until now will be represented by sdb and disk that has been represented by sdb will be represented by sda. But, internally, Linux installation on any of them would still refer to itself by old name. As a result, you probably won’t be able to boot your system.\nBottom line is that you have to make sure that hard disk that you restore your Linux installation to, being represented by the same device file as before. I.e. if when you created the backup, your Linux installation was on /dev/sda, make sure that now, when you restore it, you are restoring to device that will be represented by /dev/sda when you boot your system.\nRestoring Boot from your Linux CD. Once there, mount device that has the backup. Figure out what device file will hold your Linux installation. Remember that if you add new disks, device files that represent your old disks may shift.\nNow to the actual command.\nRestoring entire hard disk This is actually the simplest case.\nFirst, we start with mounting the disk that contains the backup. In my case this is /dev/sdb.\nknoppix@Microknoppix:~$ mount /media/sdb Next we restore the data.\nknoppix@Microknoppix:~$ bzip2 -c -d /media/sdb/sda.bz2 | dd of=/dev/sda First of all, I’ve been using Knoppix CD to restore the system. First command mounts /dev/sdb, the disk that contains the backup. Second command is the one that acutually restores the Linux installation.\nAs with backup command, it doesn’t use extra disk space. It extracts the archive that contains the installation and writes it to the disk, all on the fly. You are already familiar with bzip2’s -c command line switch. It tells bzip2 to use standard input or output. -d command line switch tells it to decompress the data. Because of -c, it redirect its output to dd that picks the data up and writes it to /dev/sda.\nYou can boot your restored system right after the above command finishes.\nRestoring single partition This is a little trickier. Things are very easy when restoring entire hard disk. You don’t have to care about partition table and boot loader. Your backup contains everything you need for a happy and working Linux system. All you have to do is to write the data to the disk and you are done.\nWhen restoring single partition, you have to take care of everything. You have to create partition table. You have to install boot loader. However, despite obvious drawbacks, backing up and then restoring single partition has some very nice advantages compared to entire disk backup.\nFirst, backing up a single partition requires less disk space. Second you have an option to restore your installation to a larger partition. Lets an example session that demonstrates both data restoration, partition resizing and boot loader installation.\nOnce again, we start with mounting the disk that contains the backup.\nknoppix@Microknoppix:~$ mount /media/sdb Demonstrating how to create a partition table is slightly out of scope of this article, so lets assume that we already have partition table ready. We will restore the backup to /dev/sda1.\nknoppix@Microknoppix:~$ bzip2 -c -d /media/sdb/sda1.bz2 | dd of=/dev/sda1 Now the data is where it should be. Lets see how we can resize the partition.\nFor the sake of this article, I’ve been experimenting with a small VMware based computer. So I use rather small disks. In this case, partition I’d backed up is 8GB long, but /dev/sda1 is 10GB long. So after we’ve restored the data on the partition, we have to resize the file-system on it, to utlize entire partition. Otherwise, it would think that it is still 8GB long.\nknoppix@Microknoppix:~$ resize2fs /dev/sda1 resize2fs 1.41.3 (12-Oct-2008) Please run 'e2fsck -f /dev/sda1' first. knoppix@Microknoppix:~$ fsck -y -f /dev/sda1 . . . knoppix@Microknoppix:~$ resize2fs /dev/sda1 resize2fs 1.41.3 (12-Oct-2008) Resizing the filesystem on /dev/sda1 to 2409742 (4k) blocks. The filesystem on /dev/sda1 is now 2409742 blocks long. As you can see, resize2fs, the tool I’ve been using to resize the file-system has asked me to run e2fsck first. e2fsck is a tool that checks file-systems for errors and fixes them – it is similar to chkdsk tool on Windows. Its output was rather long, so I skipped it – errors it has found are a result of me doing backup of a mounted file-system. Luckily, since I stopped all processes that may access the disk, when I backed it up, no data was corrupted and errors found by e2fsck were superficial.\nOnce fsck was over, I could do resize2fs. Note that without any arguments resize2fs resizes a file-system to a maximum available size – this is exactly what we wanted.\nThere’s one thing left to do. That is to install GRUB. In theory, with certain GRUB configurations you may skip this step and try to boot your restored Linux installation right away. However, based on my experience, you better do this step and make sure everything works no matter what configuration you have. So, here’s what we do.\nWe start with mounting the newly restored file-system. However, to be able to mount the partition, we have to create a temporary mount point directory. So, this is what we do.\nknoppix@Microknoppix:~$ mkdir /tmp/sda1 knoppix@Microknoppix:~$ sudo mount /dev/sda1 /tmp/sda1/ And now we can install GRUB. This is how we do it.\nknoppix@Microknoppix:~$ sudo grub-install --root-directory=/tmp/sda1 /dev/sda This command installs GRUB on /dev/sda. --root-directory command line switch tells grub-install to use kernel images and configuration from specified directory. We want to tell grub-install to use kernel images and configuration from the Linux installation that we’ve just restored. This is why I specified /tmp/sda1 as root directory.\nFinally, we want to unmount the device and reboot. This is what we do:\nknoppix@Microknoppix:~$ umount /tmp/sda1 knoppix@Microknoppix:~$ sudo reboot This is it. Now, if everything goes well, your system should boot into restored Linux installation. Just remember to remove the Live CD from the CD-ROM, before you boot.\n",
+  "wordCount" : "2370",
+  "inLanguage": "en",
+  "datePublished": "2009-04-08T16:18:40Z",
+  "dateModified": "2009-04-08T16:18:40Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://alexonlinux.com/essays/backup-and-restore-your-linux-installation/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Alex on Linux",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://alexonlinux.com/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="../../" accesskey="h" title="Alex on Linux (Alt + H)">Alex on Linux</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="../../" title="Home">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="../../essays/" title="Essays">
+                    <span>Essays</span>
+                </a>
+            </li>
+            <li>
+                <a href="../../author/" title="Author">
+                    <span>Author</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Backup and restore your Linux installation
+    </h1>
+    <div class="post-meta"><span title='2009-04-08 16:18:40 +0000 UTC'>April 8, 2009</span>&nbsp;·&nbsp;12 min
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="introduction">Introduction<a hidden class="anchor" aria-hidden="true" href="#introduction">#</a></h1>
+<p>Backing up Linux installation and restoring it, is perhaps one of the most
+fundamental tasks that every system administrator has to deal with.</p>
+<p>Here are some important points about backup methods that we will discuss in this
+article.</p>
+<ul>
+<li>This article is about backing up from a command line.
+Incremental and periodic backups are good for some things. Yet when it comes to
+an operating system installation, the whole point of backing up your system is
+to save you some time reinstalling it, in case something goes wrong. Hence,
+spending couple of hours configuring incremental and periodical backup for your
+system just to save you an hour or two reinstalling, in case something goes
+wrong, seems rather irrational.</li>
+<li>We will talk about how to save disk space and backup your system even if the
+hard disk that will hold the backup is smaller than hard disk with the
+installation.</li>
+</ul>
+<p>If these bullets talk to you, then you’re reading the right article.</p>
+<h1 id="creating-the-backup">Creating the backup<a hidden class="anchor" aria-hidden="true" href="#creating-the-backup">#</a></h1>
+<h2 id="what-to-backup">What to backup<a hidden class="anchor" aria-hidden="true" href="#what-to-backup">#</a></h2>
+<p>The actual command that does the backup is quiet simple. However, before backing
+up we have to decide what to backup. Here are our options.</p>
+<ul>
+<li>We can backup content of the entire hard disk. We can backup content of the
+Linux installation partition.</li>
+</ul>
+<p>What is good for you depends on a structure of a partition table on the hard
+disk that contains Linux installation.</p>
+<p>One common configuration (and my favorite) is when you have only two partitions
+on the hard disk, one for Linux installation and the other for swap. In this
+case it is probably wiser to backup your entire hard disk. Indeed, hard disk
+space occupied by swap partition will be wasted, but on the other hand restoring
+Linux installation from full hard disk backup is much easier. Easier means less
+commands to execute to restore the installation and this usually translates into
+smaller chances of unsuccessful data restoration.</p>
+<p>Another common configuration is when you have several partitions on the hard
+disk. In this case, we may want to backup only the partition that contains Linux
+installation. The command that does the backup is nearly the same, in this case.
+But restoring the data will be more difficult. The chances are that you will not
+have any problem whatsoever, so don’t let those couple of extra commands to
+scare you.</p>
+<p>Bottom line is that it depends on how much information you want to backup. If
+your hard disk, in addition to Linux installation, occupied by some data, it is
+probably wiser to backup only the Linux partition. In any case I’ll demonstrate
+you how to backup both, entire hard disk and the partition.</p>
+<h2 id="figuring-out-device-file">Figuring out device file<a hidden class="anchor" aria-hidden="true" href="#figuring-out-device-file">#</a></h2>
+<p>Second thing you have to figure out is the device file that represents hard disk
+or partition that you want to backup. Usually, <code>mount</code> command without any
+arguments should give you the answer. Have a look:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>alex ~ -&gt; mount
+</span></span><span style="display:flex;"><span>/dev/sda1 on / type ext3 (rw,relatime,errors=remount-ro)
+</span></span><span style="display:flex;"><span>tmpfs on /lib/init/rw type tmpfs (rw,nosuid,mode=0755)
+</span></span><span style="display:flex;"><span>/proc on /proc type proc (rw,noexec,nosuid,nodev)
+</span></span><span style="display:flex;"><span>sysfs on /sys type sysfs (rw,noexec,nosuid,nodev)
+</span></span><span style="display:flex;"><span>varrun on /var/run type tmpfs (rw,nosuid,mode=0755)
+</span></span><span style="display:flex;"><span>varlock on /var/lock type tmpfs (rw,noexec,nosuid,nodev,mode=1777)
+</span></span><span style="display:flex;"><span>udev on /dev type tmpfs (rw,mode=0755)
+</span></span><span style="display:flex;"><span>tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev)
+</span></span><span style="display:flex;"><span>devpts on /dev/pts type devpts (rw,noexec,nosuid,gid=5,mode=620)
+</span></span><span style="display:flex;"><span>alex ~ -&gt;
+</span></span></code></pre></div><p><code>mount</code> command, without any arguments, gives you a list of mounted file-systems
+and corresponding device files. For each file-system, it tells you <code>&lt;device file&gt; on &lt;directory name&gt; type &lt;fs type&gt;</code>. Since we are backing up Linux
+installation, we are looking for device file that mounted on root directory
+(<code>/</code>). In my case this is <code>/dev/sda1</code>.</p>
+<p>Note that usually device files with number and the end represent a single
+partition. If you want to know device file of the entire hard disk, strip the
+number off. For instance, <code>/dev/sda1</code> represents first partition on <code>/dev/sda</code>.</p>
+<p>In case you’re still not sure what is the correct device file, device files that
+start with <code>/dev/sd</code> usually stand for SCSI and USB disks. Device files that
+start with <code>/dev/hd</code> stand for IDE disks. And remember, if you want to backup
+Linux partition, use device file whose name ends with a number. For entire hard
+disk, use device file whose name ends with a letter.</p>
+<h2 id="preparations">Preparations<a hidden class="anchor" aria-hidden="true" href="#preparations">#</a></h2>
+<p>Before you make actual backup, you have to make sure that the hard disk or a
+partition you are backing up is not in use by any programs. This is important
+because if your hard disk is in the middle of something while being backed up,
+this will inevitably create a data corruption when you restore it. Depending on
+what kind of things you do with your hard disk, the corruption can be quiet
+serious.</p>
+<p>The best way to avoid a corruption is to boot from a Live Linux CD (Knoppix, or
+Ubuntu Desktop installation CD). If you know that your hard disk is not heavily
+used, you may try to backup live, mounted hard disk. In this case, try to bring
+down services that may use the hard disk while its being backed up.</p>
+<p>If you’re backing up mounted hard disk or a partition, run <code>sync</code> before doing
+the backup. This will flush the data from memory buffers to disks (Linux keeps
+portions of information from hard disks in memory to speed up hard disk access),
+reducing chances of data corruption even further.</p>
+<p>Prepare the media that will contain the backup. This may be NFS mount or another
+hard disk. Just make sure it is accessible.</p>
+<h2 id="actual-backup">Actual backup<a hidden class="anchor" aria-hidden="true" href="#actual-backup">#</a></h2>
+<p>One of the issues with backups is that usually you need as much disk space for
+the backup as the size of the hard disk or a partition you’re backing up.
+Obviously, you can compress the backup, but normally you still first create
+backup and then compress it.</p>
+<p>Luckily, there’s a way to backup and compress data on the fly, so that you need
+as much free space as a <strong>compressed</strong> backup will occupy. This is how you do
+it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>alex ~ -&gt; dd if=/dev/sda | bzip2 -c &gt; /media/sdb/sda.bz2
+</span></span></code></pre></div><p>Lets try to understand how it works.</p>
+<p>First we use <code>dd</code> to read data from /dev/sda. When you read something from a
+device file, Linux kernel returns you the content of the actual disk. Same thing
+happens if you read from device file that represents a partition. Only this
+time, Linux returns you the content of the partition.</p>
+<p>Usually we run <code>dd</code> with at least two arguments: <code>if</code> specifies input file, and
+<code>of</code> specifies output file. It appears that if skipping one of them, <code>dd</code> will
+use standard output or standard input instead. Hence <code>dd</code> command we use here,
+sends contents of the device to standard output.</p>
+<p>Output of <code>dd</code> command, being sent via pipe to <code>bzip2</code> command. <code>bzip2</code> is a
+compression program. When called with <code>-c</code> command line switch, it compresses
+whatever it reads from its standard input and sends the result to its standard
+output. This is why we send <code>bzip2</code>’s output to /media/sdb/sda.bz2 file. This is
+the file that will contain the backup once the command finishes.</p>
+<p>Note that the file should not be on the disk or partition that we backup. For
+that reason, I mounted additional hard disk to /media/sdb directory.</p>
+<h1 id="restoring-from-backup">Restoring from backup<a hidden class="anchor" aria-hidden="true" href="#restoring-from-backup">#</a></h1>
+<h2 id="preparations-1">Preparations<a hidden class="anchor" aria-hidden="true" href="#preparations-1">#</a></h2>
+<p>First of all, you will need a Live Linux CD. Knoppix CD or Ubuntu LiveCD should
+do the job. It is needed because you need a Linux to restore the backup, but you
+cannot use Linux installed on your hard drive because, well, you are going to
+erase it with a restored backup.</p>
+<p>When restoring the Linux installation from backup, your life will be so much
+easier if you use same hard disk and partition. Even if it is a different hard
+disk, try replacing old one with the new one and not add it as additional disk.
+The reason for this is device files allocation.</p>
+<p>When Linux kernel detects several hard disks in your computer, it allocate
+device files for them. Device files allocation are /dev/sda for first disk,
+/dev/sdb for second disk, etc. When you install Linux on one of them, it will
+reference itself by its device file. But here is the catch. Name of the device
+file that represent certain hard disk is position dependent. I.e. if you switch
+in places first and second disks in your computer, disk that has been
+represented by sda until now will be represented by sdb and disk that has been
+represented by sdb will be represented by sda. But, internally, Linux
+installation on any of them would still refer to itself by old name. As a
+result, you probably won’t be able to boot your system.</p>
+<p>Bottom line is that you have to make sure that hard disk that you restore your
+Linux installation to, being represented by the same device file as before. I.e.
+if when you created the backup, your Linux installation was on /dev/sda, make
+sure that now, when you restore it, you are restoring to device that will be
+represented by /dev/sda when you boot your system.</p>
+<h2 id="restoring">Restoring<a hidden class="anchor" aria-hidden="true" href="#restoring">#</a></h2>
+<p>Boot from your Linux CD. Once there, mount device that has the backup. Figure
+out what device file will hold your Linux installation. Remember that if you add
+new disks, device files that represent your old disks may shift.</p>
+<p>Now to the actual command.</p>
+<h3 id="restoring-entire-hard-disk">Restoring entire hard disk<a hidden class="anchor" aria-hidden="true" href="#restoring-entire-hard-disk">#</a></h3>
+<p>This is actually the simplest case.</p>
+<p>First, we start with mounting the disk that contains the backup. In my case this
+is /dev/sdb.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>knoppix@Microknoppix:~$ mount /media/sdb
+</span></span></code></pre></div><p>Next we restore the data.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>knoppix@Microknoppix:~$ bzip2 -c -d /media/sdb/sda.bz2 | dd of=/dev/sda
+</span></span></code></pre></div><p>First of all, I’ve been using Knoppix CD to restore the system. First command
+mounts /dev/sdb, the disk that contains the backup. Second command is the one
+that acutually restores the Linux installation.</p>
+<p>As with backup command, it doesn’t use extra disk space. It extracts the archive
+that contains the installation and writes it to the disk, all on the fly. You
+are already familiar with <code>bzip2</code>’s <code>-c</code> command line switch. It tells <code>bzip2</code>
+to use standard input or output. <code>-d</code> command line switch tells it to decompress
+the data. Because of <code>-c</code>, it redirect its output to <code>dd</code> that picks the data up
+and writes it to /dev/sda.</p>
+<p>You can boot your restored system right after the above command finishes.</p>
+<h3 id="restoring-single-partition">Restoring single partition<a hidden class="anchor" aria-hidden="true" href="#restoring-single-partition">#</a></h3>
+<p>This is a little trickier. Things are very easy when restoring entire hard disk.
+You don’t have to care about partition table and boot loader. Your backup
+contains everything you need for a happy and working Linux system. All you have
+to do is to write the data to the disk and you are done.</p>
+<p>When restoring single partition, you have to take care of everything. You have
+to create partition table. You have to install boot loader. However, despite
+obvious drawbacks, backing up and then restoring single partition has some very
+nice advantages compared to entire disk backup.</p>
+<p>First, backing up a single partition requires less disk space. Second you have
+an option to restore your installation to a larger partition. Lets an example
+session that demonstrates both data restoration, partition resizing and boot
+loader installation.</p>
+<p>Once again, we start with mounting the disk that contains the backup.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>knoppix@Microknoppix:~$ mount /media/sdb
+</span></span></code></pre></div><p>Demonstrating how to create a partition table is slightly out of scope of this
+article, so lets assume that we already have partition table ready. We will
+restore the backup to /dev/sda1.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>knoppix@Microknoppix:~$ bzip2 -c -d /media/sdb/sda1.bz2 | dd of=/dev/sda1
+</span></span></code></pre></div><p>Now the data is where it should be. Lets see how we can resize the partition.</p>
+<p>For the sake of this article, I’ve been experimenting with a small VMware based
+computer. So I use rather small disks. In this case, partition I’d backed up is
+8GB long, but /dev/sda1 is 10GB long. So after we’ve restored the data on the
+partition, we have to resize the file-system on it, to utlize entire partition.
+Otherwise, it would think that it is still 8GB long.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>knoppix@Microknoppix:~$ resize2fs /dev/sda1
+</span></span><span style="display:flex;"><span>resize2fs 1.41.3 (12-Oct-2008)
+</span></span><span style="display:flex;"><span>Please run &#39;e2fsck -f /dev/sda1&#39; first.
+</span></span><span style="display:flex;"><span>knoppix@Microknoppix:~$ fsck -y -f /dev/sda1
+</span></span><span style="display:flex;"><span>.
+</span></span><span style="display:flex;"><span>.
+</span></span><span style="display:flex;"><span>.
+</span></span><span style="display:flex;"><span>knoppix@Microknoppix:~$ resize2fs /dev/sda1
+</span></span><span style="display:flex;"><span>resize2fs 1.41.3 (12-Oct-2008)
+</span></span><span style="display:flex;"><span>Resizing the filesystem on /dev/sda1 to 2409742 (4k) blocks.
+</span></span><span style="display:flex;"><span>The filesystem on /dev/sda1 is now 2409742 blocks long.
+</span></span></code></pre></div><p>As you can see, <code>resize2fs</code>, the tool I’ve been using to resize the file-system
+has asked me to run <code>e2fsck</code> first. <code>e2fsck</code> is a tool that checks file-systems
+for errors and fixes them – it is similar to <code>chkdsk</code> tool on Windows. Its
+output was rather long, so I skipped it – errors it has found are a result of me
+doing backup of a mounted file-system. Luckily, since I stopped all processes
+that may access the disk, when I backed it up, no data was corrupted and errors
+found by <code>e2fsck</code> were superficial.</p>
+<p>Once <code>fsck</code> was over, I could do <code>resize2fs</code>. Note that without any arguments
+<code>resize2fs</code> resizes a file-system to a maximum available size – this is exactly
+what we wanted.</p>
+<p>There’s one thing left to do. That is to install GRUB. In theory, with certain
+GRUB configurations you may skip this step and try to boot your restored Linux
+installation right away. However, based on my experience, you better do this
+step and make sure everything works no matter what configuration you have. So,
+here’s what we do.</p>
+<p>We start with mounting the newly restored file-system. However, to be able to
+mount the partition, we have to create a temporary mount point directory. So,
+this is what we do.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>knoppix@Microknoppix:~$ mkdir /tmp/sda1
+</span></span><span style="display:flex;"><span>knoppix@Microknoppix:~$ sudo mount /dev/sda1 /tmp/sda1/
+</span></span></code></pre></div><p>And now we can install GRUB. This is how we do it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>knoppix@Microknoppix:~$ sudo grub-install --root-directory=/tmp/sda1 /dev/sda
+</span></span></code></pre></div><p>This command installs GRUB on /dev/sda. <code>--root-directory</code> command line switch
+tells <code>grub-install</code> to use kernel images and configuration from specified
+directory. We want to tell <code>grub-install</code> to use kernel images and configuration
+from the Linux installation that we’ve just restored. This is why I specified
+/tmp/sda1 as root directory.</p>
+<p>Finally, we want to unmount the device and reboot. This is what we do:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>knoppix@Microknoppix:~$ umount /tmp/sda1
+</span></span><span style="display:flex;"><span>knoppix@Microknoppix:~$ sudo reboot
+</span></span></code></pre></div><p>This is it. Now, if everything goes well, your system should boot into restored
+Linux installation. Just remember to remove the Live CD from the CD-ROM, before
+you boot.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Backup and restore your Linux installation on x"
+            href="https://x.com/intent/tweet/?text=Backup%20and%20restore%20your%20Linux%20installation&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2fbackup-and-restore-your-linux-installation%2f&amp;hashtags=backup%2ccompression%2cdisk%2charddisk%2cide%2cpartition%2crestore%2cscsi">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Backup and restore your Linux installation on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2fbackup-and-restore-your-linux-installation%2f&amp;title=Backup%20and%20restore%20your%20Linux%20installation&amp;summary=Backup%20and%20restore%20your%20Linux%20installation&amp;source=https%3a%2f%2falexonlinux.com%2fessays%2fbackup-and-restore-your-linux-installation%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Backup and restore your Linux installation on reddit"
+            href="https://reddit.com/submit?url=https%3a%2f%2falexonlinux.com%2fessays%2fbackup-and-restore-your-linux-installation%2f&title=Backup%20and%20restore%20your%20Linux%20installation">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Backup and restore your Linux installation on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2falexonlinux.com%2fessays%2fbackup-and-restore-your-linux-installation%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Backup and restore your Linux installation on whatsapp"
+            href="https://api.whatsapp.com/send?text=Backup%20and%20restore%20your%20Linux%20installation%20-%20https%3a%2f%2falexonlinux.com%2fessays%2fbackup-and-restore-your-linux-installation%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Backup and restore your Linux installation on telegram"
+            href="https://telegram.me/share/url?text=Backup%20and%20restore%20your%20Linux%20installation&amp;url=https%3a%2f%2falexonlinux.com%2fessays%2fbackup-and-restore-your-linux-installation%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Backup and restore your Linux installation on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=Backup%20and%20restore%20your%20Linux%20installation&u=https%3a%2f%2falexonlinux.com%2fessays%2fbackup-and-restore-your-linux-installation%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
