@@ -86,8 +86,8 @@ First of all, we have to, somehow, measure time. Moreover, we have to measure it
 precisely.
 
 Next thing I can think of after forcing myself to stop looking at my Swiss watch
-was, of course, the `rdtsc` instruction. After all, what can serve us better than
-built into CPU clock ticks counter and an instruction that reads it?
+was, of course, the `rdtsc` instruction. After all, what can serve us better
+than built into CPU clock ticks counter and an instruction that reads it?
 
 The thing is that modern x86 CPUs has an internal clock tick counter register or
 as folks at Intel call it, the time-stamp counter. It is incremented with at a
@@ -99,10 +99,10 @@ register.
 # Implementation
 
 Before diving into actual code that proves our little theory, we should
-understand that `rdtsc` gives us very precise results. So precise that
-the `rdtsc` instruction itself can affect it. Therefore, simply reading time-stamp
-register before and after reading 8 bytes from memory is not enough.
-The `rdtsc` instruction itself may take more time than the actual read.
+understand that `rdtsc` gives us very precise results. So precise that the
+`rdtsc` instruction itself can affect it. Therefore, simply reading time-stamp
+register before and after reading 8 bytes from memory is not enough. The `rdtsc`
+instruction itself may take more time than the actual read.
 
 To avoid this sort of interference, we should do many 8 byte reads. This way we
 will minimize effect of the `rdtsc` instruction itself.
@@ -121,12 +121,12 @@ and then calculating the average should eliminate “the noise”.
 
 ## Meet the hardware
 
-There is one hardware limitation when dealing with `rdtsc` instruction. Older CPUs
-(Pentium 3 for instance and even some Pentium 4’s and Xeon’s) has the internal
-time-stamp register work in slightly different manner, incrementing every
-instruction and not every clock tick. As a result, on older CPUs we would get a
-subjective result. Not good. Therefore, we have to use somewhat modern machine,
-with modern CPUs. This is what I have at hand.
+There is one hardware limitation when dealing with `rdtsc` instruction. Older
+CPUs (Pentium 3 for instance and even some Pentium 4’s and Xeon’s) has the
+internal time-stamp register work in slightly different manner, incrementing
+every instruction and not every clock tick. As a result, on older CPUs we would
+get a subjective result. Not good. Therefore, we have to use somewhat modern
+machine, with modern CPUs. This is what I have at hand.
 
 ```text
 processor       : 0
@@ -177,15 +177,15 @@ second describing the buffer (pointer and buffer size), third telling where to
 start reading from (the `indent`) and fourth that tells how many bytes to jump
 every iteration (the `step`).
 
-First, function does the shifting by adding the `indent` to the pointer to buffer.
-Next it reads time-stamp counter using `rdtscll()` macro. This is a kernel macro
-that reads time-stamp counter into a `long long` variable – in this case,
-the `before` variable.
+First, function does the shifting by adding the `indent` to the pointer to
+buffer. Next it reads time-stamp counter using `rdtscll()` macro. This is a
+kernel macro that reads time-stamp counter into a `long long` variable – in this
+case, the `before` variable.
 
 Then the function does the actual test. You can see the memory reads in the
-loop. It increments value of the `temp` pointer by `step` every iteration. Finally
-it calls `rdtscll()` again to check how much time have passed and returns the
-delta.
+loop. It increments value of the `temp` pointer by `step` every iteration.
+Finally it calls `rdtscll()` again to check how much time have passed and
+returns the delta.
 
 . . .
 
@@ -217,15 +217,16 @@ unsigned long long do_single_test( unsigned long real_page,
 . . .
 
 You can get the complete source code of the driver, with appropriate
-Makefile,[here](http://www.alexonlinux.com/wp-content/uploads/2008/06/align1.tgz).
+Makefile,
+[here](http://www.alexonlinux.com/wp-content/uploads/2008/06/align1.tgz).
 
 # The results
 
-I did the test twice, first time with `indent` equals 62 and second time
-with `indent` 64, i.e. started from offset 62 and 64. Both times I
-used `step` equals 128, i.e. jumped 128 bytes at a time. In first test, the value
-of `indent` intentionally caused unaligned memory access. Second test was ok in
-terms of memory alignment.
+I did the test twice, first time with `indent` equals 62 and second time with
+`indent` 64, i.e. started from offset 62 and 64. Both times I used `step` equals
+128, i.e. jumped 128 bytes at a time. In first test, the value of `indent`
+intentionally caused unaligned memory access. Second test was ok in terms of
+memory alignment.
 
 I ran each test 100 times, with 10 seconds delay in between. Then I dropped 10
 best and 10 worse results and calculated an average. The final result is this.

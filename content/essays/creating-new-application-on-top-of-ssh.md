@@ -41,11 +41,11 @@ our computer and we will see it as if we were running the command on our local
 computer.
 
 Same thing will occur if we will run command that requires input on a remote
-computer. We will type in the arguments here, on our local computer,
-and `ssh` will transmit the input over encrypted with SSH channel to the remote
-computer and feed it to the commands running on the remote computer, as if the
-input was received from a keyboard on a remote computer. Take a look at the
-example session that demonstrates this:
+computer. We will type in the arguments here, on our local computer, and `ssh`
+will transmit the input over encrypted with SSH channel to the remote computer
+and feed it to the commands running on the remote computer, as if the input was
+received from a keyboard on a remote computer. Take a look at the example
+session that demonstrates this:
 
 ```text
 alex ~ -> ssh alex@192.168.1.67 'read var; echo ${var} > file.txt'
@@ -73,16 +73,16 @@ i.e. being encrypted.
 
 ## Back to `scp`
 
-Apparently, there’s nothing magical about `scp`. It does not encrypt files before
-transferring them. In fact it knows nothing about encryption. This is how it
-works.
+Apparently, there’s nothing magical about `scp`. It does not encrypt files
+before transferring them. In fact it knows nothing about encryption. This is how
+it works.
 
-It uses `ssh` to invoke an instance of itself on a remote computer. To let itself
-know that it is a remote instance, it uses two undocumented command line
+It uses `ssh` to invoke an instance of itself on a remote computer. To let
+itself know that it is a remote instance, it uses two undocumented command line
 switches, -f and -t. Then it uses special protocol to communicate with a remote
 instance of itself. The communication protocol and the actual data, all being
-transferred over SSH. To make it happen, it uses `ssh`‘ input/output streams as a
-transport for sending and receiving data to/from remote computer.
+transferred over SSH. To make it happen, it uses `ssh`‘ input/output streams as
+a transport for sending and receiving data to/from remote computer.
 
 Simple isn’t it? In fact, creating an application that runs on top of SSH and
 transfers and receives encrypted data, seems to be easier than even creating
@@ -99,10 +99,10 @@ python because it is simpler for me, but you may write it in any programming
 language. The principles I’ve been using here, which I will explain later in the
 article, are universal and can be used with any programming language.
 
-As with `scp`, I’ve created only one program. It has two modes of operation. When
-invoked without command line arguments, it assumes it is a local instance that
-should transmit the data. When invoked with command line switch -r, it assumes
-it is a remote copy and receives data saving it in file.
+As with `scp`, I’ve created only one program. It has two modes of operation.
+When invoked without command line arguments, it assumes it is a local instance
+that should transmit the data. When invoked with command line switch -r, it
+assumes it is a remote copy and receives data saving it in file.
 
 Lets see the code.
 
@@ -145,19 +145,19 @@ line switches. If it sees -r command line switch, it runs `BeRemote()` function.
 Otherwise it runs `BeLocal()` function.
 
 `BeRemote()` is rather simple function. It creates a file named `data2.dat` in
-directory `/home/alex/works/ssh/` (this is where I’ve been developing this project
-on my computer). Then it enters a loop where it writes everything it reads from
-standard input into the file (lines 10-11). It will continue saving the data as
-long as its standard input is open. Once it will be closed, it will close the
-file and exit (line 12).
+directory `/home/alex/works/ssh/` (this is where I’ve been developing this
+project on my computer). Then it enters a loop where it writes everything it
+reads from standard input into the file (lines 10-11). It will continue saving
+the data as long as its standard input is open. Once it will be closed, it will
+close the file and exit (line 12).
 
-`BeLocal()` is a little more complex. First it spawns `ssh` connecting
-to `localhost` with username `alex`. Now I know that it is expected to connect to a
-remote computer, but for the sake of demonstration lets pretend
-that `localhost` is a remote computer. It tells `ssh` to run program
-named `ssh_client.py` with -r command line switch. `ssh_client.py` is the name of
-the script, so in essence it runs itself. -r switch tells it to run in remote
-mode, that is receiving mode.
+`BeLocal()` is a little more complex. First it spawns `ssh` connecting to
+`localhost` with username `alex`. Now I know that it is expected to connect to a
+remote computer, but for the sake of demonstration lets pretend that `localhost`
+is a remote computer. It tells `ssh` to run program named `ssh_client.py` with
+-r command line switch. `ssh_client.py` is the name of the script, so in essence
+it runs itself. -r switch tells it to run in remote mode, that is receiving
+mode.
 
 It uses popen2 python module to spawn the `ssh` process. This is similar to
 using `popen()` function in C. Basically, it runs a process, opens pipe and
@@ -203,11 +203,11 @@ alex ~/works/ssh -> md5sum data2.dat
 alex ~/works/ssh ->
 ```
 
-First I do `ls -la` to demonstrate that I have only two files in current directory
-– the data file `data.dat` and the script. Next I ran `./ssh_client.py`. It tells
-us that it is a local side and asks us for a password. Actually, the password
-request comes from `ssh`. To avoid being asked for password, you can use identity
-files as I explained in my [SSH crash
+First I do `ls -la` to demonstrate that I have only two files in current
+directory – the data file `data.dat` and the script. Next I ran
+`./ssh_client.py`. It tells us that it is a local side and asks us for a
+password. Actually, the password request comes from `ssh`. To avoid being asked
+for password, you can use identity files as I explained in my [SSH crash
 course]({{< relref "essays/ssh-crash-course.md" >}}).
 
 Then, it transfers the file and exits. After it exits I did `ls -la` once again
@@ -217,6 +217,6 @@ indeed the same file with md5sum.
 
 # Conclusion
 
-We saw how easy it is to create encrypted communication channel using SSH
-and `ssh`. I hope you’ve found this article useful and interesting. In case you
-have any questions, don’t hesitate to contact me at alexander.sandler@gmail.com.
+We saw how easy it is to create encrypted communication channel using SSH and
+`ssh`. I hope you’ve found this article useful and interesting. In case you have
+any questions, don’t hesitate to contact me at alexander.sandler@gmail.com.

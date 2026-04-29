@@ -65,9 +65,9 @@ Unlike thread per task model, this model is much more difficult to implement. It
 implies some constraints on the tasks:
 
 1. Engineer designing such system should be able to split tasks into multiple
-   jobs. Alternatively, tasks can be very short.
+jobs. Alternatively, tasks can be very short.
 2. Jobs should be more or less equal in size in terms of required processing
-   resources.
+resources.
 
 In addition, this approach requires smart task management. Such system should
 implement scheduler that spreads tasks between cores. A serios problem arises
@@ -101,16 +101,16 @@ threads model, in this model tasks split into smaller jobs. However, instead of
 letting the operating system to schedule between job execution, this model
 implements a user-mode scheduler.
 
-The actual scheduling is made using `setjmp()` and `longjmp()` calls. One obvious
-constrain that this model presents is that if thread goes to sleep in operating
-system terms it will send entire system to sleep. As a result, the system should
-have very tight control over what threads does and in particular how it sleeps.
-I.e. threads are not allowed to do regular I/O. Instead they should do I/O in a
-centralized way.
+The actual scheduling is made using `setjmp()` and `longjmp()` calls. One
+obvious constrain that this model presents is that if thread goes to sleep in
+operating system terms it will send entire system to sleep. As a result, the
+system should have very tight control over what threads does and in particular
+how it sleeps. I.e. threads are not allowed to do regular I/O. Instead they
+should do I/O in a centralized way.
 
 For example, thread that wishes to read from a file-descriptor should register
-this file-descriptor with scheduler. Scheduler will `select()` or `poll()` on all
-registered file-descriptors. Depending on what file-descriptor requires
+this file-descriptor with scheduler. Scheduler will `select()` or `poll()` on
+all registered file-descriptors. Depending on what file-descriptor requires
 attention, scheduler will schedule thread that takes care of that
 file-descriptor.
 

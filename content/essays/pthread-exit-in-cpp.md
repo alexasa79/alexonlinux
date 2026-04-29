@@ -26,8 +26,8 @@ notification. Long story short, here’s what I found out.
 
 When calling `pthread_exit()` in C++, it has to destruct all objects that has
 been created on stack. This process called stack unwinding and this is exactly
-what happens when you throw an exception. `pthread_exit()` utilizes this
-feature of C++ to cleanup before shutting down the thread for good.
+what happens when you throw an exception. `pthread_exit()` utilizes this feature
+of C++ to cleanup before shutting down the thread for good.
 
 To do that `pthread_exit()` throws some obscure exception and catches it right
 before ditching the thread. This way it cleans up all objects nicely. On the

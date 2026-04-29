@@ -6,7 +6,8 @@ categories: ["System Administrator Articles"]
 tags: ["arp", "connection", "ethereal", "ethernet", "ethtool", "icmp", "ifconfig", "linux", "netstat", "network", "packets", "pid", "port", "protocol", "route", "routing"]
 ---
 
-This article describes most useful Linux networking commands, as simple as it sounds.
+This article describes most useful Linux networking commands, as simple as it
+sounds.
 
 The truth is that I am writing this article more for myself. I am rarely doing
 complex networking configurations. As a result, when I have to configure
@@ -14,16 +15,18 @@ something, I often forget commands and their syntax. Often it takes hours to
 find out that the only reason why certain `route` command was not working is
 because I forgot to add some `netmask` parameter. Hence, this article.
 
-At the moment I only have few commands described. I’ll add stuff at a time. In the meantime, enjoy it and if you have anything to add, please fill free to email me. My email address is alexander.sandler@gmail.com.
+At the moment I only have few commands described. I’ll add stuff at a time. In
+the meantime, enjoy it and if you have anything to add, please fill free to
+email me. My email address is alexander.sandler@gmail.com.
 
 # ifconfig
 
-This command is number one command in the alphabet of Linux networking. It configures network interfaces. It features include
+This command is number one command in the alphabet of Linux networking. It
+configures network interfaces. It features include
 
-- Turning certain network interface on and off.
-- Changing interface IP address.
-- Changing netmask, MTU and other network parameters of the interface.
-- Putting interface into promiscuous mode.
+- Turning certain network interface on and off. Changing interface IP address.
+  Changing netmask, MTU and other network parameters of the interface. Putting
+  interface into promiscuous mode.
 
 ### Turn on/off network interface
 
@@ -54,14 +57,14 @@ Will turn specified network interface on and give it a IP address.
 Another nice thing that you can do with `ifconfig` is specifying additional IP
 address for one of the interfaces. Think about it for a second. Why single
 physical interface should be limited to single IP address? What stops us from
-giving single interface several different IP addresses? And of course
-`ifconfig` is the tool that let you do the job.
+giving single interface several different IP addresses? And of course `ifconfig`
+is the tool that let you do the job.
 
 As far as semantics concerned, it seems that `ifconfig` actually creates a new
 “virtual” interface. Yet, it is simply assigning a new IP address to given
 network interface. Here’s an example of doing so. Assuming we already have an
-interface named `eth0`, following command will create interface named
-`eth0:0` and assign an IP address to it.
+interface named `eth0`, following command will create interface named `eth0:0`
+and assign an IP address to it.
 
 ```text
 ifconfig eth0:0 <ip address>
@@ -95,18 +98,20 @@ In this example, ARP table on my computer contains two entries. Note the
 `HWtype` column. It is common understanding that MAC address refers to Ethernet
 MAC address, but its not necessarily true. There are many L2 protocols and some
 have their own MAC address structure. For more information about L2 and
-protocols that belong to this layer see
-[OSI model on Wikipedia](http://en.wikipedia.org/wiki/OSI_model).
+protocols that belong to this layer see [OSI model on
+Wikipedia](http://en.wikipedia.org/wiki/OSI_model).
 
 ### Add new ARP entry
 
-There are two things that you would probably like to do with ARP table; add and remove entries. This is how you add a new entry.
+There are two things that you would probably like to do with ARP table; add and
+remove entries. This is how you add a new entry.
 
 ```text
 arp -s <ip address> <hardware address>
 ```
 
-Again, hardware address is mostly Ethernet MAC address, but it is not always necessarily true.
+Again, hardware address is mostly Ethernet MAC address, but it is not always
+necessarily true.
 
 ### Delete ARP entry
 
@@ -115,15 +120,20 @@ arp -d <ip address>
 arp -d <hardware address>
 ```
 
-Both forms of this command delete the specified ARP address. First uses hostname or IP address to identify the ARP entry that we would like to delete. Second uses hardware address to identify appropriate ARP entry.
+Both forms of this command delete the specified ARP address. First uses hostname
+or IP address to identify the ARP entry that we would like to delete. Second
+uses hardware address to identify appropriate ARP entry.
 
 # route
 
-This is another one of the most useful commands available for you in your toolbox. It manages routes between your computer and other computers and networks.
+This is another one of the most useful commands available for you in your
+toolbox. It manages routes between your computer and other computers and
+networks.
 
 ### Configure default gateway
 
-One of the most important task that you can accomplish with this command is setting default gateway. This is how you do it.
+One of the most important task that you can accomplish with this command is
+setting default gateway. This is how you do it.
 
 ```text
 route add default gw <ip address>
@@ -133,7 +143,8 @@ Here, `ip address` is the address of the default gateway.
 
 ### Add routing table entry for specified network
 
-With following command you can add a static route to either a network or a specified host. This is how you do it.
+With following command you can add a static route to either a network or a
+specified host. This is how you do it.
 
 ```text
 route add -net <network address> netmask <netmask> gw <ip address>
@@ -153,7 +164,9 @@ Note that in both cases you need a complete network specifications – either
 using netmask or using CIDR notation.
 ### Using network interface name instead of gateway
 
-Interesting thing to notice here is that you can specify that packets to given IP address should be transmitted via certain network interface. This works with conjunction with ARP table. For example.
+Interesting thing to notice here is that you can specify that packets to given
+IP address should be transmitted via certain network interface. This works with
+conjunction with ARP table. For example.
 
 ```text
 route add -net 192.168.101.0/24 dev eth1
@@ -161,8 +174,8 @@ route add -net 192.168.101.0/24 dev eth1
 
 ### Add routing table entry for specified host
 
-Another kind of routes that you can add with `route` command is route to
-certain host. This is how you do it.
+Another kind of routes that you can add with `route` command is route to certain
+host. This is how you do it.
 
 ```text
 route add -host <ip address> gw <gateway>
@@ -187,13 +200,17 @@ route del -net 192.168.101.0/24
 route del -net 192.168.101.0 netmask 255.255.255.0
 ```
 
-Note that when removing a route, there is no need to specify the gateway or the network interface that being used to reach that network or a host. The network or a host identifiers are enough to remove the route.
+Note that when removing a route, there is no need to specify the gateway or the
+network interface that being used to reach that network or a host. The network
+or a host identifiers are enough to remove the route.
 
 # netstat
 
 ### List listening sockets and associated port numbers and process PID
 
-This is a very powerful information providing tool. It can show lots of network related information. For instance, you would like to know if certain process is listening on a certain port. Easy!
+This is a very powerful information providing tool. It can show lots of network
+related information. For instance, you would like to know if certain process is
+listening on a certain port. Easy!
 
 ```text
 $ netstat -l -p -n
@@ -201,15 +218,18 @@ $ netstat -l -p -n
 
 Will print list of sockets being listened to accompanied by a process PID and
 name and port number that being listened to. Note that you need super-user
-rights to see the list PIDs. In the command above, `-l` causes `netstat` to
-list sockets that being listened to – i.e. servers running on the computer and
+rights to see the list PIDs. In the command above, `-l` causes `netstat` to list
+sockets that being listened to – i.e. servers running on the computer and
 waiting for someone to connect to them from outside. `-p` causes `netstat` to
 produce names of the processes and their PID and `-n` causes `netstat` to use
 numeric values for port numbers, instead of numbers from `/etc/protocols`.
 
 ### Generate statistics about
 
-Another nice thing that `netstat` can do for you is to generate statistics about traffic your Linux box received and transmitted. The catch here is that statistics printed per protocol. I.e. you can see number of ICMP packets received. You can do it with -i option.
+Another nice thing that `netstat` can do for you is to generate statistics about
+traffic your Linux box received and transmitted. The catch here is that
+statistics printed per protocol. I.e. you can see number of ICMP packets
+received. You can do it with -i option.
 
 ```text
 $ netstat -i
@@ -232,7 +252,8 @@ version. Note that running `ethtool` requires superuser privileges.
 
 ### Figure out interface link speed
 
-Another handy thing you can do with `ethtool` is to see the speed of the network interface. You can do it with…
+Another handy thing you can do with `ethtool` is to see the speed of the network
+interface. You can do it with…
 
 ```text
 $ ethtool <interface name>

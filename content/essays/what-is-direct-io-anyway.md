@@ -53,9 +53,9 @@ makes I/O slower and does not let Linux do various optimizations that it usually
 does. Also, it introduces some constraints on memory buffer that being used for
 the I/O. Yet sometimes it is inevitable.
 
-Want to try it yourself? `dd`, I/O Swiss army knife, has an option
-called `direct`. It tells `dd` to do direct I/O instead of regular I/O. Another
-option for doing direct I/O is writing your own program that opens files with
+Want to try it yourself? `dd`, I/O Swiss army knife, has an option called
+`direct`. It tells `dd` to do direct I/O instead of regular I/O. Another option
+for doing direct I/O is writing your own program that opens files with
 `O_DIRECT` flag (see `open(2)` for details).
 
 *Update: Thanks to one of the readers for noting the difference between

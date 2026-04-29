@@ -18,8 +18,8 @@ Luckily, there’s a solution. Here’s what I did.
 
 You start with registering a signal handler. Once you get the signal, inside of
 the signal handler, set signal handler for the signal to `SIG_DFL`. Then send
-yourself same signal, using `kill()` system call. Here’s a short code snippet that
-demonstrates this little trick in action.
+yourself same signal, using `kill()` system call. Here’s a short code snippet
+that demonstrates this little trick in action.
 
 ```c
 #include <stdio.h>

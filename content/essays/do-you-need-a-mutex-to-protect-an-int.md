@@ -102,9 +102,10 @@ You can download the code and a Makefile
 
 The setup is simple. Number of threads is as number of CPUs in your machine
 (this includes cores and even hyperthreaded semi-cores). Each thread affined to
-certain core with `sched_setaffinity()`. I.e. scheduler configured to run certain
-thread on certain core, to make sure that all cores access that variable. Each
-thread increases a global integer named `global_int` one million times.
+certain core with `sched_setaffinity()`. I.e. scheduler configured to run
+certain thread on certain core, to make sure that all cores access that
+variable. Each thread increases a global integer named `global_int` one million
+times.
 
 In the meantime, main thread waits for the worker threads to do their job. Once
 they’re done, it prints the value of `global_int`.

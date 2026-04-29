@@ -6,17 +6,16 @@ categories: ["Programming Articles", "Short articles"]
 tags: []
 ---
 
-Doing file I/O of any kind in Python is really easy. You can start with
-plain `open()` and friends, working with Python’s file objects. by the way,
-Python’s `open()` resembles C’s `fopen()` so closely that I can’t stop thinking
-that `open()` may be based on `fopen()`.
+Doing file I/O of any kind in Python is really easy. You can start with plain
+`open()` and friends, working with Python’s file objects. by the way, Python’s
+`open()` resembles C’s `fopen()` so closely that I can’t stop thinking that
+`open()` may be based on `fopen()`.
 
-When its not enough, you can always upgrade
-to `open()` and `close()` from `os` module. Opening man page on `open()`
-(`open(2)`) reveals all those O_something options that you can pass
-to `os.open()`. But not all of them can be used in Python. For example, if you
-open a file with `O_DIRECT` and then try to write to it, you will end up with some
-strange error message.
+When its not enough, you can always upgrade to `open()` and `close()` from `os`
+module. Opening man page on `open()` (`open(2)`) reveals all those O_something
+options that you can pass to `os.open()`. But not all of them can be used in
+Python. For example, if you open a file with `O_DIRECT` and then try to write to
+it, you will end up with some strange error message.
 
 ```python
 >>> import os
@@ -36,8 +35,8 @@ Reading `open(2)` man page further reveals that working with `O_DIRECT` requires
 that all buffers used for I/O should be aligned to 512 byte boundary. But how
 can you have a memory buffer aligned to 512 bytes in Python?
 
-Apparently, there’s a way. Python comes with a module called `mmap`. `mmap()` is a
-system call that allows one to map portion of file into memory. All writes to
+Apparently, there’s a way. Python comes with a module called `mmap`. `mmap()` is
+a system call that allows one to map portion of file into memory. All writes to
 memory mapped file, go directly to file despite it looks like you’re working
 with plain memory buffer. Same with reads.
 
@@ -46,9 +45,9 @@ memory page – 4kb that is. So every memory mapped buffer is naturally memory
 aligned to 4kb, thus to 512 byte boundary too. But hey, shouldn’t `mmap` map
 files?
 
-Well, apparently `mmap` can be used for memory allocations. I.e. specifying -1 as
-file descriptor does just that – allocates RAM, as much as you tell it. So, this
-is what we do:
+Well, apparently `mmap` can be used for memory allocations. I.e. specifying -1
+as file descriptor does just that – allocates RAM, as much as you tell it. So,
+this is what we do:
 
 ```python
 >>> import os
@@ -65,8 +64,8 @@ is what we do:
 >>>
 ```
 
-Note that `mmap` memory buffer object behaves like a file. I.e. you can write into
-the buffer and read from it – like I do in line 8. More on it in [official
+Note that `mmap` memory buffer object behaves like a file. I.e. you can write
+into the buffer and read from it – like I do in line 8. More on it in [official
 documentation](http://docs.python.org/library/mmap.html).
 
 Have fun!:-)

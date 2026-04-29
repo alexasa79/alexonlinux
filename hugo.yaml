@@ -1,8 +1,8 @@
-baseURL: https://alexasa79.codeberg.page/alexonlinux.com/
+baseURL: https://alexonlinux.com/
 languageCode: en-us
 title: Alex on Linux
 theme: hugo-PaperMod
-relativeURLs: false
+relativeURLs: true
 canonifyURLs: false
 
 disableKinds:
@@ -39,3 +39,7 @@ menu:
       name: Essays
       url: /essays/
       weight: 20
+    - identifier: author
+      name: Author
+      url: /author/
+      weight: 30

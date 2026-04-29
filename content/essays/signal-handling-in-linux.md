@@ -42,12 +42,12 @@ interrupted by some other signal.
 
 Each one of signals can be in one of three states:
 
-- We may have our own signal handler for the signal.
-- Signal may be handled by the default handler. Every signal has its default
-  handler function. For instance, SIGINT default handler will terminate your
-  application.
+- We may have our own signal handler for the signal. Signal may be handled by
+  the default handler. Every signal has its default
+handler function. For instance, SIGINT default handler will terminate your
+application.
 - Signal may be ignored. Ignoring signal sometimes referred to as blocking
-  signal.
+signal.
 
 When manipulating signals and managing signal configuration, it is often easier
 to manage a so called signal mask. It is a bit-mask, where each bit has a
@@ -106,49 +106,49 @@ Lets see most common and their use.
 # Types of signals
 
 - `SIGHUP` This signal indicates that someone has killed the controlling
-  terminal. For instance, lets say our program runs in xterm or in
-  gnome-terminal. When someone kills the terminal program, without killing
-  applications running inside of terminal window, operating system sends SIGHUP
-  to the program. Default handler for this signal will terminate your program.
-  *Thanks to Mark Pettit for the tip.*
+terminal. For instance, lets say our program runs in xterm or in gnome-terminal.
+When someone kills the terminal program, without killing applications running
+inside of terminal window, operating system sends SIGHUP to the program. Default
+handler for this signal will terminate your program. *Thanks to Mark Pettit for
+the tip.*
 - `SIGINT` This is the signal that being sent to your application when it is
-  running in a foreground in a terminal and someone presses CTRL-C. Default
-  handler of this signal will quietly terminate your program.
+running in a foreground in a terminal and someone presses CTRL-C. Default
+handler of this signal will quietly terminate your program.
 - `SIGQUIT` Again, according to documentation, this signal means “Quit from
-  keyboard”. In reality I couldn’t find who sends this signal. I.e. you can only
-  send it explicitly.
+keyboard”. In reality I couldn’t find who sends this signal. I.e. you can only
+send it explicitly.
 - `SIGILL` Illegal instruction signal. This is a exception signal, sent to
-  your application by the operating system when it encounters an illegal
-  instruction inside of your program. Something like this may happen when
-  executable file of your program has been corrupted. Another option is when
-  your program loads dynamic library that has been corrupted. Consider this as
-  an exception of a kind, but the one that is very unlikely to happen.
+your application by the operating system when it encounters an illegal
+instruction inside of your program. Something like this may happen when
+executable file of your program has been corrupted. Another option is when your
+program loads dynamic library that has been corrupted. Consider this as an
+exception of a kind, but the one that is very unlikely to happen.
 - `SIGABRT` Abort signal means you used used `abort()` API inside of your
-  program. It is yet another method to terminate your program. `abort()` issues
-  SIGABRT signal which in its term terminates your program (unless handled by
-  your custom handler). It is up to you to decide whether you want to
-  use `abort()` or not.
+program. It is yet another method to terminate your program. `abort()` issues
+SIGABRT signal which in its term terminates your program (unless handled by your
+custom handler). It is up to you to decide whether you want to use `abort()` or
+not.
 - `SIGFPE` Floating point exception. This is another exception signal, issued
-  by operating system when your application caused an exception.
+by operating system when your application caused an exception.
 - `SIGSEGV` This is an exception signal as well. Operating system sends a
-  program this signal when it tries to access memory that does not belong to it.
+program this signal when it tries to access memory that does not belong to it.
 - `SIGPIPE` Broken pipe. As documentation states, this signal sent to your
-  program when you try to write into pipe (another IPC) with no readers on the
-  other side.
+program when you try to write into pipe (another IPC) with no readers on the
+other side.
 - `SIGALRM` Alarm signal. Sent to your program using `alarm()` system call.
-  The `alarm()` system call is basically a timer that allows you to receive
-  SIGALRM in preconfigured number of seconds. This can be handy, although there
-  are more accurate timer API out there.
+The `alarm()` system call is basically a timer that allows you to receive
+SIGALRM in preconfigured number of seconds. This can be handy, although there
+are more accurate timer API out there.
 - `SIGTERM` This signal tells your program to terminate itself. Consider this
-  as a signal to cleanly shut down while SIGKILL is an abnormal termination
-  signal.
+as a signal to cleanly shut down while SIGKILL is an abnormal termination
+signal.
 - `SIGCHLD` Tells you that a child process of your program has stopped or
-  terminated. This is handy when you wish to synchronize your process with a
-  process with its child.
+terminated. This is handy when you wish to synchronize your process with a
+process with its child.
 - `SIGUSR1` and `SIGUSR2` Finally, SIGUSR1 and SIGUSR2 are two signals that
-  have no predefined meaning and are left for your consideration. You may use
-  these signals to synchronise your program with some other program or to
-  communicate with it.
+have no predefined meaning and are left for your consideration. You may use
+these signals to synchronise your program with some other program or to
+communicate with it.
 
 ## Handling exception signals
 
@@ -160,7 +160,8 @@ program to ignore this signal and an exception that has caused the signal. This
 is something that you don’t want to do.
 
 In case you still want to handle exception signals, read my [How to handle
-`SIGSEGV`, but also generate a core dump]({{< relref "essays/how-to-handle-sigsegv-but-also-generate-a-core-dump.md" >}}) article.
+`SIGSEGV`, but also generate a core dump]({{< relref
+"essays/how-to-handle-sigsegv-but-also-generate-a-core-dump.md" >}}) article.
 
 ## `SIGKILL` and `SIGSTOP`
 
@@ -178,10 +179,10 @@ your program. However, you can send this signal.
 
 ### `SIGSTOP`
 
-`SIGSTOP` used when debugging. When you debug your program, operating system sends
-`SIGSTOP` to stop your program, for instance in case it reaches a breakpoint.
-Operating system does not let you change its handler because you may cause your
-program to be undebuggable.
+`SIGSTOP` used when debugging. When you debug your program, operating system
+sends `SIGSTOP` to stop your program, for instance in case it reaches a
+breakpoint. Operating system does not let you change its handler because you may
+cause your program to be undebuggable.
 
 # Registering signal handler
 
@@ -218,16 +219,16 @@ this small program. See what is happening when you run it and press CTRL-C.
 
 ### Ignoring signals and restoring original signal handler function
 
-Using `signal()` you can set default signal handler for certain signal to be used.
-You can also tell the system that you would like to ignore certain signal. To
-ignore the signal, specify SIG_IGN as a signal handler. To restore default
+Using `signal()` you can set default signal handler for certain signal to be
+used. You can also tell the system that you would like to ignore certain signal.
+To ignore the signal, specify SIG_IGN as a signal handler. To restore default
 signal handler, specify SIG_DFL as signal handler.
 
-Although this seems to be everything you may need, it is better to avoid
-using `signal()`. There’s a portability problem with this system call. I.e. it
-behaves differently on different operating systems. There’s a newer system call
-that does everything `signal()` does and also gives slightly more information
-about the actual signal, its origin, etc.
+Although this seems to be everything you may need, it is better to avoid using
+`signal()`. There’s a portability problem with this system call. I.e. it behaves
+differently on different operating systems. There’s a newer system call that
+does everything `signal()` does and also gives slightly more information about
+the actual signal, its origin, etc.
 
 ## `sigaction()`
 
@@ -257,48 +258,49 @@ struct sigaction
 
 `sa_handler` is a pointer to the signal handler routine. The routine accepts
 single integer number containing signal number that it handles and returns void
-– same as signal handler registered by `signal()`. In addition, `sigaction()` let
-you have more advanced signal handler routine. If needed `sa_sigaction` pointer
-should point to the advanced signal handler routine. This one receives much more
-information about the origin of the signal.
+– same as signal handler registered by `signal()`. In addition, `sigaction()`
+let you have more advanced signal handler routine. If needed `sa_sigaction`
+pointer should point to the advanced signal handler routine. This one receives
+much more information about the origin of the signal.
 
-To use `sa_sigaction` routine, make sure to set SA_SIGINFO flag in `sa_flags` member
-of `struct sigaction`. Similarily to `sa_handler`, `sa_sigaction` receives an
-integer telling it what signal has been triggered. In addition it receives a
-pointer to structure called `siginfo_t`. It describes the origin of the signal.
-For instance, `si_pid` member of `siginfo_t` holds the process ID of the process
-that has sent the signal. There are several other fields that tell you lots of
-useful information about the signal. You can find all the details
-on `sigaction`’s manual page (man sigaction).
+To use `sa_sigaction` routine, make sure to set SA_SIGINFO flag in `sa_flags`
+member of `struct sigaction`. Similarily to `sa_handler`, `sa_sigaction`
+receives an integer telling it what signal has been triggered. In addition it
+receives a pointer to structure called `siginfo_t`. It describes the origin of
+the signal. For instance, `si_pid` member of `siginfo_t` holds the process ID of
+the process that has sent the signal. There are several other fields that tell
+you lots of useful information about the signal. You can find all the details on
+`sigaction`’s manual page (man sigaction).
 
-Last argument received by `sa_sigaction` handler is a pointer to `ucontext_t`. This
-type different from architecture to architecture. My advice to you is to ignore
-this pointer, unless you are writing a new debugger.
+Last argument received by `sa_sigaction` handler is a pointer to `ucontext_t`.
+This type different from architecture to architecture. My advice to you is to
+ignore this pointer, unless you are writing a new debugger.
 
-One additional advantage of `sigaction()` compared to `signal()` is that it allows
-you to tell operating system what signals can handle signal you are registering.
-I.e. it gives you full control over what signals can arrive, while your program
-handling another signal.
+One additional advantage of `sigaction()` compared to `signal()` is that it
+allows you to tell operating system what signals can handle signal you are
+registering. I.e. it gives you full control over what signals can arrive, while
+your program handling another signal.
 
 To tell this, you should manipulate `sa_mask` member of the `struct sigaction`.
 Note that is a `sigset_t` field. sigset_t type represents signal masks. To
 manipulate signal masks, use one of the following functions:
 
 - `int sigemptyset(sigset_t *)` – to clear the mask.
-- `int sigfillset(sigset_t *)` – to set all bits in the mask.
-- `int sigaddset(sigset_t *, int signum)` – to set bit that represents certain
+  `int sigfillset(sigset_t *)` – to set all bits in the mask.
+  `int sigaddset(sigset_t *, int signum)` – to set bit that represents certain
   signal.
 - `int sigdelset(sigset_t *, int signum)` – to clear bit that represents certain
-  signal.
-- `int sigismember(sigset_t *, int signum)` – to check status of certain signal in
-  a mask.
+signal.
+- `int sigismember(sigset_t *, int signum)` – to check status of certain signal
+  in
+a mask.
 
 ### `sigaction()` in action
 
-To conclude, I would like to show a small program that
-demonstrates `sigaction()` in use. I would like the program to register signal
-handler for SIGTERM and then, when it receives the signal, print some
-information about the origin of the signal.
+To conclude, I would like to show a small program that demonstrates
+`sigaction()` in use. I would like the program to register signal handler for
+SIGTERM and then, when it receives the signal, print some information about the
+origin of the signal.
 
 On the other hand, I will use Python interpretor to send the program a signal.
 

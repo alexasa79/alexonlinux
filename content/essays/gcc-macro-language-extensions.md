@@ -34,8 +34,8 @@ std::cout << ", obj.member13: " << obj.member13 << std::endl;
 std::cout << ", obj.member14: " << obj.member14 << std::endl;
 ```
 
-Wouldn’t you give a kidney just not to write name of every single member
-of `obj` twice? Well, it appears that this can be done. Watch this:
+Wouldn’t you give a kidney just not to write name of every single member of
+`obj` twice? Well, it appears that this can be done. Watch this:
 
 ```cpp
 #define PMEM(mem) #mem ": " << mem
@@ -109,11 +109,11 @@ ADD_GETTER(bool, member2);
 ADD_GETTER(unsigned long, member3);
 ```
 
-Lets analyze this piece of code for second. First I defined a structure
-called `some_struct`. Next, I wanted a macro that defines getter function for
-every member of `some_struct`. I added `ADD_GETTER` macro for that. Then I
-called it three times in a row providing type of the field in `some_struct` and
-name of the member.
+Lets analyze this piece of code for second. First I defined a structure called
+`some_struct`. Next, I wanted a macro that defines getter function for every
+member of `some_struct`. I added `ADD_GETTER` macro for that. Then I called it
+three times in a row providing type of the field in `some_struct` and name of
+the member.
 
 Calling a macro for member1 expanded to following piece of code:
 
@@ -125,11 +125,11 @@ int get_member1(struct some_struct& st)
 ```
 
 Notice how it created name of the function. This is concatenation operation in
-action. `##` makes gcc and g++ preprocessor concatenate two
-tokens, `get_` and `member1` into single token. `##` operator removes all space
-characters between two tokens. Another thing that it does is eliminating white
-space and punctuation characters between two tokens. This is especially useful
-when implementing macros with variable number of arguments.
+action. `##` makes gcc and g++ preprocessor concatenate two tokens, `get_` and
+`member1` into single token. `##` operator removes all space characters between
+two tokens. Another thing that it does is eliminating white space and
+punctuation characters between two tokens. This is especially useful when
+implementing macros with variable number of arguments.
 
 # Macros with variable number of arguments
 
@@ -164,8 +164,8 @@ int main()
 
 Note that strings have to be immediate values. For instance calling
 `DPRINT(format, "...");` where `format` is pointer to string will not work
-because gcc cannot concatenate `format` with “DEBUG” string. Anyway, I wanted
-to address something different. You will be surprised to learn that this code
+because gcc cannot concatenate `format` with “DEBUG” string. Anyway, I wanted to
+address something different. You will be surprised to learn that this code
 doesn’t compile. This is because after preprocessing this code turns into
 something that is not valid C/C++. This is how `main` will look like after
 preprocessing:
@@ -194,5 +194,5 @@ int main()
 Note concatenation operator before `__VA_ARGS__`. I already mentioned that
 concatenation operator gets rid of white space and punctuation characters
 between two tokens. This is exactly what it does in this case – it removes comma
-between format and empty token leaving clean
-`printf("DEBUG: " "hello world");`. This is exactly what we needed.
+between format and empty token leaving clean `printf("DEBUG: " "hello world");`.
+This is exactly what we needed.

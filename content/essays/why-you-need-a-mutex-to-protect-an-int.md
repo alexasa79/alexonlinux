@@ -6,7 +6,8 @@ categories: ["Blog", "Programming Articles", "Short articles"]
 tags: []
 ---
 
-This is a follow up on [my previous essay]({{< relref "essays/do-you-need-a-mutex-to-protect-an-int.md" >}}) about need to protect
+This is a follow up on [my previous essay]({{< relref
+"essays/do-you-need-a-mutex-to-protect-an-int.md" >}}) about need to protect
 access to even simplest variables when working in multi-threaded environment. In
 this essay I would like to explain what’s going on under the hood and why you
 actually need some protection here.
@@ -36,16 +37,15 @@ Typical x86 processor tries to solve the problem of slow memory using several
 different techniques:
 
 1. Memory works in units of 32 and sometimes even 64 bytes called memory lines.
-   I.e. when CPU reads memory cell, it typically reads 32 byte line.
+I.e. when CPU reads memory cell, it typically reads 32 byte line.
 2. Multiple levels of cache make sure that memory access is effective. Typically
-   there are 3 levels of cache named L1, L2 and L3. Sometimes there are four
-   levels. Sometimes there are two. With three levels of cache, L1 usually is
-   local to CPU core, L2 local to physical CPU and L3 shared between several
-   CPUs.
+there are 3 levels of cache named L1, L2 and L3. Sometimes there are four
+levels. Sometimes there are two. With three levels of cache, L1 usually is local
+to CPU core, L2 local to physical CPU and L3 shared between several CPUs.
 3. Special cache called instruction cache caches program’s instructions.
 4. CPU does not immediately writes changes to main memory. Instead CPU tries to
-   delay updating main memory hoping there will be additional changes in same
-   memory line. Changes stored in so called Store Buffer.
+delay updating main memory hoping there will be additional changes in same
+memory line. Changes stored in so called Store Buffer.
 
 Store buffer is the key to what happens with plain integer when multiple threads
 try to change it at the same time.

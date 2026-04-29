@@ -48,8 +48,9 @@ need an ability to query and set values of the debuggee’s registers, when it
 stops.
 
 And operating system lets us to do all this. Each operating system does it in
-it’s manner of course. Linux provides single system call named `ptrace()` (defined
-in `sys/ptrace.h`), which allows to do all these operations and much more.
+it’s manner of course. Linux provides single system call named `ptrace()`
+(defined in `sys/ptrace.h`), which allows to do all these operations and much
+more.
 
 ### `ptrace()`
 
@@ -68,14 +69,14 @@ attaching to it or running it. There is a `ptrace()` operation for each one of
 these cases.
 
 First called `PTRACE_TRACEME`, tells the kernel that calling process wants its
-parent to debug itself. I.e. me calling `ptrace( PTRACE_TRACEME )` means I want my
-dad to debug me. This comes handy when you want debugger process to spawn the
+parent to debug itself. I.e. me calling `ptrace( PTRACE_TRACEME )` means I want
+my dad to debug me. This comes handy when you want debugger process to spawn the
 debuggee. In this case you do `fork()` creating a new process, then
 `ptrace( PTRACE_TRACEME )`, and then you call `exec()` or `execve()`.
 
-Second operation called `PTRACE_ATTACH`. It tells the kernel that calling process
-should become debugging parent of the process being called. Debugging parent
-means debugger and a parent process.
+Second operation called `PTRACE_ATTACH`. It tells the kernel that calling
+process should become debugging parent of the process being called. Debugging
+parent means debugger and a parent process.
 
 ### Debugger-debuggee synchronization
 
@@ -89,10 +90,11 @@ debuggee and let debugger do its thing?
 Operating system does that for us using signals. Actually, operating system
 notifies us, the debugger, about all kinds of events that occur in debuggee and
 it does all that with signals. This includes the “debuggee is ready to shoot”
-signal. In particular, if we attach to existing process it receives `SIGSTOP` and
-we receive `SIGCHLD` once it actually stops. If we spawn a new process and it
-did `ptrace( PTRACE_TRACEME )` it will receive `SIGTRAP` signal once it attempts
-to `exec()` or `execve()`. We will be notified with `SIGCHLD` about this, of course.
+signal. In particular, if we attach to existing process it receives `SIGSTOP`
+and we receive `SIGCHLD` once it actually stops. If we spawn a new process and
+it did `ptrace( PTRACE_TRACEME )` it will receive `SIGTRAP` signal once it
+attempts to `exec()` or `execve()`. We will be notified with `SIGCHLD` about
+this, of course.
 
 ### A new debugger was born
 
@@ -117,11 +119,11 @@ The debuggee does the following…
 ```
 
 Note the `ptrace( PTRACE_TRACEME )` followed by `execve()`. This is what real
-debuggers do to spawn the process that going to be debugged. As you
-know, `execve()` replaces current executable image and memory of the current
-process with the executable and memory space belonging to program that
-being `execve()`’d. Once kernel finishes this operation, it sends `SIGTRAP` to
-calling process and `SIGCHLD` to the debugger. The debugger receives appropriate
+debuggers do to spawn the process that going to be debugged. As you know,
+`execve()` replaces current executable image and memory of the current process
+with the executable and memory space belonging to program that being
+`execve()`’d. Once kernel finishes this operation, it sends `SIGTRAP` to calling
+process and `SIGCHLD` to the debugger. The debugger receives appropriate
 notifications via signals and via `wait()` that returns. Here is the debugger’s
 code.
 
@@ -175,10 +177,10 @@ into single instruction, while others may be translated into hundreds and even
 thousands of instructions. Instruction may be bigger or smaller. From 1 byte up
 to 15 bytes long for modern CPUs (Intel x86_64).
 
-Debuggers mostly operate on CPU instruction level. The matter of fact
-that `gdb` understands C/C++ code and allows you to place breakpoints at certain
-C/C++ line is only an enhancement over `gdb`’s basic ability to place breakpoints
-on certain instruction.
+Debuggers mostly operate on CPU instruction level. The matter of fact that `gdb`
+understands C/C++ code and allows you to place breakpoints at certain C/C++ line
+is only an enhancement over `gdb`’s basic ability to place breakpoints on
+certain instruction.
 
 There are several ways to place breakpoints. The most widely used is the INT 3
 instruction. It is a single byte operation code instruction that once reached by
@@ -197,15 +199,14 @@ see how this can be done.
 Breakpoints placed with INT 3 instruction. Before writing the actual 0xcc (INT 3
 operation code), we should figure where to place the instruction. For purpose of
 this article we will do it manually. On the contrary, real debuggers include
-complex logic that calculates where and when to place the
-breakpoints. `gdb` places several breakpoints by itself, without you even knowing
-about it. And obviously it has functionality that places breakpoints once you
-ask it to do so.
+complex logic that calculates where and when to place the breakpoints. `gdb`
+places several breakpoints by itself, without you even knowing about it. And
+obviously it has functionality that places breakpoints once you ask it to do so.
 
 In our previous example we had our debuggee process executing `ls`. It is not
 suitable for our next demonstration. We will need a sample program that would
 let us easily demonstrate breakpoints in
-action.[Here](http://www.alexonlinux.com/wp-content/uploads/2008/03/sleeper.c)
+action. [Here](http://www.alexonlinux.com/wp-content/uploads/2008/03/sleeper.c)
 it is.
 
 ```c
@@ -244,22 +245,22 @@ and then producing second printout.
 We’ll achieve our goal in several steps.
 
 1. First of all, we should `fork()` off the debuggee. We already did something
-   similar.
+similar.
 2. Next step is to intercept the `execve()` call in debuggee. Been there, done
-   that.
+that.
 3. Here’s something new. We should modify a byte at address 0x400516 from 0xbf
-   to 0xcc, saving original value (0xbf). This is how we place the breakpoint.
+to 0xcc, saving original value (0xbf). This is how we place the breakpoint.
 4. Next, we’re going to `wait()` for the process. Once it will reach the
-   breakpoint, we’ll be notified.
+breakpoint, we’ll be notified.
 5. Once the debuggee reaches the breakpoint we want to restore the code we broke
-   with our 0xcc to its original state.
+with our 0xcc to its original state.
 6. In addition, we want to fix value of RIP register. This register tells CPU
-   what is the location in memory of next meaningful instruction for it to
-   execute. It’s value will be 0x400517, one byte after 0xcc that we placed. We
-   want to set the RIP register to 0x400516 value because we don’t want the CPU
-   to skip over that MOV instruction that we broke with our 0xcc.
+what is the location in memory of next meaningful instruction for it to execute.
+It’s value will be 0x400517, one byte after 0xcc that we placed. We want to set
+the RIP register to 0x400516 value because we don’t want the CPU to skip over
+that MOV instruction that we broke with our 0xcc.
 7. Finally, we want to wait five seconds for the sake of demonstration and let
-   the debuggee continue running.
+the debuggee continue running.
 
 First things first. Lets see how we do step 3.
 
@@ -277,8 +278,8 @@ First things first. Lets see how we do step 3.
 .
 ```
 
-Again, we can see how `ptrace()` does the job for us. First we peek 8
-(`sizeof( long )`) bytes from address 0x400516. On some architectures this could cause
+Again, we can see how `ptrace()` does the job for us. First we peek 8 (`sizeof(
+long )`) bytes from address 0x400516. On some architectures this could cause
 lots of headache because of unaligned memory access. Luckily, we’re on x86_64
 and unaligned memory accesses are permitted. Next we set the lowest byte to be
 0xcc – INT 3 instruction. Finally, we place 8 bytes back to their place.
@@ -308,10 +309,10 @@ back. Again `ptrace()` does all the job for us.
 
 Things are not too well documented here. For instance `ptrace()` documentation
 never mentions `struct user_regs_struct`, however this is what `ptrace()` system
-call expects to receive in kernel. Once we know what we should use
-as `ptrace()` arguments, it is easy. We use `PTRACE_GETREGS` operation to obtain
-values of debuggee’s registers, we modify the RIP register and write them back
-with `PTRACE_SETREGS` operation. Clear and simple.
+call expects to receive in kernel. Once we know what we should use as `ptrace()`
+arguments, it is easy. We use `PTRACE_GETREGS` operation to obtain values of
+debuggee’s registers, we modify the RIP register and write them back with
+`PTRACE_SETREGS` operation. Clear and simple.
 
 Lets see how things actually work. You can find complete listing of debugger
 process
@@ -323,10 +324,9 @@ In debuggee process 29843
 In debugger process 29842
 Process 29842 received signal 17
 ~~~~~~~~~~~~> Before breakpoint
-Process 29842 received signal 17
-RIP before resuming child is 400517
-Time before debugger falling asleep: 1206346035
-Time after debugger falling asleep: 1206346040. Resuming debuggee...
+Process 29842 received signal 17 RIP before resuming child is 400517 Time before
+debugger falling asleep: 1206346035 Time after debugger falling asleep:
+1206346040. Resuming debuggee...
 ~~~~~~~~~~~~> After breakpoint
 Process 29842 received signal 17
 Debuggee exited...
@@ -341,8 +341,8 @@ indicates that the debuggee has stopped on address 0x400517, as we expected.
 
 After seeing how easy to place a breakpoint, you can guess that stepping over
 one line of C/C++ code is simply a matter of placing a breakpoint on the next
-line of code. This is exactly what `gdb` does when you want it to single step over
-some expression.
+line of code. This is exactly what `gdb` does when you want it to single step
+over some expression.
 
 ### Conclusion
 

@@ -9,13 +9,16 @@ tags: ["atomic", "linux", "multithreaded", "mutex", "pthread", "semaphore", "spi
 # Introduction
 
 In this article I would like to continue subject I started in my previous two
-essays ([essay 1]({{< relref "essays/do-you-need-a-mutex-to-protect-an-int.md" >}}) and [essay 2]({{< relref "essays/pthread-spinlocks.md" >}})). Question I am
+essays ([essay 1]({{< relref "essays/do-you-need-a-mutex-to-protect-an-int.md"
+>}}) and [essay 2]({{< relref "essays/pthread-spinlocks.md" >}})). Question I am
 trying to answer is what is the most efficient, yet safe way of accessing simple
 data type variables from two or more threads. I.e. how to change a variable from
 two threads at the same time, without screwing its value.
 
-[In my first essay]({{< relref "essays/do-you-need-a-mutex-to-protect-an-int.md" >}}) I’ve shown how easy it is to turn variable value into garbage by modifying
-it from two or more threads. [In my second essay]({{< relref "essays/pthread-spinlocks.md" >}}) I am talking about spinlocks, a recent
+[In my first essay]({{< relref "essays/do-you-need-a-mutex-to-protect-an-int.md"
+>}}) I’ve shown how easy it is to turn variable value into garbage by modifying
+it from two or more threads. [In my second essay]({{< relref
+"essays/pthread-spinlocks.md" >}}) I am talking about spinlocks, a recent
 addition into `pthread` library. Spinlocks indeed can help to solve the problem.
 Yet spinlocks more suitable for protecting small data structures rather than
 simple data types such as `int` and `long`. Atomic variables, on the other hand,
@@ -74,9 +77,9 @@ thread 1 will wake up and execute line 2.
 
 ![two_threads]({{< relurl "assets/2008-12-23T135529 Multithreaded simple data type access and atomic variables/two_threads-1d8b30a3c0.png" >}})
 
-When this happens, no one of the threads will run `fire_a_gun()` routine (line 3).
-This is obviously wrong behavior and if we were protecting this piece of code
-with a mutex or a spinlock this would not have happened.
+When this happens, no one of the threads will run `fire_a_gun()` routine (line
+3). This is obviously wrong behavior and if we were protecting this piece of
+code with a mutex or a spinlock this would not have happened.
 
 > In case you’re wondering how likely something like this to happen, be sure
 > that this is very likely. When I first started working with multithreaded
@@ -84,10 +87,9 @@ with a mutex or a spinlock this would not have happened.
 > scenario I described earlier is unlikely, it happens overwhelmingly often.
 
 As I mentioned, we could solve this problem by giving up on atomic variables and
-using spinlock or mutex instead. Luckily, we can still use atomic
-variables. `gcc` developers have thought about our needs and this particular
-problem and offered a solution. Lets see actual routines that operate atomic
-variables.
+using spinlock or mutex instead. Luckily, we can still use atomic variables.
+`gcc` developers have thought about our needs and this particular problem and
+offered a solution. Lets see actual routines that operate atomic variables.
 
 # The real thing…
 
@@ -123,19 +125,15 @@ type __sync_nand_and_fetch (type *ptr, type value);
 
 `type` in each of the expressions can be one of the following:
 
-- int
-- unsigned int
-- long
-- unsigned long
-- long long
-- unsigned long long
+- int unsigned int long unsigned long long long unsigned long long
 
 These are so called built-in functions, meaning that you don’t have to include
 anything to use them.
 
 # Time to see some action
 
-Back to the example I started in the [first essay]({{< relref "essays/do-you-need-a-mutex-to-protect-an-int.md" >}}) I mentioned earlier.
+Back to the example I started in the [first essay]({{< relref
+"essays/do-you-need-a-mutex-to-protect-an-int.md" >}}) I mentioned earlier.
 
 To remind you, this small program opens several of threads. Number of threads is
 as number of CPUs in the computer. Then it binds each one of the threads to one
@@ -225,25 +223,26 @@ Then run `./a.out` to execute the program.
 
 Note lines 36 and 37. Instead of simply incrementing the variable, I use
 built-in function `__sync_fetch_and_add()`. Running this code obviously produces
-expected results – i.e. value of `global_int` is 4,000,000 as expected (number of
-CPUs in the machine multiply 1 million – in my case this is a 4 core machine).
-Remember that [when I ran this code snippet leaving line 36 as is]({{< relref "essays/do-you-need-a-mutex-to-protect-an-int.md" >}}), the result was 1,908,090
-and not 4,000,000 as we’d expect.
+expected results – i.e. value of `global_int` is 4,000,000 as expected (number
+of CPUs in the machine multiply 1 million – in my case this is a 4 core
+machine). Remember that [when I ran this code snippet leaving line 36 as is]({{<
+relref "essays/do-you-need-a-mutex-to-protect-an-int.md" >}}), the result was
+1,908,090 and not 4,000,000 as we’d expect.
 
 # Precautions
 
 When using atomic variables, some extra precautions have to be taken. One
-serious problem with atomic variable implementation in `gcc` is that it allows you
-to do atomic operations on regular variables. I.e. there is no clear distinction
-between atomic variables and regular variables. There is nothing that prevents
-you from incrementing value of the atomic variable
-with `__sync_fetch_and_add()` as I just demonstrated and later in the code doing
-same thing with regular ++ operator.
+serious problem with atomic variable implementation in `gcc` is that it allows
+you to do atomic operations on regular variables. I.e. there is no clear
+distinction between atomic variables and regular variables. There is nothing
+that prevents you from incrementing value of the atomic variable with
+`__sync_fetch_and_add()` as I just demonstrated and later in the code doing same
+thing with regular ++ operator.
 
 Obviously this might be a serious problem. Things tend to be forgotten and it is
 a matter of time until someone in your project or even you yourself will modify
-value of the variable using regular operators, instead of atomic functions
-that `gcc` has.
+value of the variable using regular operators, instead of atomic functions that
+`gcc` has.
 
 To address this problem, I strongly suggest wrapping around atomic functions and
 variables with either ADT in C or C++ class.

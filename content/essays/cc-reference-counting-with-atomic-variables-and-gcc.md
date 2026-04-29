@@ -113,9 +113,9 @@ eraser thread should be able to delete it.
 
 Lets say that it takes manipulator thread to do its manipulations 1 minute at
 most. I am exaggerating on purpose here. When eraser thread tries to delete the
-object, all it has to do is to grab a mutex or a [spinlock]({{< relref "essays/pthread-spinlocks.md" >}})
-that protects the data structure that contains the objects and remove the
-object from the data structure.
+object, all it has to do is to grab a mutex or a [spinlock]({{< relref
+"essays/pthread-spinlocks.md" >}}) that protects the data structure that
+contains the objects and remove the object from the data structure.
 
 Next it has to get current time and save it in the object. Object should have
 methods that allows it to remember its deletion time. Then eraser thread has to
@@ -183,16 +183,16 @@ There’s no need to include any header file to use these functions. If your
 architecture doesn’t support them, you will receive a linker error as if you
 were calling a non-existing function.
 
-Each one of these functions manipulates a variable of certain `type`. `type` can be
-either char, short, int, long, long long or their unsigned counterparts.
+Each one of these functions manipulates a variable of certain `type`. `type` can
+be either char, short, int, long, long long or their unsigned counterparts.
 
 It is a good idea to wrap these functions with something that hides
 implementation details. This can be class that represents atomic variable or a
 abstract data type.
 
 Finally, I have a nice example of how to use atomic variables in [multithreaded
-simple data type access and atomic
-variables]({{< relref "essays/multithreaded-simple-data-type-access-and-atomic-variables.md" >}})
+simple data type access and atomic variables]({{< relref
+"essays/multithreaded-simple-data-type-access-and-atomic-variables.md" >}})
 article.
 
 ## Conclusion

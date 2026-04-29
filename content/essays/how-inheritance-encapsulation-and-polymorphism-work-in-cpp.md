@@ -13,8 +13,8 @@ OOP/OOD in general and C++ in particular.
 
 When programming C, it is very easy to remember how things work. You know that
 when you add an `int` variable to a structure it mostly grows by four bytes. You
-know that `long` is either four or eight bytes long depending on the architecture
-you’re working with.
+know that `long` is either four or eight bytes long depending on the
+architecture you’re working with.
 
 Things are less obvious when moving to C++. OOP brings more abstractions to the
 program. As a result you are no longer sure if a+b sums two numbers or calls
@@ -50,16 +50,16 @@ Otherwise, objects know nothing about methods that operate on them.
 
 ## How overloading works
 
-Another thing that we have to take care of in C++ is how to distinguish
-between `some_function()` and `some_class::some_function()`. Or
-between `some_class::some_function( int )` and `some_class::some_function()` I.e.
-what’s the difference between two methods with the same name that receive
-different number and type of arguments? What is the difference between method
-and function that has same name?
+Another thing that we have to take care of in C++ is how to distinguish between
+`some_function()` and `some_class::some_function()`. Or between
+`some_class::some_function( int )` and `some_class::some_function()` I.e. what’s
+the difference between two methods with the same name that receive different
+number and type of arguments? What is the difference between method and function
+that has same name?
 
 Obviously, out of linker, compiler and preprocessor, linker is the one that
-should be aware of the above difference. This is because we may
-have `some_function()` in some distant object file. Linker is the component that
+should be aware of the above difference. This is because we may have
+`some_function()` in some distant object file. Linker is the component that
 should find this distant function and interconnect the call to the function and
 the actual function. Linker uses function name as a unique identifier of the
 function.
@@ -68,7 +68,7 @@ To make things work, g++ and any other modern compiler, mangles the name of the
 method/function and makes sure that:
 
 1. Mangled method name includes name of the class it belongs to (if it belongs
-   to any class).
+to any class).
 2. Mangled method name includes number and type of arguments method receives.
 3. Mangled method name includes namespace it belongs to.
 
@@ -99,13 +99,13 @@ void some_method()
 
 `g++` will turn:
 
-- `void *some_class::some_method()` into `_ZN10some_class11some_methodEv`
-- `void some_namespace::some_class::some_method()` into
-  `_ZN14some_namespace10some_class11some_methodEv`
+- `void *some_class::some_method()` into `_ZN10some_class11some_methodEv` `void
+  some_namespace::some_class::some_method()` into
+`_ZN14some_namespace10some_class11some_methodEv`
 - `void some_method()` into `_Z11some_methodv`
 
-Adding integer argument to `void some_method()` will turn it
-from `_Z11some_methodv` to `_Z11some_methodi`.
+Adding integer argument to `void some_method()` will turn it from
+`_Z11some_methodv` to `_Z11some_methodi`.
 
 ### How mangling solves the problem
 
@@ -171,10 +171,10 @@ int main()
 ```
 
 The interesting thing to notice here is that `a` actually points to instance of
-class B. When dereferencing `a_member`, we’re actually
-dereferencing `a_member` that defined in class A, but belongs to class B (via
-inheritance). To make this happen, compiler has to make sure that common part of
-both classes (`a_member` in our case) located at the same offset in the object.
+class B. When dereferencing `a_member`, we’re actually dereferencing `a_member`
+that defined in class A, but belongs to class B (via inheritance). To make this
+happen, compiler has to make sure that common part of both classes (`a_member`
+in our case) located at the same offset in the object.
 
 ![image]({{< relurl "assets/2008-09-18T181509 How inheritance encapsulation and polymorphism work in C/a_b1-0534206b8c.png" >}})
 
@@ -222,8 +222,8 @@ int main()
 ```
 
 If you compile and run this program it will obviously print “0 0”. But how, you
-may ask. After all we did `a->reset()`. Without our understanding of polymorphism
-we could think that we’re calling method that belongs to class A.
+may ask. After all we did `a->reset()`. Without our understanding of
+polymorphism we could think that we’re calling method that belongs to class A.
 
 The reason it works is because when compiler sees code that dereferences pointer
 to A it expects certain internal object structure and when it dereferences

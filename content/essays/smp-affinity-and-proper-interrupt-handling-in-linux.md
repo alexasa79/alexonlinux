@@ -165,8 +165,8 @@ correspond to single CPU.
 
 How about writing “3” into the file. In theory, this should cause APIC to divert
 interrupts to CPU0 and CPU1. Unfortunately, things are a little more complicated
-here. It all depends on whether APIC works in `physical` “destination mode”
-and `low priority` “delivery mode”. If it is so, than you most likely would not be
+here. It all depends on whether APIC works in `physical` “destination mode” and
+`low priority` “delivery mode”. If it is so, than you most likely would not be
 seeing CPU0 handling all interrupts. This is because when kernel configures APIC
 to work in `physical/low priority` modes, it automatically tells APIC to load
 balance interrupts between first eight cores.

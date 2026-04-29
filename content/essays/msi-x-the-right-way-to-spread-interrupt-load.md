@@ -10,15 +10,14 @@ When considering ways to spread interrupts from one device among multiple cores,
 I can’t not to mention MSI-X. The thing is that MSI-X is actually the right way
 to do the job.
 
-Interrupt affinity, which I discussed
-[here]({{< relref "essays/why-interrupt-affinity-with-multiple-cores-is-not-such-a-good-thing.md" >}})
-and
-[here]({{< relref "essays/smp-affinity-and-proper-interrupt-handling-in-linux.md" >}}),
-has a fundamental
-problem. That is inevitable CPU cache misses. To emphasise this, think about
-what happens when your computer receives a packet from the network. Packet
-belongs to some connection. With interrupt affinity the packet would land on
-core X, while the chances are that previous packet on the same TCP connection
+Interrupt affinity, which I discussed [here]({{< relref
+"essays/why-interrupt-affinity-with-multiple-cores-is-not-such-a-good-thing.md"
+>}}) and [here]({{< relref
+"essays/smp-affinity-and-proper-interrupt-handling-in-linux.md" >}}), has a
+fundamental problem. That is inevitable CPU cache misses. To emphasise this,
+think about what happens when your computer receives a packet from the network.
+Packet belongs to some connection. With interrupt affinity the packet would land
+on core X, while the chances are that previous packet on the same TCP connection
 has landed on core Y (X ≠ Y).
 
 Handing the packet would require kernel to load TCP connection object into X’s
@@ -73,8 +72,8 @@ kernel can ask NIC driver to provide a queue number for the packet. This
 functionality, however, is optional in NIC drivers and at the moment both Intel
 and Broadcom drivers don’t provide it. Otherwise, kernel uses a simple hashing
 algorithm that produces 16 bit number from two ip addresses and (in case of TCP
-or UDP) two port numbers. All this happens in function named `simple_tx_hash()` in
-net/core/dev.c.
+or UDP) two port numbers. All this happens in function named `simple_tx_hash()`
+in net/core/dev.c.
 
 When receiving packets, things are even easier because NIC firmware and the
 driver decide what queue to use to introduce the packet to the kernel.

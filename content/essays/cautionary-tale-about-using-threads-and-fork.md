@@ -30,10 +30,10 @@ And this is it. I did not have second hunch. It took me a while to realize what
 really happened.
 
 This process expected to run in the background. So the most natural thing for it
-to do was to `fork()` right after starting. A moment before that it was launching
-a thread that handle some asynchronous tasks. When process calls `fork()`, the
-child process inherits memory and file descriptors from parent process. One
-thing that it is not inheriting is its threads.
+to do was to `fork()` right after starting. A moment before that it was
+launching a thread that handle some asynchronous tasks. When process calls
+`fork()`, the child process inherits memory and file descriptors from parent
+process. One thing that it is not inheriting is its threads.
 
 In my particular case parent created a thread. Thread started running, locking
 the mutex. At this exact moment parent process called `fork()` and child process

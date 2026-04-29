@@ -16,20 +16,37 @@ newer.
 To run locally:
 
 ```bash
-hugo server --bind 0.0.0.0 --baseURL http://localhost:1313/alexonlinux.com/
+hugo server --bind 0.0.0.0 --baseURL http://localhost:1313/
 ```
 
 ## Codeberg Pages
 
-The configured project URL is:
+The canonical URL is:
 
-- `https://alexasa79.codeberg.page/alexonlinux.com/`
+- `https://alexonlinux.com/`
 
-Important limitation from current Codeberg documentation: custom domains on the
-newer Pages stack do not support repository names containing dots. Since this
-repository is named `alexonlinux.com`, using it directly with a custom domain
-may require a different repository layout later, for example a dedicated
-`pages` repository or a renamed repository.
+The source branch is `main`. Generated output is published to the `pages`
+branch in the same Codeberg repository.
+
+The custom domains are listed in `static/.domains` so Hugo copies them to
+`public/.domains` during the build:
+
+- `alexonlinux.com`
+- `www.alexonlinux.com`
+
+To publish:
+
+```bash
+./publish.sh
+```
+
+The script removes stale local output, builds the Hugo site, creates or reuses a
+local `../pages` worktree for the generated `pages` branch, commits generated
+changes if there are any, and pushes `HEAD:pages` to `origin`.
+
+The DNS setup should follow the same pattern used by the `alchemy-lang` site,
+with the domain records pointing Codeberg Pages at this repository's Pages
+target.
 
 Sources:
 

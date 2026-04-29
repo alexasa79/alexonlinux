@@ -74,7 +74,7 @@ large data structure. Lets also assume that bloom filter has $m$ bits.
 > one company so that probability that two of them have birthday on the same day
 > is above 50%. Interestingly enough, the answer is approximately square root of
 > all possibilities. There are 365 options for birthdays, so the answer is 19.
->
+
 > This problem often called paradox because the right answer is not intuitive.
 > One would expect the answer to be much bigger.
 
@@ -106,8 +106,8 @@ set, we will conclude that element is in the filter.
 In this case, probability of false positive will be
 $\frac{2}{10}\cdot\frac{1}{9}=\frac{1}{45}$. This is because probability of
 hitting first set bit is $\frac{2}{10}$ and probability if hitting second set
-bit is $\frac{1}{9}$. So, we clearly see that probability of hitting drops
-when we use several bits.
+bit is $\frac{1}{9}$. So, we clearly see that probability of hitting drops when
+we use several bits.
 
 ![Data structure vs bloom filter2]({{< relurl "assets/2013-09-04T050824 Bloom filters/Data-structure-vs-bloom-filter2-62dea9dd9c.png" >}})
 
@@ -119,18 +119,23 @@ decreases number of elements we can safely insert into bloom filter. Lets see
 how.
 
 With just one bit per element, probability of hitting false positive answer for
-querying is $\frac{1}{10}=10\\%$.
-With two bits inside, probability of hitting false positive when querying for
-third element is $\frac{2}{10}=\frac{1}{5}=20\\%$.
-This is obviously lower than $\frac{1}{10}$.
+querying is $\frac{1}{10}=10\\%$. With two bits inside, probability of hitting
+false positive when querying for third element is
+$\frac{2}{10}=\frac{1}{5}=20\\%$. This is obviously lower than $\frac{1}{10}$.
 
 With two bits per element, probability of hitting false positive is
-$\frac{2}{10}\cdot\frac{1}{9}=\frac{1}{45}$. Adding second element and
-querying for third, makes probability of false positive
-$\frac{4}{10}\cdot\frac{3}{9}+\frac{3}{10}\cdot\frac{2}{9}+\frac{2}{10}\cdot\frac{1}{9}=\frac{2}{9}$.
+$\frac{2}{10}\cdot\frac{1}{9}=\frac{1}{45}$. Adding second element and querying
+for third, makes probability of false positive
+
+$$
+\frac{4}{10}\cdot\frac{3}{9}+
+\frac{3}{10}\cdot\frac{2}{9}+
+\frac{2}{10}\cdot\frac{1}{9}=\frac{2}{9}.
+$$
+
 So, its clear that probability of false positive when querying for third element
-decreased from $\frac{1}{5}$ to $\frac{2}{9}$ simply because we’re using
-one more bit per element.
+decreased from $\frac{1}{5}$ to $\frac{2}{9}$ simply because we’re using one
+more bit per element.
 
 In fact, as we will see in later, bloom filter is a function of four parameters:
 overall number of bits in the bloom, number of bits per element, probability of
@@ -141,10 +146,10 @@ false positive and how many elements are in the bloom.
 Like I said, bloom filter is a function of four different variables. Lets name
 them:
 
-- $m$ – number of bits in bloom filter
-- $k$ – number of bits that will represent single entry
-- $n$ – number of entries in the bloom filter when calculating probability of
-  false positive
+- $m$ – number of bits in bloom filter $k$ – number of bits that will represent
+  single entry $n$ – number of entries in the bloom filter when calculating
+  probability of
+false positive
 - $p$ – probability of false positive answer
 
 As we just saw, calculating probabilities for large bloom filter can be quiet
@@ -152,15 +157,12 @@ complicated task. Luckily there are some approximations that can help us to get
 a clue of what’s going on.
 
 Normally, when calculating various properties of the bloom filter, we can start
-with making an assumption on maximum number of elements in the filter $n$.
-Also, you can decide what is the probability of false positive you can tolerate.
-With this in hand, lets see how we choose $m$. I’ll spare you the task of
-calculating probabilities and how they affect our $m$ and give you the final
-formula:
+with making an assumption on maximum number of elements in the filter $n$. Also,
+you can decide what is the probability of false positive you can tolerate. With
+this in hand, lets see how we choose $m$. I’ll spare you the task of calculating
+probabilities and how they affect our $m$ and give you the final formula:
 
-$$
-m=-\frac{n\ln{p}}{\ln{2}^2}=n\cdot-\frac{\ln{p}}{\ln{2}^2}
-$$
+$$ m=-\frac{n\ln{p}}{\ln{2}^2}=n\cdot-\frac{\ln{p}}{\ln{2}^2} $$
 
 Chart below shows number of bits in bloom filter per element as a function of
 probability of getting false positive.
@@ -174,9 +176,7 @@ and with probability of 5% you can settle with just 6 bits per element. And with
 Now lets see how many bits in the set will represent single entry in the filter.
 Here comes another useful approximation.
 
-$$
-k=\frac{m}{n}\ln{2}=\frac{m}{n}\cdot0.693
-$$
+$$ k=\frac{m}{n}\ln{2}=\frac{m}{n}\cdot0.693 $$
 
 So, with $\frac{m}{n}=10$ you will set 7 bits per element in the bloom. This
 will give us 1% chance of false positive. From here, the math is fairly simple,
@@ -228,9 +228,9 @@ To conclude, obviously this solution has two major drawbacks:
 
 1. Bloom filter size increases significantly.
 2. This approach does not solve the problem completely because if you reach
-   maximum value of your counter, you cannot change it anymore, thus you revert
-   to original bloom filter design (one with one bit), at least for one entry in
-   the filter.
+maximum value of your counter, you cannot change it anymore, thus you revert to
+original bloom filter design (one with one bit), at least for one entry in the
+filter.
 
 However, with careful design, you can use this approach to solve the problem of
 deletes from bloom filter using this approach, while keeping memory consumption

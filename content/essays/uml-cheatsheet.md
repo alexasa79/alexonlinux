@@ -39,25 +39,19 @@ This is how the User class uses the Resource class.
 
 ![image]({{< relurl "assets/2011-09-19T184844 UML cheatsheet/whole_part_managed-512a43292f.png" >}})
 
-Here, the Whole class contains and manages the Part class. This type of relation can be
-extended to one of the following:
+Here, the Whole class contains and manages the Part class. This type of relation
+can be extended to one of the following:
 
-- One to One
-- One to Many
-- Many to One
-- Many to Many
+- One to One One to Many Many to One Many to Many
 
 ## References
 
 ![image]({{< relurl "assets/2011-09-19T184844 UML cheatsheet/whole_part_unmanaged-be04f39fff.png" >}})
 
-Here, the Whole class references to the Part class, but does not manage it. Again, can
-be extended with:
+Here, the Whole class references to the Part class, but does not manage it.
+Again, can be extended with:
 
-- One to One
-- One to Many
-- Many to One
-- Many to Many
+- One to One One to Many Many to One Many to Many
 
 This is enough information for now. I’ll probably extend it over time. In any
 case, please post your corrections and suggestions.

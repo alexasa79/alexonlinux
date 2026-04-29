@@ -11,7 +11,8 @@ among multiple cores. Benefits of such configuration seems to be obvious.
 Interrupts consume CPU time and by spreading them on all cores we avoid
 bottle-necks.
 
-I’ve written an [article explaining this mechanism in greater detail]({{< relref "essays/smp-affinity-and-proper-interrupt-handling-in-linux.md" >}}). Yet let me
+I’ve written an [article explaining this mechanism in greater detail]({{< relref
+"essays/smp-affinity-and-proper-interrupt-handling-in-linux.md" >}}). Yet let me
 remind you how it works in two words.
 
 Every x86 motherboard has a chip called IO-APIC. This is a device that controls
@@ -46,8 +47,8 @@ their cache. This will cause [cache
 coherency](http://en.wikipedia.org/wiki/Cache_coherence) problems (cache
 misses). And as you can learn from the [article I’ve written on misaligned
 memory accesses]({{< relref "essays/aligned-vs-unaligned-memory-access.md" >}}),
-accessing memory that is
-not in cache can take up to 30 times more time than accessing cached RAM.
+accessing memory that is not in cache can take up to 30 times more time than
+accessing cached RAM.
 
 Moreover, assuming TCP connection object is properly protected using
 synchronization techniques, one of the cores will inevitably have to wait for
@@ -57,10 +58,9 @@ My point is that round-robin style interrupt delivery can be quiet nasty on
 performance. It is much better to deliver interrupts from certain device to
 given core.
 
-Luckily, `smp_affinity` interface, that I mentioned in my [old
-article]({{< relref "essays/smp-affinity-and-proper-interrupt-handling-in-linux.md" >}}),
-allows you to
-bind interrupts from certain device to certain (single) core.
+Luckily, `smp_affinity` interface, that I mentioned in my [old article]({{<
+relref "essays/smp-affinity-and-proper-interrupt-handling-in-linux.md" >}}),
+allows you to bind interrupts from certain device to certain (single) core.
 
 On some computers IO-APIC does not support logical delivery mode. This can be
 because of buggy BIOS or too many CPUs. On such computers physical interrupt

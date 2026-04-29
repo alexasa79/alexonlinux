@@ -14,8 +14,8 @@ techniques used to fool a debugger and make the code undebuggable.
 
 Anyway, here’s something else that I learned during one of the interviews.
 
-I was asked to implement insertion into a linked list in C. Each list node has
-a number (`num`). Numbers in the list should be sorted in ascending order – node
+I was asked to implement insertion into a linked list in C. Each list node has a
+number (`num`). Numbers in the list should be sorted in ascending order – node
 with lowest number should be first. Here is my naive implementation.
 
 ```c
@@ -97,8 +97,8 @@ node. Thus we don’t need two pointers anymore.
 
 Also, this version uses pointer to pointer to node to traverse through the list.
 We don’t insert the node in the while loop anymore. Purpose of the while loop is
-to find right place for the new node. This spares `if` statement that tests if the
-list is empty and `if` statement in the loop.
+to find right place for the new node. This spares `if` statement that tests if
+the list is empty and `if` statement in the loop.
 
 Finally, once `tmp` points to the right place, we insert the node.
 
