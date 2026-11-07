@@ -1,11 +1,9 @@
 # Alex on Linux
 
-This repository now contains the Hugo site for Alex on Linux.
+Source for <https://alexonlinux.com/>, built with Hugo and the PaperMod theme.
 
-The site uses the `hugo-PaperMod` theme as a Git submodule under
-`themes/hugo-PaperMod`. It is pinned to PaperMod `v8.0` because the installed
-Hugo version is `0.123.7`; newer PaperMod releases require Hugo `0.146.0` or
-newer.
+The site uses Hugo Extended `0.123.7` and PaperMod `v8.0`, pinned by the Git
+submodule under `themes/hugo-PaperMod`.
 
 ## Content layout
 
@@ -13,43 +11,27 @@ newer.
 - `static/assets/`: local assets referenced by essays
 - `original/`: preserved archive of the broader recovered material
 
-To run locally:
+## Local preview
+
+Install Hugo Extended `0.123.7`, then run:
 
 ```bash
-hugo server --bind 0.0.0.0 --baseURL http://localhost:1313/
+git submodule update --init --recursive
+hugo server --buildDrafts --baseURL http://localhost:1313/
 ```
 
-## Codeberg Pages
+## Publishing
 
-The canonical URL is:
+Pushing to `main` builds and deploys the website through GitHub Actions to GitHub
+Pages. The build includes drafts, matching the previous publishing script.
 
-- `https://alexonlinux.com/`
+To rebuild the latest GitHub `main` without a new commit, run `./publish.sh` with
+the GitHub CLI installed and authenticated. Local, unpushed changes are not
+included in that rebuild.
 
-The source branch is `main`. Generated output is published to the `pages`
-branch in the same Codeberg repository.
+The workflow pins Hugo `0.123.7` and verifies the downloaded archive's checksum.
+It keeps the production `baseURL` from `hugo.yaml` so existing article and asset
+URLs remain unchanged.
 
-The custom domains are listed in `static/.domains` so Hugo copies them to
-`public/.domains` during the build:
-
-- `alexonlinux.com`
-- `www.alexonlinux.com`
-
-To publish:
-
-```bash
-./publish.sh
-```
-
-The script removes stale local output, builds the Hugo site, creates or reuses a
-local `../pages` worktree for the generated `pages` branch, commits generated
-changes if there are any, and pushes `HEAD:pages` to `origin`.
-
-The DNS setup should follow the same pattern used by the `alchemy-lang` site,
-with the domain records pointing Codeberg Pages at this repository's Pages
-target.
-
-Sources:
-
-- https://docs.codeberg.org/codeberg-pages/
-- https://docs.codeberg.org/codeberg-pages/forgejo-actions/
-- https://docs.codeberg.org/codeberg-pages/using-custom-domain/
+The custom domain is configured in the repository's Pages settings. DNS must
+point `alexonlinux.com` and `www.alexonlinux.com` to GitHub Pages.
